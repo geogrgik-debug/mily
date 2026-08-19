@@ -1,0 +1,26 @@
+# Таймкоды моментов внутри скачанных матчей.
+#
+# at   — 90 | "1:30" | "01:02:03" | "1:02.5"
+# dur  — длина момента в секундах (нарезчик сам добавит запас с краёв)
+# tag  — попадает в имя файла
+#
+# Как заполнять: открыл матч, проехал по нему, выписал тайминги.
+# Полчаса работы дают библиотеку на неделю постинга.
+
+marks:
+  - source: clips/raw/wc26_final_esp_arg.mp4
+    player: messi
+    moments:
+      - { at: "00:00", dur: 5, tag: "dribble" }
+      - { at: "00:00", dur: 4, tag: "pass" }
+      - { at: "00:00", dur: 6, tag: "fullwhistle" }   # реакция на финальный свисток
+
+  - source: clips/raw/wc26_final_esp_arg.mp4
+    player: ferran
+    moments:
+      - { at: "00:00", dur: 6, tag: "goal" }          # победный в д.в.
+
+  - source: clips/raw/wc26_messi_group.mp4
+    player: messi
+    moments:
+      - { at: "00:00", dur: 5, tag: "goal" }

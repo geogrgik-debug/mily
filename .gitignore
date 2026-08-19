@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# медиа в гит не тащим
+clips/raw/*
+clips/cut/*
+out/*
+!clips/raw/.gitkeep
+!clips/cut/.gitkeep
+!out/.gitkeep
