@@ -17,6 +17,7 @@ from . import brand as brand_mod
 from . import promo as promo_mod
 from . import ledger as ledger_mod
 from . import twitch as twitch_mod
+from . import inspect as inspect_mod
 from .shell import MissingBinary
 
 CONFIG_DIR = Path("config")
@@ -308,7 +309,17 @@ def cmd_twitch(args) -> int:
 
     if args.action == "search":
         try:
-            clips = twitch_mod.fetch_clips(args.game, days=args.days, limit=args.limit)
+            if args.streamers:
+                logins = twitch_mod.load_streamers(Path(args.streamers_file))
+                if not logins:
+                    print(f"[!] список стримеров пуст: {args.streamers_file}",
+                          file=sys.stderr)
+                    return 1
+                clips = twitch_mod.fetch_by_streamers(
+                    logins, days=args.days, per_streamer=args.per_streamer)
+            else:
+                clips = twitch_mod.fetch_clips(
+                    args.game, days=args.days, limit=args.limit)
         except twitch_mod.TwitchError as exc:
             print(f"[!] {exc}", file=sys.stderr)
             return 1
@@ -325,7 +336,7 @@ def cmd_twitch(args) -> int:
         print(f"найдено {len(clips)}, после отсева {len(picked)} -> {manifest}\n")
         for c in picked[:15]:
             print(f"  {c.views:>8,}  {c.duration:>5.1f}c  {c.language:<3}  "
-                  f"{c.title[:52]}")
+                  f"{c.broadcaster[:16]:<16}  {c.title[:40]}")
         if len(picked) > 15:
             print(f"  ... и ещё {len(picked) - 15}")
         return 0
@@ -340,6 +351,29 @@ def cmd_twitch(args) -> int:
         return 0 if got else 1
 
     return 1
+
+
+def cmd_inspect(args) -> int:
+    src = Path(args.src)
+    files = [src] if src.is_file() else sorted(src.glob(args.glob))
+    if not files:
+        print(f"[!] нечего разбирать: {src}", file=sys.stderr)
+        return 1
+
+    for f in files:
+        r = inspect_mod.inspect(f, out_dir=Path(args.out), frames=args.frames,
+                                zones=not args.no_zones)
+        print(f"\n=== {f.name} ===")
+        print(f"  {r.width}x{r.height}  {r.aspect}")
+        print(f"  {r.duration:.1f} c, {r.fps:.0f} fps")
+        print(f"  звук: {'есть' if r.has_audio else 'НЕТ'}"
+              + (f", средний уровень {r.mean_volume:.1f} dB"
+                 if r.mean_volume is not None else ""))
+        for w in r.warnings():
+            print(f"  [!] {w}")
+        if r.sheet:
+            print(f"  лист кадров: {r.sheet}")
+    return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -435,8 +469,22 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--min-seconds", type=float, default=10.0)
     p.add_argument("--max-seconds", type=float, default=60.0)
     p.add_argument("--lang", help="языки через запятую, например ru,en")
+    p.add_argument("--streamers", action="store_true",
+                   help="брать по списку стримеров, а не глобальный топ игры")
+    p.add_argument("--streamers-file", default=str(twitch_mod.STREAMERS))
+    p.add_argument("--per-streamer", type=int, default=20,
+                   help="сколько клипов брать у каждого")
     p.add_argument("--manifest", default=str(twitch_mod.MANIFEST))
     p.set_defaults(func=cmd_twitch)
+
+    p = sub.add_parser("inspect", help="разобрать ролик в лист кадров и цифры")
+    p.add_argument("src", help="файл или папка")
+    p.add_argument("--glob", default="*.mp4")
+    p.add_argument("--frames", type=int, default=8)
+    p.add_argument("--out", default=str(inspect_mod.OUT_DIR))
+    p.add_argument("--no-zones", action="store_true",
+                   help="не подсвечивать зоны интерфейса")
+    p.set_defaults(func=cmd_inspect)
 
     return parser
 

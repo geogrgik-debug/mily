@@ -31,6 +31,10 @@ PAGE_SIZE = 100
 
 RAW_DIR = Path("clips/raw")
 MANIFEST = Path("config/twitch_clips.json")
+STREAMERS = Path("config/streamers.yaml")
+
+# Get Users принимает до 100 логинов за запрос.
+USERS_PER_CALL = 100
 
 
 class TwitchError(RuntimeError):
@@ -113,6 +117,40 @@ def game_id(name: str, client_id: str, token: str) -> str:
     return items[0]["id"]
 
 
+def get_user_ids(logins: list[str], client_id: str, token: str) -> dict[str, str]:
+    """Логины -> идентификаторы. Пропавшие в ответе просто отсутствуют."""
+    found: dict[str, str] = {}
+
+    for i in range(0, len(logins), USERS_PER_CALL):
+        batch = [l.strip().lower() for l in logins[i:i + USERS_PER_CALL] if l.strip()]
+        if not batch:
+            continue
+        data = api_get("users", {"login": batch}, client_id, token)
+        for row in data.get("data") or []:
+            found[row["login"].lower()] = row["id"]
+
+    return found
+
+
+def load_streamers(path: Path = STREAMERS) -> list[str]:
+    """Список логинов из config/streamers.yaml."""
+    import yaml
+
+    if not path.exists():
+        raise TwitchError(f"нет {path} — заведи список стримеров")
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+    logins = []
+    for item in data.get("streamers", []):
+        if isinstance(item, dict):
+            login = item.get("login")
+        else:
+            login = item
+        if login:
+            logins.append(str(login).strip().lower())
+    return logins
+
+
 def parse_clip(row: dict) -> Clip:
     return Clip(
         id=row.get("id", ""),
@@ -175,6 +213,50 @@ def fetch_clips(
             break
 
     return out[:limit]
+
+
+def fetch_by_streamers(
+    logins: list[str],
+    *,
+    days: int = 7,
+    per_streamer: int = 20,
+    client_id: str | None = None,
+    token: str | None = None,
+) -> list[Clip]:
+    """Топ клипов по каждому стримеру из списка.
+
+    Смысл в узнаваемости: для аудитории СНГ знакомое лицо в кадре весит
+    больше, чем то, насколько момент смешной сам по себе. Поэтому берём
+    не глобальный топ по игре, а лучшее у конкретных людей.
+    """
+    if client_id is None or token is None:
+        cid, secret = credentials()
+        client_id = cid
+        token = app_token(cid, secret)
+
+    ids = get_user_ids(logins, client_id, token)
+    missing = [l for l in logins if l not in ids]
+    if missing:
+        print(f"[twitch] не найдены на площадке: {', '.join(missing)}")
+
+    ended = datetime.now(timezone.utc)
+    started = ended - timedelta(days=days)
+
+    out: list[Clip] = []
+    for login, uid in ids.items():
+        data = api_get("clips", {
+            "broadcaster_id": uid,
+            "started_at": started.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "ended_at": ended.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "first": min(PAGE_SIZE, per_streamer),
+        }, client_id, token)
+
+        rows = (data.get("data") or [])[:per_streamer]
+        clips = [parse_clip(r) for r in rows]
+        out.extend(clips)
+        print(f"[twitch] {login:<20} клипов: {len(clips)}")
+
+    return out
 
 
 def select(
