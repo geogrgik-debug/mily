@@ -13,6 +13,7 @@ from . import cut as cut_mod
 from . import variate as variate_mod
 from . import anim as anim_mod
 from . import finish as finish_mod
+from . import brand as brand_mod
 from .shell import MissingBinary
 
 CONFIG_DIR = Path("config")
@@ -158,6 +159,35 @@ def cmd_finish(args) -> int:
     return 0 if done else 1
 
 
+def cmd_brand(args) -> int:
+    image = Path(args.image)
+    if not image.exists():
+        print(f"[!] нет баннера: {image}", file=sys.stderr)
+        return 1
+
+    src = Path(args.src)
+    files = [src] if src.is_file() else sorted(src.glob(args.glob))
+    if not files:
+        print(f"[!] нечего обрабатывать: {src}", file=sys.stderr)
+        return 1
+
+    out_dir = Path(args.out)
+    if args.position:
+        banner = brand_mod.Banner(
+            image=image,
+            position=args.position,
+            width_ratio=args.width,
+            opacity=args.opacity,
+        )
+        done = [d for f in files
+                if (d := brand_mod.apply(f, out_dir / f.name, banner, crf=args.crf))]
+    else:
+        done = brand_mod.apply_batch(files, out_dir, image, seed=args.seed, crf=args.crf)
+
+    print(f"\nс баннером: {len(done)} из {len(files)}  (в {out_dir}/)")
+    return 0 if done else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mily",
@@ -202,6 +232,19 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--out", default="out/finished", help="куда складывать")
     p.add_argument("--crf", type=int, default=18)
     p.set_defaults(func=cmd_finish)
+
+    p = sub.add_parser("brand", help="наложить баннер с учётом безопасных зон")
+    p.add_argument("src", help="файл или папка")
+    p.add_argument("--image", required=True, help="PNG баннера, желательно с альфой")
+    p.add_argument("--glob", default="*.mp4")
+    p.add_argument("--out", default="out/branded")
+    p.add_argument("--position", choices=list(brand_mod.POSITIONS),
+                   help="фиксировать позицию; без него разводится по роликам")
+    p.add_argument("--width", type=float, default=0.34, help="ширина от кадра")
+    p.add_argument("--opacity", type=float, default=1.0)
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--crf", type=int, default=20)
+    p.set_defaults(func=cmd_brand)
 
     return parser
 
