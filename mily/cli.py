@@ -14,6 +14,7 @@ from . import variate as variate_mod
 from . import anim as anim_mod
 from . import finish as finish_mod
 from . import brand as brand_mod
+from . import promo as promo_mod
 from .shell import MissingBinary
 
 CONFIG_DIR = Path("config")
@@ -188,6 +189,33 @@ def cmd_brand(args) -> int:
     return 0 if done else 1
 
 
+def cmd_promo(args) -> int:
+    spec = promo_mod.PromoSpec(
+        banner=Path(args.banner),
+        area_ratio=args.area,
+        speed=args.speed,
+    )
+
+    src = Path(args.src)
+    files = [src] if src.is_file() else sorted(src.glob(args.glob))
+    if not files:
+        print(f"[!] нечего обрабатывать: {src}", file=sys.stderr)
+        return 1
+
+    out_dir = Path(args.out)
+    done, rejected = [], []
+    for f in files:
+        try:
+            done.append(promo_mod.apply(f, out_dir / f.name, spec, crf=args.crf))
+        except promo_mod.RuleViolation as exc:
+            rejected.append(str(exc))
+
+    for msg in rejected:
+        print(f"[отказ] {msg}", file=sys.stderr)
+    print(f"\nготово: {len(done)}, отклонено: {len(rejected)}  (в {out_dir}/)")
+    return 0 if done else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mily",
@@ -245,6 +273,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--crf", type=int, default=20)
     p.set_defaults(func=cmd_brand)
+
+    p = sub.add_parser("promo", help="вставить баннер кампании по её правилам")
+    p.add_argument("src", help="файл или папка")
+    p.add_argument("--banner", required=True, help="анимированный баннер СО ЗВУКОМ")
+    p.add_argument("--glob", default="*.mp4")
+    p.add_argument("--out", default="out/promo")
+    p.add_argument("--area", type=float, default=promo_mod.DEFAULT_AREA_RATIO,
+                   help=f"доля площади кадра (минимум {promo_mod.MIN_AREA_RATIO})")
+    p.add_argument("--speed", type=float, default=1.0,
+                   help=f"ускорение баннера (максимум {promo_mod.MAX_SPEED})")
+    p.add_argument("--crf", type=int, default=20)
+    p.set_defaults(func=cmd_promo)
 
     return parser
 
