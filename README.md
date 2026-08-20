@@ -244,6 +244,46 @@ python -m mily ledger stats                     # отдача и срок жи�
 `stats` считает это по факту. У забаненных срок считается до бана, иначе
 мёртвые продолжали бы стареть и занижать среднюю отдачу.
 
+## Клипы с Twitch
+
+Клип на твиче — это уже отобранный момент: кто-то смотрел стрим и нажал
+«клип», потому что там что-то произошло. Отбор сделан зрителями, у каждого
+клипа есть счётчик просмотров. Ни Whisper, ни скоринг для этого не нужны.
+
+Ключи с dev.twitch.tv, нужен только app access token:
+
+```bash
+export TWITCH_CLIENT_ID=...
+export TWITCH_CLIENT_SECRET=...
+```
+
+```bash
+python -m mily twitch search --game "Counter-Strike" --days 7 \
+    --min-views 1000 --min-seconds 10 --max-seconds 60 --lang ru,en
+python -m mily twitch fetch --limit 50
+```
+
+`search` собирает топ за период и пишет `config/twitch_clips.json`,
+`fetch` качает по манифесту в `clips/raw/`. Имя файла начинается с числа
+просмотров, поэтому сортировка сразу осмысленная.
+
+Нижняя граница длины стоит на 10 секундах не просто так: ролики короче
+кампания не принимает, а клип короче этого уже не растянуть.
+
+## Полная цепочка под клиппинг
+
+```bash
+python -m mily twitch search --game "Counter-Strike" --days 7 --min-views 1000
+python -m mily twitch fetch --limit 50
+python -m mily variate -n 2 --glob "*.mp4"      # сбить отпечаток
+python -m mily promo out/... --banner promo.mp4  # баннер кампании
+python -m mily ledger post --name phone01 --video ...
+```
+
+`variate` здесь нужен не для растяжки на сетку, а потому что тот же самый
+клип качают и заливают десятки других клипперов. Без обработки площадка
+видит дубликат и режет охваты.
+
 ## Что стоит помнить
 
 - **Музыка ловится точнее видео.** Трек матчится мгновенно, поэтому звук

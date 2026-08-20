@@ -16,6 +16,7 @@ from . import finish as finish_mod
 from . import brand as brand_mod
 from . import promo as promo_mod
 from . import ledger as ledger_mod
+from . import twitch as twitch_mod
 from .shell import MissingBinary
 
 CONFIG_DIR = Path("config")
@@ -302,6 +303,45 @@ def cmd_ledger(args) -> int:
     return 1
 
 
+def cmd_twitch(args) -> int:
+    manifest = Path(args.manifest)
+
+    if args.action == "search":
+        try:
+            clips = twitch_mod.fetch_clips(args.game, days=args.days, limit=args.limit)
+        except twitch_mod.TwitchError as exc:
+            print(f"[!] {exc}", file=sys.stderr)
+            return 1
+
+        picked = twitch_mod.select(
+            clips,
+            min_views=args.min_views,
+            min_seconds=args.min_seconds,
+            max_seconds=args.max_seconds,
+            languages=args.lang.split(",") if args.lang else None,
+        )
+        twitch_mod.save_manifest(picked, manifest)
+
+        print(f"найдено {len(clips)}, после отсева {len(picked)} -> {manifest}\n")
+        for c in picked[:15]:
+            print(f"  {c.views:>8,}  {c.duration:>5.1f}c  {c.language:<3}  "
+                  f"{c.title[:52]}")
+        if len(picked) > 15:
+            print(f"  ... и ещё {len(picked) - 15}")
+        return 0
+
+    if args.action == "fetch":
+        if not manifest.exists():
+            print(f"[!] нет {manifest} — сначала `twitch search`", file=sys.stderr)
+            return 1
+        clips = twitch_mod.load_manifest(manifest)[: args.limit]
+        got = twitch_mod.download(clips)
+        print(f"\nскачано: {len(got)} из {len(clips)}")
+        return 0 if got else 1
+
+    return 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mily",
@@ -385,6 +425,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--rate", type=float, default=ledger_mod.DEFAULT_RATE,
                    help="ставка за 1000 просмотров для прикидки")
     p.set_defaults(func=cmd_ledger)
+
+    p = sub.add_parser("twitch", help="клипы с Twitch: поиск и скачивание")
+    p.add_argument("action", choices=["search", "fetch"])
+    p.add_argument("--game", default="Counter-Strike", help="точное название игры")
+    p.add_argument("--days", type=int, default=7, help="окно поиска в днях")
+    p.add_argument("--limit", type=int, default=100)
+    p.add_argument("--min-views", type=int, default=500)
+    p.add_argument("--min-seconds", type=float, default=10.0)
+    p.add_argument("--max-seconds", type=float, default=60.0)
+    p.add_argument("--lang", help="языки через запятую, например ru,en")
+    p.add_argument("--manifest", default=str(twitch_mod.MANIFEST))
+    p.set_defaults(func=cmd_twitch)
 
     return parser
 
