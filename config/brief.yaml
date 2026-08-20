@@ -1,0 +1,25 @@
+# Бриф формата под оригинальную анимацию.
+#
+# Это единственный файл, который заполняется головой. Дальше:
+#   mily anim prompt   -> заготовка запроса на раскадровку
+#   (ответ модели вернуть сюда, в ключ shots)
+#   mily anim shots    -> shots.json
+#   ... генерация сцен в Higgsfield, файлы в clips/anim/ ...
+#   mily anim assemble -> assemble.jsx для After Effects
+
+title: "untitled"
+logline: "О чём формат в одном предложении."
+character: "Кто в кадре. Один и тот же персонаж из ролика в ролик — это и есть формат."
+style: "Визуальный стиль: материал, палитра, референсы."
+tone: "Тон: мрачный, ироничный, тёплый."
+target_seconds: 30
+
+# Заполняется после раскадровки. file проставляется после генерации.
+shots: []
+#  - id: hook
+#    prompt: "low angle shot, neon-lit alley, rain, cinematic, moody"
+#    duration: 3
+#    caption: "он не должен был это находить"
+#    camera: "push in"
+#    character: "vex"
+#    file: ""

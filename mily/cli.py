@@ -11,6 +11,7 @@ import yaml
 from . import fetch as fetch_mod
 from . import cut as cut_mod
 from . import variate as variate_mod
+from . import anim as anim_mod
 from .shell import MissingBinary
 
 CONFIG_DIR = Path("config")
@@ -96,6 +97,42 @@ def cmd_plan(args) -> int:
     return 0
 
 
+def cmd_anim(args) -> int:
+    brief_path = CONFIG_DIR / "brief.yaml"
+    shots_path = Path("config/shots.json")
+
+    if args.step == "prompt":
+        brief = anim_mod.load_brief(brief_path)
+        print(anim_mod.prompt_template(brief, args.scenes))
+        return 0
+
+    if args.step == "shots":
+        brief = anim_mod.load_brief(brief_path)
+        if not brief.shots:
+            print("[!] в brief.yaml пустой shots — сначала сделай раскадровку",
+                  file=sys.stderr)
+            return 1
+        anim_mod.save_shots(brief, shots_path)
+        print(f"раскадровка записана: {shots_path} ({len(brief.shots)} сцен)")
+        return 0
+
+    if args.step == "assemble":
+        data = anim_mod.load_shots(shots_path)
+        footage = Path(args.footage)
+        try:
+            script = anim_mod.build_aescript(data, footage)
+        except ValueError as exc:
+            print(f"[!] {exc}", file=sys.stderr)
+            return 1
+        out = Path(args.out)
+        out.write_text(script, encoding="utf-8")
+        print(f"скрипт сборки готов: {out}")
+        print("в After Effects: File > Scripts > Run Script File")
+        return 0
+
+    return 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mily",
@@ -125,6 +162,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--limit", type=int, default=2, help="сколько клипов показать")
     p.add_argument("--seed", type=int, default=0)
     p.set_defaults(func=cmd_plan)
+
+    p = sub.add_parser("anim", help="оригинальная анимация: бриф -> сцены -> сборка")
+    p.add_argument("step", choices=["prompt", "shots", "assemble"])
+    p.add_argument("--scenes", type=int, default=8, help="сцен в раскадровке")
+    p.add_argument("--footage", default="clips/anim", help="где лежат сгенерированные сцены")
+    p.add_argument("--out", default="out/assemble.jsx", help="куда писать скрипт AE")
+    p.set_defaults(func=cmd_anim)
 
     return parser
 
