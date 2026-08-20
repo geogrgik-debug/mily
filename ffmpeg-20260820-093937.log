@@ -1,0 +1,174 @@
+ffmpeg started on 2026-08-20 at 09:39:37
+Report written to "ffmpeg-20260820-093937.log"
+Log level: 48
+Successfully parsed a group of options.
+Parsing a group of options: input url /tmp/claude-0/-home-user-mily/3cef4b96-ad92-5eed-bb00-48acec4a523a/scratchpad/gen.mp4.
+Applying option ss (set the start time offset) with argument 2.
+Successfully parsed a group of options.
+Opening an input file: /tmp/claude-0/-home-user-mily/3cef4b96-ad92-5eed-bb00-48acec4a523a/scratchpad/gen.mp4.
+[AVFormatContext @ 0x55a809aa8f40] Opening '/tmp/claude-0/-home-user-mily/3cef4b96-ad92-5eed-bb00-48acec4a523a/scratchpad/gen.mp4' for reading
+[file @ 0x55a809aa9640] Setting default whitelist 'file,crypto,data'
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8f40] Format mov,mp4,m4a,3gp,3g2,mj2 probed with size=2048 and score=100
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8f40] ISO: File Type Major Brand: isom
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8f40] Unknown dref type 0x206c7275 size 12
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8f40] Processing st: 0, edit list 0 - media time: 0, duration: 61440
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8f40] Before avformat_find_stream_info() pos: 342060 bytes read:34053 seeks:1 nb_streams:1
+[h264 @ 0x55a809aa9fc0] nal_unit_type: 7(SPS), nal_ref_idc: 3
+[h264 @ 0x55a809aa9fc0] Decoding VUI
+[h264 @ 0x55a809aa9fc0] nal_unit_type: 8(PPS), nal_ref_idc: 3
+[h264 @ 0x55a809aa9fc0] nal_unit_type: 7(SPS), nal_ref_idc: 3
+[h264 @ 0x55a809aa9fc0] Decoding VUI
+[h264 @ 0x55a809aa9fc0] nal_unit_type: 8(PPS), nal_ref_idc: 3
+[h264 @ 0x55a809aa9fc0] nal_unit_type: 6(SEI), nal_ref_idc: 0
+[h264 @ 0x55a809aa9fc0] nal_unit_type: 5(IDR), nal_ref_idc: 3
+[h264 @ 0x55a809aa9fc0] Format yuv420p chosen by get_format().
+[h264 @ 0x55a809aa9fc0] Reinit context to 1088x1920, pix_fmt: yuv420p
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8f40] All info found
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8f40] After avformat_find_stream_info() pos: 10938 bytes read:66821 seeks:2 frames:1
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/tmp/claude-0/-home-user-mily/3cef4b96-ad92-5eed-bb00-48acec4a523a/scratchpad/gen.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf60.16.100
+  Duration: 00:00:04.00, start: 0.000000, bitrate: 684 kb/s
+  Stream #0:0[0x1](und), 1, 1/15360: Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p(progressive), 1080x1920 [SAR 1:1 DAR 9:16], 681 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc60.31.102 libx264
+Successfully opened the file.
+Parsing a group of options: output url -.
+Applying option vframes (set the number of video frames to output) with argument 1.
+Applying option vf (set video filters) with argument signalstats.
+Applying option f (force format) with argument null.
+Successfully parsed a group of options.
+Opening an output file: -.
+[out#0/null @ 0x55a809aaef00] No explicit maps, mapping streams automatically...
+[vost#0:0/wrapped_avframe @ 0x55a809b28cc0] Created video stream from input stream 0:0
+detected 4 logical cores
+[h264 @ 0x55a809b93d40] nal_unit_type: 7(SPS), nal_ref_idc: 3
+[h264 @ 0x55a809b93d40] Decoding VUI
+[h264 @ 0x55a809b93d40] nal_unit_type: 8(PPS), nal_ref_idc: 3
+Successfully opened the file.
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))
+Press [q] to stop, [?] for help
+[NULL @ 0x55a809aa9fc0] nal_unit_type: 7(SPS), nal_ref_idc: 3
+[NULL @ 0x55a809aa9fc0] Decoding VUI
+[NULL @ 0x55a809aa9fc0] nal_unit_type: 8(PPS), nal_ref_idc: 3
+[h264 @ 0x55a809b93d40] nal_unit_type: 6(SEI), nal_ref_idc: 0
+[h264 @ 0x55a809b93d40] nal_unit_type: 5(IDR), nal_ref_idc: 3
+[h264 @ 0x55a809b93d40] Format yuv420p chosen by get_format().
+[h264 @ 0x55a809b93d40] Reinit context to 1088x1920, pix_fmt: yuv420p
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[graph 0 input from stream 0:0 @ 0x55a809b6fec0] Setting 'video_size' to value '1080x1920'
+[graph 0 input from stream 0:0 @ 0x55a809b6fec0] Setting 'pix_fmt' to value '0'
+[graph 0 input from stream 0:0 @ 0x55a809b6fec0] Setting 'time_base' to value '1/15360'
+[graph 0 input from stream 0:0 @ 0x55a809b6fec0] Setting 'pixel_aspect' to value '1/1'
+[graph 0 input from stream 0:0 @ 0x55a809b6fec0] Setting 'frame_rate' to value '30/1'
+[graph 0 input from stream 0:0 @ 0x55a809b6fec0] w:1080 h:1920 pixfmt:yuv420p tb:1/15360 fr:30/1 sar:1/1
+[AVFilterGraph @ 0x55a809ba6780] query_formats: 4 queried, 3 merged, 0 already done, 0 delayed
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b93d40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809ba5800] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b98880] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809bcea40] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+[h264 @ 0x55a809b59fc0] nal_unit_type: 1(Coded slice of a non-IDR picture), nal_ref_idc: 2
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf60.16.100
+  Stream #0:0(und), 0, 1/30: Video: wrapped_avframe, yuv420p(progressive), 1080x1920 [SAR 1:1 DAR 9:16], q=2-31, 200 kb/s, 30 fps, 30 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc60.31.102 wrapped_avframe
+[out#0/null @ 0x55a809aaef00] sq: send 0 ts 0.0333333
+[out#0/null @ 0x55a809aaef00] sq: 0 frames_max 1 reached
+[out#0/null @ 0x55a809aaef00] sq: finish 0; head ts 0.0333333
+[out#0/null @ 0x55a809aaef00] sq: finish queue
+[out#0/null @ 0x55a809aaef00] sq: receive 0 ts 0.0333333 queue head 0 ts 0.0333333
+[out#0/null @ 0x55a809aaef00] sq: 0 EOF
+[out#0/null @ 0x55a809aaef00] sq: finish queue
+frame=    0 fps=0.0 q=-0.0 size=       0kB time=00:00:00.00 bitrate=N/A speed=   0x    No more output streams to write to, finishing.
+[vist#0:0/h264 @ 0x55a809aaae40] Decoder thread received EOF packet
+[out#0/null @ 0x55a809aaef00] All streams finished
+[out#0/null @ 0x55a809aaef00] Terminating muxer thread
+[vist#0:0/h264 @ 0x55a809aaae40] Decoder returned EOF, finishing
+[vist#0:0/h264 @ 0x55a809aaae40] Terminating decoder thread
+[out#0/null @ 0x55a809aaef00] sq: 0 EOF
+[out#0/null @ 0x55a809aaef00] sq: finish queue
+[out#0/null @ 0x55a809aaef00] sq: 0 EOF
+[out#0/null @ 0x55a809aaef00] sq: finish queue
+[out#0/null @ 0x55a809aaef00] sq: 0 EOF
+[out#0/null @ 0x55a809aaef00] sq: finish queue
+[out#0/null @ 0x55a809aaef00] Output file #0 (pipe:):
+[out#0/null @ 0x55a809aaef00]   Output stream #0:0 (video): 1 frames encoded; 1 packets muxed (480 bytes); 
+[out#0/null @ 0x55a809aaef00]   Total: 1 packets (480 bytes) muxed
+[out#0/null @ 0x55a809aaef00] video:0kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+frame=    1 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.00 bitrate=N/A speed=   0x    
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8e40] Terminating demuxer thread
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8e40] Input file #0 (/tmp/claude-0/-home-user-mily/3cef4b96-ad92-5eed-bb00-48acec4a523a/scratchpad/gen.mp4):
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8e40]   Input stream #0:0 (video): 67 packets read (220306 bytes); 65 frames decoded; 0 decode errors; 
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x55a809aa8e40]   Total: 67 packets (220306 bytes) demuxed
+[AVIOContext @ 0x55a809ab1840] Statistics: 263429 bytes read, 2 seeks

@@ -12,6 +12,7 @@ from . import fetch as fetch_mod
 from . import cut as cut_mod
 from . import variate as variate_mod
 from . import anim as anim_mod
+from . import finish as finish_mod
 from .shell import MissingBinary
 
 CONFIG_DIR = Path("config")
@@ -133,6 +134,30 @@ def cmd_anim(args) -> int:
     return 1
 
 
+def cmd_finish(args) -> int:
+    try:
+        look = finish_mod.FilmLook.preset(args.preset)
+    except ValueError as exc:
+        print(f"[!] {exc}", file=sys.stderr)
+        return 1
+
+    src = Path(args.src)
+    out_dir = Path(args.out)
+
+    files = [src] if src.is_file() else sorted(src.glob(args.glob))
+    if not files:
+        print(f"[!] нечего обрабатывать: {src}", file=sys.stderr)
+        return 1
+
+    done = 0
+    for f in files:
+        if finish_mod.apply(f, out_dir / f.name, look, crf=args.crf):
+            done += 1
+
+    print(f"\nобработано: {done} из {len(files)}  (в {out_dir}/)")
+    return 0 if done else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mily",
@@ -169,6 +194,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--footage", default="clips/anim", help="где лежат сгенерированные сцены")
     p.add_argument("--out", default="out/assemble.jsx", help="куда писать скрипт AE")
     p.set_defaults(func=cmd_anim)
+
+    p = sub.add_parser("finish", help="финишный проход: убрать следы генерации")
+    p.add_argument("src", help="файл или папка со сценами")
+    p.add_argument("--preset", default="medium", choices=list(finish_mod.PRESETS))
+    p.add_argument("--glob", default="*.mp4", help="фильтр, если src это папка")
+    p.add_argument("--out", default="out/finished", help="куда складывать")
+    p.add_argument("--crf", type=int, default=18)
+    p.set_defaults(func=cmd_finish)
 
     return parser
 
