@@ -15,6 +15,7 @@ from . import anim as anim_mod
 from . import finish as finish_mod
 from . import brand as brand_mod
 from . import promo as promo_mod
+from . import ledger as ledger_mod
 from .shell import MissingBinary
 
 CONFIG_DIR = Path("config")
@@ -216,6 +217,91 @@ def cmd_promo(args) -> int:
     return 0 if done else 1
 
 
+def cmd_ledger(args) -> int:
+    conn = ledger_mod.connect(Path(args.db))
+
+    if args.action == "account":
+        if not args.name:
+            print("[!] нужен --name", file=sys.stderr)
+            return 1
+        ledger_mod.add_account(conn, args.name, args.device or "", args.proxy or "")
+        print(f"аккаунт {args.name} заведён")
+        return 0
+
+    if args.action == "ban":
+        if not args.name:
+            print("[!] нужен --name", file=sys.stderr)
+            return 1
+        ok = ledger_mod.ban_account(conn, args.name)
+        print(f"{args.name}: {'помечен забаненным' if ok else 'уже забанен или не найден'}")
+        return 0 if ok else 1
+
+    if args.action == "post":
+        if not (args.name and args.video):
+            print("[!] нужны --name и --video", file=sys.stderr)
+            return 1
+        try:
+            pid = ledger_mod.add_post(conn, args.name, args.video)
+        except ValueError as exc:
+            print(f"[!] {exc}", file=sys.stderr)
+            return 1
+        print(f"публикация #{pid} записана, забрать до "
+              f"{ledger_mod.CLAIM_WINDOW_DAYS} дней")
+        return 0
+
+    if args.action == "views":
+        if args.id is None or args.value is None:
+            print("[!] нужны --id и --value", file=sys.stderr)
+            return 1
+        ok = ledger_mod.set_views(conn, args.id, args.value)
+        print(f"#{args.id}: {'обновлено' if ok else 'не найдено'}")
+        return 0 if ok else 1
+
+    if args.action == "claim":
+        if args.id is None or args.value is None:
+            print("[!] нужны --id и --value (сумма)", file=sys.stderr)
+            return 1
+        ok = ledger_mod.claim(conn, args.id, float(args.value))
+        print(f"#{args.id}: {'забрано' if ok else 'уже забрано или не найдено'}")
+        return 0 if ok else 1
+
+    if args.action == "due":
+        rows = ledger_mod.due_posts(conn)
+        if not rows:
+            print("незабранных роликов нет")
+            return 0
+        rate = args.rate
+        print(f"{'#':>4}  {'аккаунт':<12} {'просмотры':>11} {'~$':>8}  "
+              f"{'осталось':>9}  статус")
+        total = 0.0
+        for d in rows:
+            left = "—" if d.hours_left <= 0 else f"{d.hours_left:.0f} ч"
+            est = d.payout_estimate(rate)
+            if d.hours_left > 0:
+                total += est
+            print(f"{d.id:>4}  {d.account:<12} {d.views:>11,} {est:>8.2f}  "
+                  f"{left:>9}  {d.state}")
+        print(f"\nв работе (не просрочено): ~${total:.2f} по ставке ${rate}/1000")
+        return 0
+
+    if args.action == "stats":
+        rows = ledger_mod.account_stats(conn)
+        t = ledger_mod.totals(conn)
+        if rows:
+            print(f"{'аккаунт':<14} {'жив':>4} {'дней':>6} {'постов':>7} "
+                  f"{'просмотры':>11} {'в день':>9} {'$':>8}")
+            for a in rows:
+                print(f"{a.name:<14} {'да' if a.alive else 'нет':>4} {a.days:>6.1f} "
+                      f"{a.posts:>7} {a.views:>11,} {a.views_per_day:>9,.0f} "
+                      f"{a.payout:>8.2f}")
+        print(f"\nвсего: аккаунтов {t['accounts']} (живых {t['alive']}), "
+              f"постов {t['posts']}, просмотров {t['views']:,}, "
+              f"незабрано {t['unclaimed']}, выплат ${t['payout']:.2f}")
+        return 0
+
+    return 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mily",
@@ -285,6 +371,20 @@ def build_parser() -> argparse.ArgumentParser:
                    help=f"ускорение баннера (максимум {promo_mod.MAX_SPEED})")
     p.add_argument("--crf", type=int, default=20)
     p.set_defaults(func=cmd_promo)
+
+    p = sub.add_parser("ledger", help="учёт аккаунтов, публикаций и окна выплаты")
+    p.add_argument("action",
+                   choices=["account", "ban", "post", "views", "claim", "due", "stats"])
+    p.add_argument("--name", help="имя аккаунта")
+    p.add_argument("--device", help="телефон, к которому привязан")
+    p.add_argument("--proxy", help="прокси аккаунта")
+    p.add_argument("--video", help="файл ролика")
+    p.add_argument("--id", type=int, help="номер публикации")
+    p.add_argument("--value", type=float, help="просмотры или сумма выплаты")
+    p.add_argument("--db", default=str(ledger_mod.DB_PATH))
+    p.add_argument("--rate", type=float, default=ledger_mod.DEFAULT_RATE,
+                   help="ставка за 1000 просмотров для прикидки")
+    p.set_defaults(func=cmd_ledger)
 
     return parser
 

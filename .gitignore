@@ -10,3 +10,4 @@ out/*
 !clips/raw/.gitkeep
 !clips/cut/.gitkeep
 !out/.gitkeep
+ledger.db
