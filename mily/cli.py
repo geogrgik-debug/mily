@@ -18,6 +18,7 @@ from . import promo as promo_mod
 from . import ledger as ledger_mod
 from . import twitch as twitch_mod
 from . import inspect as inspect_mod
+from . import review as review_mod
 from .shell import MissingBinary
 
 CONFIG_DIR = Path("config")
@@ -197,6 +198,7 @@ def cmd_promo(args) -> int:
         banner=Path(args.banner),
         area_ratio=args.area,
         speed=args.speed,
+        mode=args.mode,
     )
 
     src = Path(args.src)
@@ -318,8 +320,15 @@ def cmd_twitch(args) -> int:
                 clips = twitch_mod.fetch_by_streamers(
                     logins, days=args.days, per_streamer=args.per_streamer)
             else:
+                keep = twitch_mod.make_filter(
+                    min_views=args.min_views,
+                    min_seconds=args.min_seconds,
+                    max_seconds=args.max_seconds,
+                    languages=args.lang.split(",") if args.lang else None,
+                )
                 clips = twitch_mod.fetch_clips(
-                    args.game, days=args.days, limit=args.limit)
+                    args.game, days=args.days, limit=args.limit,
+                    max_pages=args.max_pages, keep=keep)
         except twitch_mod.TwitchError as exc:
             print(f"[!] {exc}", file=sys.stderr)
             return 1
@@ -373,6 +382,27 @@ def cmd_inspect(args) -> int:
             print(f"  [!] {w}")
         if r.sheet:
             print(f"  лист кадров: {r.sheet}")
+    return 0
+
+
+def cmd_review(args) -> int:
+    try:
+        review_mod.run(
+            queue=Path(args.queue),
+            approved=Path(args.approved),
+            rejected=Path(args.rejected),
+            state_path=Path(args.state),
+            mode=args.mode,
+            hold_minutes=args.hold,
+            batch=args.batch,
+            once=args.once,
+            poll_seconds=args.poll,
+        )
+    except review_mod.TelegramError as exc:
+        print(f"[!] {exc}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        print("\nостановлено")
     return 0
 
 
@@ -443,6 +473,9 @@ def build_parser() -> argparse.ArgumentParser:
                    help=f"доля площади кадра (минимум {promo_mod.MIN_AREA_RATIO})")
     p.add_argument("--speed", type=float, default=1.0,
                    help=f"ускорение баннера (максимум {promo_mod.MAX_SPEED})")
+    p.add_argument("--mode", default="overlay", choices=list(promo_mod.MODES),
+                   help="overlay — ролик играет под баннером; "
+                        "freeze — замирает на кадре")
     p.add_argument("--crf", type=int, default=20)
     p.set_defaults(func=cmd_promo)
 
@@ -472,6 +505,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--streamers", action="store_true",
                    help="брать по списку стримеров, а не глобальный топ игры")
     p.add_argument("--streamers-file", default=str(twitch_mod.STREAMERS))
+    p.add_argument("--max-pages", type=int, default=30,
+                   help="предел глубины листания")
     p.add_argument("--per-streamer", type=int, default=20,
                    help="сколько клипов брать у каждого")
     p.add_argument("--manifest", default=str(twitch_mod.MANIFEST))
@@ -485,6 +520,22 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-zones", action="store_true",
                    help="не подсвечивать зоны интерфейса")
     p.set_defaults(func=cmd_inspect)
+
+    p = sub.add_parser("review", help="приёмка роликов через Telegram")
+    p.add_argument("--queue", default=str(review_mod.QUEUE_DIR))
+    p.add_argument("--approved", default=str(review_mod.APPROVED_DIR))
+    p.add_argument("--rejected", default=str(review_mod.REJECTED_DIR))
+    p.add_argument("--state", default=str(review_mod.STATE_PATH))
+    p.add_argument("--mode", default="skip-only", choices=list(review_mod.MODES),
+                   help="skip-only — одна кнопка, молчание = взял; "
+                        "both — две кнопки")
+    p.add_argument("--hold", type=float, default=30.0,
+                   help="минут до автоприёма в skip-only")
+    p.add_argument("--batch", type=int, default=10,
+                   help="сколько отправлять за проход")
+    p.add_argument("--poll", type=float, default=5.0)
+    p.add_argument("--once", action="store_true", help="один проход и выход")
+    p.set_defaults(func=cmd_review)
 
     return parser
 

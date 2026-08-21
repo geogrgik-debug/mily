@@ -171,13 +171,20 @@ def fetch_clips(
     *,
     days: int = 7,
     limit: int = 100,
+    max_pages: int = 30,
+    keep=None,
     client_id: str | None = None,
     token: str | None = None,
 ) -> list[Clip]:
     """Топ клипов по игре за последние `days` дней.
 
-    Helix при заданном окне отдаёт клипы по убыванию просмотров, поэтому
-    первая же страница — это и есть лучшее за период.
+    Листает до тех пор, пока не наберётся `limit` клипов, ПРОШЕДШИХ отсев,
+    а не просто выданных API. Это принципиально: в глобальном топе по CS
+    почти всё англоязычное, и первая сотня после фильтра по русскому даёт
+    единицы. `keep` — предикат отсева, применяется во время листания.
+
+    max_pages ограничивает глубину: без него узкий фильтр на бедном окне
+    крутил бы пагинацию до конца выдачи.
     """
     if client_id is None or token is None:
         cid, secret = credentials()
@@ -192,12 +199,14 @@ def fetch_clips(
         "game_id": gid,
         "started_at": started.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "ended_at": ended.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "first": min(PAGE_SIZE, limit),
+        "first": PAGE_SIZE,
     }
 
     out: list[Clip] = []
+    seen = 0
     cursor = None
-    while len(out) < limit:
+
+    for _ in range(max_pages):
         page = dict(params)
         if cursor:
             page["after"] = cursor
@@ -206,11 +215,22 @@ def fetch_clips(
         rows = data.get("data") or []
         if not rows:
             break
-        out.extend(parse_clip(r) for r in rows)
+        seen += len(rows)
+
+        for row in rows:
+            clip = parse_clip(row)
+            if keep is None or keep(clip):
+                out.append(clip)
+
+        if len(out) >= limit:
+            break
 
         cursor = (data.get("pagination") or {}).get("cursor")
         if not cursor:
             break
+
+    if keep is not None:
+        print(f"[twitch] просмотрено {seen}, подошло {len(out)}")
 
     return out[:limit]
 
@@ -257,6 +277,28 @@ def fetch_by_streamers(
         print(f"[twitch] {login:<20} клипов: {len(clips)}")
 
     return out
+
+
+def make_filter(
+    *,
+    min_views: int = 0,
+    min_seconds: float = 10.0,
+    max_seconds: float = 60.0,
+    languages: list[str] | None = None,
+):
+    """Тот же отсев, что в select, но как предикат — для пагинации."""
+    langs = {l.lower() for l in languages} if languages else None
+
+    def keep(c: Clip) -> bool:
+        if c.views < min_views:
+            return False
+        if not (min_seconds <= c.duration <= max_seconds):
+            return False
+        if langs and c.language.lower() not in langs:
+            return False
+        return True
+
+    return keep
 
 
 def select(

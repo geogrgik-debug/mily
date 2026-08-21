@@ -38,13 +38,25 @@ class RuleViolation(Exception):
     """Ролик или настройки не проходят правила кампании."""
 
 
+# Что делает основной ролик, пока идёт баннер.
+#   overlay — продолжает играть под баннером, длина ролика не меняется
+#   freeze  — замирает на кадре, баннер играет поверх, ролик длиннее на
+#             длину баннера, и ни один момент не перекрыт
+MODES = ("overlay", "freeze")
+
+
 @dataclass
 class PromoSpec:
     banner: Path
     area_ratio: float = DEFAULT_AREA_RATIO
     speed: float = 1.0
+    mode: str = "overlay"
 
     def validate(self) -> None:
+        if self.mode not in MODES:
+            raise RuleViolation(
+                f"нет режима {self.mode!r}, есть: {', '.join(MODES)}"
+            )
         if not self.banner.exists():
             raise RuleViolation(f"нет файла баннера: {self.banner}")
         if self.speed > MAX_SPEED:
@@ -173,6 +185,43 @@ def build_audiograph(points: list[float], speed: float, has_audio: bool) -> str:
     return ";".join(parts)
 
 
+def build_freeze_graph(
+    start: float, bw: int, bh: int, banner_seconds: float,
+    speed: float, audio_input: str,
+) -> str:
+    """Граф для режима freeze: ролик замирает на кадре, пока идёт баннер.
+
+    Голова обрезается до точки вставки и достраивается клоном последнего
+    кадра на длину баннера (tpad), баннер кладётся поверх этой заморозки,
+    затем приклеивается хвост. Итоговый ролик длиннее исходного ровно на
+    длину баннера, зато ни один кадр не перекрыт.
+    """
+    end = start + banner_seconds
+    v = [
+        f"[0:v]trim=0:{start:.3f},setpts=PTS-STARTPTS,"
+        f"tpad=stop_mode=clone:stop_duration={banner_seconds:.3f}[head]",
+        f"[1:v]setpts=PTS/{speed:.4f},scale={bw}:{bh},format=rgba,"
+        f"setpts=PTS+{start:.3f}/TB[bn]",
+        f"[head][bn]overlay=x=(W-w)/2:y=(H-h)/2"
+        f":enable=between(t\,{start:.3f}\,{end:.3f})[headb]",
+        f"[0:v]trim={start:.3f},setpts=PTS-STARTPTS[tail]",
+        "[headb][tail]concat=n=2:v=1:a=0[v]",
+    ]
+
+    tempo = "" if abs(speed - 1.0) < 1e-6 else f"atempo={speed:.4f},"
+    delay = int(start * 1000)
+    a = [
+        f"{audio_input}atrim=0:{start:.3f},asetpts=PTS-STARTPTS,"
+        f"apad=pad_dur={banner_seconds:.3f},aresample=48000[ha]",
+        f"[1:a]{tempo}adelay={delay}|{delay},aresample=48000[ba]",
+        "[ha][ba]amix=inputs=2:duration=first:dropout_transition=0[hm]",
+        f"{audio_input}atrim={start:.3f},asetpts=PTS-STARTPTS,"
+        f"aresample=48000[ta]",
+        "[hm][ta]concat=n=2:v=0:a=1[a]",
+    ]
+    return ";".join(v + a)
+
+
 def apply(
     src: Path,
     dst: Path,
@@ -208,16 +257,34 @@ def apply(
     points = insertion_points(video["duration"], banner_seconds)
     has_audio = _has_audio(src)
 
-    graph = (
-        build_filtergraph(points, bw, bh, banner_seconds, spec.speed)
-        + ";"
-        + build_audiograph(points, spec.speed, has_audio)
-    )
+    extra_inputs: list[str] = []
+    if spec.mode == "freeze":
+        if len(points) > 1:
+            raise RuleViolation(
+                f"{src.name}: freeze не поддерживает несколько вставок "
+                f"(нужно {len(points)}). Для роликов длиннее минуты бери overlay"
+            )
+        if has_audio:
+            audio_input = "[0:a]"
+        else:
+            # concat по звуку требует дорожку у обоих кусков
+            audio_input = "[2:a]"
+            extra_inputs = ["-f", "lavfi", "-i",
+                            f"anullsrc=r=48000:cl=stereo:d={video['duration']:.3f}"]
+        graph = build_freeze_graph(
+            points[0], bw, bh, banner_seconds, spec.speed, audio_input)
+    else:
+        graph = (
+            build_filtergraph(points, bw, bh, banner_seconds, spec.speed)
+            + ";"
+            + build_audiograph(points, spec.speed, has_audio)
+        )
 
     dst.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
         "ffmpeg", "-y",
         "-i", str(src), "-i", str(spec.banner),
+        *extra_inputs,
         "-filter_complex", graph,
         "-map", "[v]", "-map", "[a]",
         "-c:v", "libx264", "-preset", x264_preset, "-crf", str(crf),
@@ -229,7 +296,8 @@ def apply(
 
     area = bw * bh / (video["width"] * video["height"])
     print(f"[promo] {src.name}: баннер {bw}x{bh} ({area:.0%} кадра), "
-          f"вставок {len(points)} в {', '.join(f'{p:.1f}c' for p in points)}")
+          f"режим {spec.mode}, вставок {len(points)} "
+          f"в {', '.join(f'{p:.1f}c' for p in points)}")
 
     if run(cmd).returncode != 0:
         raise RuleViolation(f"{src.name}: ffmpeg не справился")

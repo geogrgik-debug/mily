@@ -11,3 +11,10 @@ out/*
 !clips/cut/.gitkeep
 !out/.gitkeep
 ledger.db
+review_state.json
+clips/queue/*
+clips/approved/*
+clips/rejected/*
+!clips/queue/.gitkeep
+!clips/approved/.gitkeep
+!clips/rejected/.gitkeep
