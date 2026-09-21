@@ -1068,34 +1068,37 @@ Automated monitoring (с V2): drift калибровки по неделям (PS
 ## 25. Итоговая рекомендуемая архитектура
 
 ```
-                    ┌──────────────────────────────────────────────────────────────┐
-                    │  OFFLINE (ежедневно/еженедельно)                             │
-   historical ────► │  ratings: serve/return skills (EKF/Elo→ hierarchical Bayes)  │
-   matches/PBP      │  hyperparams: σ_day, σ_walk, process-feature noise, calib     │
-   news/schedule ─► │  context flags (official only): load, withdrawals, MTO, tz    │
-                    └───────────────┬──────────────────────────────────────────────┘
-                                    │ priors as-of(match_date−1)
- LIVE                               ▼
- PBP feed ──► raw event log (received_at) ──► MatchState (4-dim: S_A,R_A,S_B,R_B; Kalman on logit p)
- (5–20 s)         │                                   ▲ observations: point outcomes, 1st-in/DF (cum),
-                  │                                   │ process series (speed z, tempo, rally Δ) if any
- [V4] video ──► view gate → scoreboard/speed OCR ─────┘ (timestamped, lagged, flagged)
-                  │
- game boundary ──► immutable GameSnapshot ──► PROBABILITY ENGINE:
-                                              p̂ ~ posterior → Markov tree → P(hold), exact-score
-                                              + residual context model (LR/GBDT) → calibration
-                                              + uncertainty (posterior sd, bootstrap, conformal)
- Betfair Stream ─┐                                   │
- BetsAPI (B365) ─┴► market_snapshots (ts, status, delay, overround) ──► MARKET MODEL:
-                    Shin fair, tree-fit p_book, Markov-null ──────────► edge_pp, edge_z, CLV
-                                                                             │
-                                          [V3+] LLM-veto (data-quality/context flags; lowers confidence only)
-                                                                             │
-                                              PAPER POLICY (delay & reprice sim, limits) ──► paper_trades
-                                                                             │
-                                              LOGGING: predictions, markets, outcomes, counterfactuals
-                                                                             │
-                                              POST-MATCH LEARNING: walk-forward refit, calib drift, reports
+                      ┌───────────────────────────────────────────────────────────────────┐
+                      │ OFFLINE (ежедневно / еженедельно)                                 │
+  historical ──────►  │ ratings: serve/return skills (EKF/Elo → hierarchical Bayes)       │
+  matches / PBP       │ hyperparams: σ_day, σ_walk, process-feature noise, calibration    │
+  news / schedule ─►  │ context flags (official only): load, withdrawals, MTO, time zones │
+                      └─────────────────────────────────┬─────────────────────────────────┘
+                                                        │ priors as-of (match_date − 1)
+  LIVE                                                  ▼
+  PBP feed (5–20 s) ──► raw event log (received_at) ──► MatchState: 4-dim state (S_A, R_A, S_B, R_B),
+                              │                          Kalman filter on logit p; observations =
+  [V4] video ──► view gate ──► scoreboard / speed OCR ──► point outcomes, cum. 1st-in / DF, process series
+                              │
+  game boundary ──► immutable GameSnapshot ──► PROBABILITY ENGINE
+                                               p̂ ~ posterior → Markov tree → P(hold), exact score
+                                               + residual context model (LR / GBDT) → calibration
+                                               + uncertainty (posterior sd, bootstrap, conformal)
+                                                                   │
+  Betfair Stream ─┐                                                ▼
+  BetsAPI (B365) ─┴► market_snapshots ──► MARKET MODEL: Shin fair, tree-fit p_book, Markov-null
+                     (ts, status, delay, overround)               │
+                                                                   ▼  edge_pp, edge_z, CLV
+                                       [V3+] LLM-veto (data-quality / context flags; lowers confidence only)
+                                                                   │
+                                                                   ▼
+                                       PAPER POLICY (delay & reprice simulation, limits) ──► paper_trades
+                                                                   │
+                                                                   ▼
+                                       LOGGING: predictions, markets, outcomes, counterfactuals
+                                                                   │
+                                                                   ▼
+                                       POST-MATCH LEARNING: walk-forward refit, calibration drift, reports
 ```
 
 Отличия от схемы blueprint §17: (1) «HISTORICAL PLAYER MODEL» и «RECENT FORM MODEL» слиты в один rating/prior-слой с затуханием; (2) «LIVE MATCH STATE» — байесовский фильтр, не state machine; (3) «VIDEO FEATURES» — наблюдения фильтра, не отдельный слой, и только с V4; (4) «MULTI-AGENT CHALLENGE» заменён на uncertainty + опциональный veto; (5) добавлен Markov-null как обязательная часть market-слоя; (6) raw event log с `received_at` — фундамент всего.
