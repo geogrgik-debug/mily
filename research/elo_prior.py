@@ -93,8 +93,17 @@ def _invert(win_prob_r, baseline_r, best_of):
     return baseline + d, baseline - d
 
 def invert(win_prob, baseline, best_of=3):
-    """Round the inputs so the bisection cache does the heavy lifting."""
-    return _invert(round(float(win_prob), 3), round(float(baseline), 3), int(best_of))
+    """(p_serve, p_serve_opponent) for a player with this match win probability.
+
+    The bisection in _invert only searches d >= 0, so it can solve for a favourite. An underdog
+    is solved as the opponent's favourite problem and the pair is swapped; without that swap
+    every win_prob below 0.5 silently returned the baseline for both players.
+    """
+    w = float(win_prob); b = round(float(baseline), 3); bo = int(best_of)
+    if w < 0.5:
+        opp, me = _invert(round(1.0 - w, 3), b, bo)
+        return me, opp
+    return _invert(round(w, 3), b, bo)
 
 # ------------------------------------------------------------------ data
 def load_matches(atp_dir):
@@ -206,9 +215,16 @@ def evaluate(atp_dir, out_json="elo_prior_results.json", prior_csv=None):
     print(f"tour SPW baseline = {tour_spw:.4f}", flush=True)
 
     # surface/year baseline for the inversion constraint
-    bl = long.groupby([long["date"].dt.year, "surface"]).apply(
-        lambda d: d["spw_k"].sum() / d["spw_n"].sum()).rename("baseline").reset_index()
-    bl.columns = ["year", "surface", "baseline"]
+    # Baseline per surface from the PREVIOUS year only: computing it over the whole sample
+    # would let the test period set the constraint that the inversion is solved under.
+    byr = long.groupby([long["date"].dt.year, "surface"]).apply(
+        lambda d: pd.Series({"k": d["spw_k"].sum(), "n": d["spw_n"].sum()})).reset_index()
+    byr.columns = ["year", "surface", "k", "n"]
+    byr = byr.sort_values(["surface", "year"])
+    byr["k_prev"] = byr.groupby("surface")["k"].shift(1)
+    byr["n_prev"] = byr.groupby("surface")["n"].shift(1)
+    byr["baseline"] = byr["k_prev"] / byr["n_prev"]
+    bl = byr[["year", "surface", "baseline"]]
 
     # one row per player-match with Elo-implied win prob
     cols = ["date","year","surface","best_of","match_key","pid","oid","pname","oname",

@@ -29,6 +29,9 @@ OUT = sys.argv[4] if len(sys.argv) > 4 else "slam_process_results.json"
 SLAM_SURFACE = {"ausopen": "Hard", "usopen": "Hard", "wimbledon": "Grass", "frenchopen": "Clay"}
 SLAM_MONTH = {"ausopen": 1, "frenchopen": 5, "wimbledon": 7, "usopen": 8}
 SCORES = {"0": 0, "15": 1, "30": 2, "40": 3, "AD": 4}
+# Some feeds (2020 RG, 2021 AO, 2021 RG) write the last point of a game as "GAME"; treating
+# that token as a non-standard score dropped those three tournaments entirely.
+SCORE_TOKENS = set(SCORES) | {"GAME"}
 
 # ---------------------------------------------------------------- load points
 def load_slam(slam_dir):
@@ -55,6 +58,11 @@ def load_slam(slam_dir):
         if c in p.columns: p[c] = pd.to_numeric(p[c], errors="coerce")
         else: p[c] = np.nan
     p = p[p["PointServer"].isin([1, 2]) & p["PointWinner"].isin([1, 2])]
+    # The third segment of match_id encodes the draw: 1xxx men's singles, 2xxx women's.
+    # Deriving it from whether an ATP prior joined instead put 762 men's matches in the
+    # women's sample, because AO and RG abbreviate names in 2018-2021.
+    seg = p["match_id"].astype(str).str.split("-").str[-1].str[0].str.upper()
+    p["draw"] = np.where(seg.isin(["1", "M"]), "M", np.where(seg.isin(["2", "W"]), "W", "?"))
     return p
 
 # ---------------------------------------------------------------- service games
@@ -68,7 +76,7 @@ def build_games(p):
     srv = p["PointServer"].to_numpy()
     s1 = p["P1Score"].astype(str).to_numpy()
     s2 = p["P2Score"].astype(str).to_numpy()
-    ok = np.isin(s1, list(SCORES)) & np.isin(s2, list(SCORES))
+    ok = np.isin(s1, list(SCORE_TOKENS)) & np.isin(s2, list(SCORE_TOKENS))
     p["bad_score"] = ~ok                                   # tiebreak games score 0,1,2,...
     p["srv_won"] = (p["PointWinner"].to_numpy() == srv).astype(float)
     is_p1 = (srv == 1)
@@ -109,6 +117,7 @@ def build_games(p):
     g = p.groupby(["match_id", "SetNo", "GameNo"], sort=False)
     A = g.agg(
         year=("year", "first"), slam=("slam", "first"), surface=("surface", "first"),
+        draw=("draw", "first"),
         date=("date", "first"), srv=("PointServer", "first"), n_srv=("PointServer", "nunique"),
         server=("server_name", "first"), returner=("returner_name", "first"),
         p1_games=("P1GamesWon", "first"), p2_games=("P2GamesWon", "first"),
@@ -140,10 +149,17 @@ def build_games(p):
 
 # ---------------------------------------------------------------- features
 def norm_name(x):
+    """First initial plus surname, so "Novak Djokovic" and "N. Djokovic" agree.
+
+    AO and RG abbreviate given names in 2018-2021; matching on the full string silently
+    dropped those eight tournaments from the men's sample.
+    """
     x = str(x).strip().lower()
     x = re.sub(r"[^a-z ]", " ", x)
-    x = re.sub(r"\s+", " ", x).strip()
-    return x
+    parts = [t for t in re.split(r"\s+", x) if t]
+    if not parts: return ""
+    if len(parts) == 1: return parts[0]
+    return parts[0][0] + " " + parts[-1]
 
 def attach_prior(G, priors_csv):
     """Join the Elo-anchored p_serve prior by player name and nearest earlier slam date."""
@@ -192,9 +208,24 @@ def add_features(G):
     G["live_spw"] = (G["cum_won"] + 40*G["p_prior"]) / (G["cum_pts"] + 40)
     G["live_spw_dev"] = G["live_spw"] - G["p_prior"]
     G["live_hold_rate"] = (G["cum_holds"] + 6*mu) / (G["cum_games"] + 6)
-    # opponent's own service games so far (the other side of the match)
-    opp = G.groupby(["match_id","returner"], sort=False)
-    G["opp_cum_pts"] = 0.0
+    # The returner's own service games so far. This was a stub set to zero, which meant the
+    # comparison model never saw how the other player was serving in this same match.
+    G["g_ord"] = G.groupby("match_id").cumcount()
+    side = G[["match_id", "server", "g_ord", "n_pts", "pts_won", "hold"]].copy()
+    side = side.sort_values(["match_id", "server", "g_ord"])
+    side["opp_cum_pts"] = side.groupby(["match_id", "server"])["n_pts"].cumsum() - side["n_pts"]
+    side["opp_cum_won"] = side.groupby(["match_id", "server"])["pts_won"].cumsum() - side["pts_won"]
+    side["opp_cum_holds"] = side.groupby(["match_id", "server"])["hold"].cumsum() - side["hold"]
+    side["opp_cum_games"] = side.groupby(["match_id", "server"]).cumcount()
+    side = side.rename(columns={"server": "returner"})[
+        ["match_id", "returner", "g_ord", "opp_cum_pts", "opp_cum_won",
+         "opp_cum_holds", "opp_cum_games"]].sort_values("g_ord")
+    G = pd.merge_asof(G.sort_values("g_ord"), side, on="g_ord",
+                      by=["match_id", "returner"], direction="backward")
+    for c in ["opp_cum_pts", "opp_cum_won", "opp_cum_holds", "opp_cum_games"]:
+        G[c] = G[c].fillna(0.0)
+    G["opp_live_spw"] = (G["opp_cum_won"] + 40 * 0.62) / (G["opp_cum_pts"] + 40)
+    G["opp_live_hold_rate"] = (G["opp_cum_holds"] + 6 * mu) / (G["opp_cum_games"] + 6)
     # ---- previous service game: outcome and process, plus in-match running process means
     for c in ["hold","pts_lost","bp_faced","deuce","n_pts"] + PROC:
         G[f"prev_{c}"] = grp[c].shift(1)
@@ -230,6 +261,7 @@ def add_features(G):
 GROUPS = {
     "A_prior":      ["p_prior", "hist_hold", "surf_grass", "surf_clay"],
     "B_live_cum":   ["live_spw_dev", "cum_pts", "live_hold_rate"],
+    "B2_live_opp":  ["opp_live_spw", "opp_live_hold_rate", "opp_cum_pts"],
     "C_prev_out":   ["prev_easy_hold", "prev_hard_hold", "prev_broken", "prev_bp_faced",
                      "prev_deuce", "prev_n_pts", "just_broke_no_changeover", "just_broke_changeover"],
     "D_prev_proc":  ["prev_speed1_mean_dev", "prev_speed1_mean_trend", "prev_first_in_dev",
@@ -296,7 +328,7 @@ def run(G, tag, split_year, res, do_gbdt=True):
     out["models"] = {"0_constant": dict(logloss=float(log_loss(te["hold"], p0)),
                                         brier=float(brier_score_loss(te["hold"], p0)), auc=0.5)}
     print(f"  constant            logloss={out['models']['0_constant']['logloss']:.4f}", flush=True)
-    order = ["A_prior", "B_live_cum", "C_prev_out", "D_prev_proc", "F_cum_proc", "E_context"]
+    order = ["A_prior", "B_live_cum", "B2_live_opp", "C_prev_out", "D_prev_proc", "F_cum_proc", "E_context"]
     cols, preds = [], {}
     for g in order:
         cols = cols + GROUPS[g]
@@ -318,6 +350,7 @@ def run(G, tag, split_year, res, do_gbdt=True):
     # incremental bootstraps that answer the project's questions
     _, _, pA = fit_eval(tr, te, GROUPS["A_prior"])
     _, _, pAB = fit_eval(tr, te, GROUPS["A_prior"] + GROUPS["B_live_cum"])
+    _, _, pABo = fit_eval(tr, te, GROUPS["A_prior"] + GROUPS["B_live_cum"] + GROUPS["B2_live_opp"])
     _, _, pABC = fit_eval(tr, te, GROUPS["A_prior"] + GROUPS["B_live_cum"] + GROUPS["C_prev_out"])
     _, _, pABD = fit_eval(tr, te, GROUPS["A_prior"] + GROUPS["B_live_cum"] + GROUPS["D_prev_proc"])
     _, _, pABF = fit_eval(tr, te, GROUPS["A_prior"] + GROUPS["B_live_cum"] + GROUPS["F_cum_proc"])
@@ -325,7 +358,11 @@ def run(G, tag, split_year, res, do_gbdt=True):
     # crude prior (no Elo) for the head-to-head the audit asked about
     _, _, pCrude = fit_eval(tr, te, ["hist_hold", "surf_grass", "surf_clay"])
     for name, a, b in [("live_over_prior", pA, pAB),
+                       ("returner_side_over_server_side", pAB, pABo),
                        ("prev_outcome_over_prior_live", pAB, pABC),
+                       ("process_over_prior_live_and_opp", pABo,
+                        fit_eval(tr, te, GROUPS["A_prior"] + GROUPS["B_live_cum"] + GROUPS["B2_live_opp"]
+                                 + GROUPS["D_prev_proc"] + GROUPS["F_cum_proc"])[2]),
                        ("prev_process_over_prior_live", pAB, pABD),
                        ("cum_process_over_prior_live", pAB, pABF),
                        ("all_process_over_prior_live", pAB, pABDF),
@@ -360,8 +397,8 @@ def main():
     print("process coverage:", {k: round(v, 3) for k, v in res["process_coverage"].items()}, flush=True)
     # The slam feed carries both draws. Hold rates differ by roughly ten points and the ATP prior
     # only joins to the men's draw, so the men's games are the primary population here.
-    men = G[G["p_blend"].notna()].copy()
-    women = G[G["p_blend"].isna()].copy()
+    men = G[G["draw"] == "M"].copy()
+    women = G[G["draw"] == "W"].copy()
     res["n_men"], res["n_women"] = int(len(men)), int(len(women))
     print(f"\nmen {len(men)} (hold {men['hold'].mean():.4f}), "
           f"women {len(women)} (hold {women['hold'].mean():.4f})", flush=True)
