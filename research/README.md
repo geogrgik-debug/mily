@@ -1,23 +1,34 @@
 # research/
 
-Reproducible calculations behind `docs/AUDIT_Tennis_Live_Next_Game_v1.md`.
+Reproducible calculations behind the audit and the follow-up experiments.
 
 | File | What |
 |---|---|
-| `calc.py` | Markov hold/break probabilities by score, exact-score tree, market-margin analysis of the blueprint screenshot, standard errors, i.i.d. null model for "hot state" patterns, likelihood-ratio and power simulations (Appendix C). `pip install numpy scipy && python calc.py` |
-| `mcp_next_game_study.py` | Empirical mini-study on the Tennis Abstract Match Charting Project (men): builds a "one row = one service game" dataset, chronological train/test (split 2023-01-01), nested ablation of feature groups (player prior / in-match cumulative / previous-game outcome / previous-game process / score context), prior-window comparison, conditional hold rates, split-half "day-form" test, cluster bootstrap by match (Appendix A). |
-| `mcp_study_results.json` | Output of the study as run on 2026-09-21 (MCP snapshot of 2026-09-18). |
+| `calc.py` | Markov hold/break probabilities by score, exact-score tree, margin analysis of the blueprint screenshot, standard errors, i.i.d. null model for "hot state" patterns, likelihood-ratio and power simulations. |
+| `mcp_next_game_study.py` | Service-game dataset from the Match Charting Project; chronological ablation of feature groups; split-half "day form" test; cluster bootstrap by match. |
+| `elo_prior.py` | Surface-blended Elo, Markov match model (game, tiebreak, set, match), inversion of a match win probability into a pair of serve-point-win probabilities, Barnett-Clarke opponent adjustment, validation by serve-points-won forecast RMSE. |
+| `elo_sweep.py` | Sweeps the Elo K-shape and surface weight to test whether the Elo-vs-Barnett-Clarke result is an artefact of an under-tuned rating. |
+| `slam_process_study.py` | Service-game dataset from Grand Slam point-by-point with Hawk-Eye process fields (serve speed, rally length, return depth, distance run); feature-group ablation for men, women and the tracked subset. |
+| `confound_test.py` | Removes the prior from the men's games to test whether process features carry today's state or just player identity. |
+| `*_results.json` | Outputs as run on 2026-09-21. |
 
-## Running the MCP study
+## Data
 
-Data (CC BY-NC-SA 4.0, non-commercial research use only; not redistributed here):
+Not redistributed here. All of it is CC BY-NC-SA 4.0 — non-commercial research use only.
 
+- Match Charting Project: `JeffSackmann/tennis_MatchChartingProject` (still public).
+- ATP matches and Grand Slam point-by-point: the four original Sackmann data repos were removed
+  from GitHub between June and July 2026; the mirror `Aneeshers/tennis-sackmann-archive` carries
+  ATP/WTA through June 2026 and slam point-by-point 2011-2024.
+
+Download commands are in `docs/EXPERIMENT_B_elo_prior_and_process.md`.
+
+## Order to run
+
+```bash
+pip install numpy scipy pandas scikit-learn
+python calc.py
+python elo_prior.py atp elo_prior_results.json priors.csv
+python slam_process_study.py slam priors.csv atp slam_process_results.json
+python confound_test.py
 ```
-mkdir mcp && cd mcp
-for f in charting-m-matches.csv charting-m-points-2010s.csv charting-m-points-2020s.csv; do
-  curl -sSL -O https://raw.githubusercontent.com/JeffSackmann/tennis_MatchChartingProject/master/$f
-done
-cd .. && pip install pandas numpy scikit-learn && python mcp_next_game_study.py mcp results.json
-```
-
-First run parses ~1.1M points (~3 min) and caches `mcp/_games_cache.pkl`; subsequent runs take ~3 min (feature building + bootstraps).

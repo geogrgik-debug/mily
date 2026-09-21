@@ -59,73 +59,84 @@ def load_slam(slam_dir):
 
 # ---------------------------------------------------------------- service games
 def build_games(p):
-    rows = []
-    for (mid, sn), g in p.groupby(["match_id", "SetNo"], sort=False):
-        g = g.sort_values("PointNumber")
-        for gn, gg in g.groupby("GameNo", sort=True):
-            if gg["PointServer"].nunique() != 1: continue
-            srv = int(gg["PointServer"].iloc[0])
-            # drop tiebreaks: scores run 0,1,2,... instead of 0/15/30/40
-            s1 = gg["P1Score"].astype(str); s2 = gg["P2Score"].astype(str)
-            if not (set(s1) | set(s2)) <= set(SCORES): continue
-            won = (gg["PointWinner"] == srv).to_numpy().astype(int)
-            n = len(won); w = int(won.sum()); l = n - w
-            hold = 1 if (w >= 4 and w - l >= 2) else (0 if (l >= 4 and l - w >= 2) else None)
-            if hold is None or n < 4: continue
-            rec = dict(match_id=mid, year=int(gg["year"].iloc[0]), slam=gg["slam"].iloc[0],
-                       surface=gg["surface"].iloc[0], date=gg["date"].iloc[0],
-                       set_no=int(sn), game_no=int(gn), srv=srv,
-                       server=gg["player1"].iloc[0] if srv == 1 else gg["player2"].iloc[0],
-                       returner=gg["player2"].iloc[0] if srv == 1 else gg["player1"].iloc[0],
-                       p1_games=float(gg["P1GamesWon"].iloc[0]), p2_games=float(gg["P2GamesWon"].iloc[0]),
-                       first_pt=int(gg["PointNumber"].iloc[0]),
-                       hold=hold, n_pts=n, pts_won=w, pts_lost=l,
-                       deuce=int((s1.eq("40") & s2.eq("40")).any()),
-                       bp_faced=int(((gg["P1BreakPoint"] if srv == 2 else gg["P2BreakPoint"]).fillna(0) > 0).sum()))
-            # ---- process fields, server-attributed
-            sp = pd.to_numeric(gg["Speed_KMH"], errors="coerce").replace(0, np.nan)
-            sn_ = pd.to_numeric(gg["ServeNumber"], errors="coerce")
-            rec["speed1_mean"] = float(sp[sn_ == 1].mean()) if (sn_ == 1).any() else np.nan
-            rec["speed1_n"] = int(sp[sn_ == 1].notna().sum())
-            rec["speed2_mean"] = float(sp[sn_ == 2].mean()) if (sn_ == 2).any() else np.nan
-            rec["speed_max"] = float(sp.max()) if sp.notna().any() else np.nan
-            rec["first_in"] = float((sn_ == 1).mean()) if sn_.notna().any() else np.nan
-            rally = pd.to_numeric(gg["RallyCount"], errors="coerce").replace(0, np.nan)
-            rec["rally_mean"] = float(rally.mean()) if rally.notna().any() else np.nan
-            rec["rally_long_share"] = float((rally >= 5).mean()) if rally.notna().any() else np.nan
-            rd = gg["ReturnDepth"].astype(str)
-            rec["ret_deep_share"] = float((rd == "D").sum() / max((rd.isin(["D", "ND"])).sum(), 1)) \
-                if (rd.isin(["D", "ND"])).any() else np.nan
-            rec["ret_depth_n"] = int((rd.isin(["D", "ND"])).sum())
-            dsrv = gg["P1DistanceRun"] if srv == 1 else gg["P2DistanceRun"]
-            dret = gg["P2DistanceRun"] if srv == 1 else gg["P1DistanceRun"]
-            dsrv = pd.to_numeric(dsrv, errors="coerce").replace(0, np.nan)
-            dret = pd.to_numeric(dret, errors="coerce").replace(0, np.nan)
-            rec["dist_srv_per_pt"] = float(dsrv.mean()) if dsrv.notna().any() else np.nan
-            rec["dist_ret_per_pt"] = float(dret.mean()) if dret.notna().any() else np.nan
-            ace = gg["P1Ace"] if srv == 1 else gg["P2Ace"]
-            df_ = gg["P1DoubleFault"] if srv == 1 else gg["P2DoubleFault"]
-            ue_s = gg["P1UnfErr"] if srv == 1 else gg["P2UnfErr"]
-            ue_r = gg["P2UnfErr"] if srv == 1 else gg["P1UnfErr"]
-            wn_s = gg["P1Winner"] if srv == 1 else gg["P2Winner"]
-            rec["ace_r"] = float(pd.to_numeric(ace, errors="coerce").fillna(0).gt(0).mean())
-            rec["df_r"] = float(pd.to_numeric(df_, errors="coerce").fillna(0).gt(0).mean())
-            rec["srv_ue_r"] = float(pd.to_numeric(ue_s, errors="coerce").fillna(0).gt(0).mean())
-            rec["ret_ue_r"] = float(pd.to_numeric(ue_r, errors="coerce").fillna(0).gt(0).mean())
-            rec["srv_win_r"] = float(pd.to_numeric(wn_s, errors="coerce").fillna(0).gt(0).mean())
-            # elapsed seconds, for tempo
-            def secs(t):
-                try:
-                    h, m, s = str(t).split(":"); return int(h)*3600 + int(m)*60 + int(s)
-                except Exception: return np.nan
-            e = gg["ElapsedTime"].map(secs)
-            rec["t_start"] = float(e.iloc[0]) if e.notna().any() else np.nan
-            rec["t_end"] = float(e.iloc[-1]) if e.notna().any() else np.nan
-            rec["sec_per_point"] = (rec["t_end"] - rec["t_start"]) / max(n - 1, 1) \
-                if np.isfinite(rec.get("t_start", np.nan)) and np.isfinite(rec.get("t_end", np.nan)) else np.nan
-            rows.append(rec)
-    G = pd.DataFrame(rows)
-    return G.sort_values(["date", "match_id", "set_no", "game_no"]).reset_index(drop=True)
+    """One row per completed, non-tiebreak service game, built with whole-column operations.
+
+    A per-game Python loop over this data costs millions of small pandas calls and runs for
+    tens of minutes; every quantity here is a groupby aggregation instead.
+    """
+    p = p.copy()
+    srv = p["PointServer"].to_numpy()
+    s1 = p["P1Score"].astype(str).to_numpy()
+    s2 = p["P2Score"].astype(str).to_numpy()
+    ok = np.isin(s1, list(SCORES)) & np.isin(s2, list(SCORES))
+    p["bad_score"] = ~ok                                   # tiebreak games score 0,1,2,...
+    p["srv_won"] = (p["PointWinner"].to_numpy() == srv).astype(float)
+    is_p1 = (srv == 1)
+    def by_server(c1, c2):
+        a = pd.to_numeric(p[c1], errors="coerce").to_numpy()
+        b = pd.to_numeric(p[c2], errors="coerce").to_numpy()
+        return np.where(is_p1, a, b), np.where(is_p1, b, a)
+    p["srv_ace"], _ = by_server("P1Ace", "P2Ace")
+    p["srv_df"], _ = by_server("P1DoubleFault", "P2DoubleFault")
+    p["srv_ue"], p["ret_ue"] = by_server("P1UnfErr", "P2UnfErr")
+    p["srv_win_shot"], _ = by_server("P1Winner", "P2Winner")
+    _, p["bp"] = by_server("P1BreakPoint", "P2BreakPoint")   # break point belongs to the returner
+    p["dist_srv"], p["dist_ret"] = by_server("P1DistanceRun", "P2DistanceRun")
+    for c in ["srv_ace","srv_df","srv_ue","ret_ue","srv_win_shot","bp"]:
+        p[c] = (np.nan_to_num(p[c].to_numpy()) > 0).astype(float)
+    for c in ["dist_srv","dist_ret"]:
+        p[c] = pd.to_numeric(p[c], errors="coerce").replace(0, np.nan)
+    speed = pd.to_numeric(p["Speed_KMH"], errors="coerce").replace(0, np.nan)
+    sn = pd.to_numeric(p["ServeNumber"], errors="coerce")
+    p["speed1"] = speed.where(sn == 1); p["speed2"] = speed.where(sn == 2)
+    p["speed"] = speed
+    p["is_first"] = (sn == 1).astype(float).where(sn.notna())
+    rally = pd.to_numeric(p["RallyCount"], errors="coerce").replace(0, np.nan)
+    p["rally"] = rally; p["rally_long"] = (rally >= 5).astype(float).where(rally.notna())
+    rd = p["ReturnDepth"].astype(str)
+    p["ret_deep"] = np.where(rd == "D", 1.0, np.where(rd == "ND", 0.0, np.nan))
+    p["deuce_pt"] = ((s1 == "40") & (s2 == "40")).astype(float)
+    # ElapsedTime is usually H:MM:SS but the feed also carries malformed values; anything that
+    # does not parse to a plausible match clock becomes NaN rather than a huge number.
+    t = p["ElapsedTime"].astype(str).str.extract(r"^(\d{1,2}):(\d{2}):(\d{2})$")
+    tsec = (pd.to_numeric(t[0], errors="coerce") * 3600
+            + pd.to_numeric(t[1], errors="coerce") * 60
+            + pd.to_numeric(t[2], errors="coerce"))
+    p["tsec"] = tsec.where((tsec >= 0) & (tsec <= 8 * 3600))
+    p["server_name"] = np.where(is_p1, p["player1"], p["player2"])
+    p["returner_name"] = np.where(is_p1, p["player2"], p["player1"])
+
+    g = p.groupby(["match_id", "SetNo", "GameNo"], sort=False)
+    A = g.agg(
+        year=("year", "first"), slam=("slam", "first"), surface=("surface", "first"),
+        date=("date", "first"), srv=("PointServer", "first"), n_srv=("PointServer", "nunique"),
+        server=("server_name", "first"), returner=("returner_name", "first"),
+        p1_games=("P1GamesWon", "first"), p2_games=("P2GamesWon", "first"),
+        first_pt=("PointNumber", "first"),
+        n_pts=("srv_won", "size"), pts_won=("srv_won", "sum"),
+        bad=("bad_score", "max"), deuce=("deuce_pt", "max"), bp_faced=("bp", "sum"),
+        speed1_mean=("speed1", "mean"), speed1_n=("speed1", "count"),
+        speed2_mean=("speed2", "mean"), speed_max=("speed", "max"),
+        first_in=("is_first", "mean"),
+        rally_mean=("rally", "mean"), rally_long_share=("rally_long", "mean"),
+        ret_deep_share=("ret_deep", "mean"), ret_depth_n=("ret_deep", "count"),
+        dist_srv_per_pt=("dist_srv", "mean"), dist_ret_per_pt=("dist_ret", "mean"),
+        ace_r=("srv_ace", "mean"), df_r=("srv_df", "mean"),
+        srv_ue_r=("srv_ue", "mean"), ret_ue_r=("ret_ue", "mean"), srv_win_r=("srv_win_shot", "mean"),
+        t_start=("tsec", "first"), t_end=("tsec", "last"),
+    ).reset_index()
+    A["pts_lost"] = A["n_pts"] - A["pts_won"]
+    spp = (A["t_end"] - A["t_start"]) / A["n_pts"].sub(1).clip(lower=1)
+    A["sec_per_point"] = spp.where((spp >= 5) & (spp <= 180))   # outside this is a delay or a bad clock
+    hold = np.where((A["pts_won"] >= 4) & (A["pts_won"] - A["pts_lost"] >= 2), 1.0,
+           np.where((A["pts_lost"] >= 4) & (A["pts_lost"] - A["pts_won"] >= 2), 0.0, np.nan))
+    A["hold"] = hold
+    A = A[(A["bad"] == 0) & (A["n_srv"] == 1) & (A["n_pts"] >= 4) & A["hold"].notna()]
+    A = A.rename(columns={"SetNo": "set_no", "GameNo": "game_no"})
+    A["hold"] = A["hold"].astype(int)
+    A["deuce"] = A["deuce"].astype(int)
+    keep = [c for c in A.columns if c not in ("bad", "n_srv")]
+    return A[keep].sort_values(["date", "match_id", "set_no", "game_no"]).reset_index(drop=True)
 
 # ---------------------------------------------------------------- features
 def norm_name(x):
@@ -230,8 +241,28 @@ GROUPS = {
     "E_context":    ["game_diff", "serving_for_set", "serving_to_stay", "games_in_set", "set_no"],
 }
 
+def prepare(tr, te, cols):
+    """Winsorize at train 1/99 percentiles and add a missingness flag per partly-missing column.
+
+    Filling a missing deviation with zero silently asserts "no deviation"; the flag lets the model
+    separate that from "not measured", which on this data tracks which court the match was on.
+    """
+    Tr, Te = tr[cols].copy(), te[cols].copy()
+    out = list(cols)
+    for c in cols:
+        lo, hi = Tr[c].quantile(0.01), Tr[c].quantile(0.99)
+        if np.isfinite(lo) and np.isfinite(hi) and hi > lo:
+            Tr[c] = Tr[c].clip(lo, hi); Te[c] = Te[c].clip(lo, hi)
+        miss = Tr[c].isna().mean()
+        if miss > 0.01:
+            Tr[c + "__na"] = Tr[c].isna().astype(float); Te[c + "__na"] = Te[c].isna().astype(float)
+            out.append(c + "__na")
+        med = Tr[c].median()
+        Tr[c] = Tr[c].fillna(med); Te[c] = Te[c].fillna(med)
+    return Tr[out].to_numpy(), Te[out].to_numpy(), out
+
 def fit_eval(tr, te, cols, kind="lr"):
-    Xtr, Xte = tr[cols].fillna(0.0).to_numpy(), te[cols].fillna(0.0).to_numpy()
+    Xtr, Xte, _ = prepare(tr, te, cols)
     if kind == "lr":
         clf = make_pipeline(StandardScaler(), LogisticRegression(C=1.0, max_iter=3000))
     else:
@@ -279,7 +310,8 @@ def run(G, tag, split_year, res, do_gbdt=True):
         print(f"  full - {g:12s} logloss={r['logloss']:.4f}", flush=True)
     r_full, clf, p_full = fit_eval(tr, te, allc)
     out["models"]["lr_full"] = r_full
-    out["lr_full_std_coefs"] = dict(zip(allc, [float(x) for x in clf.named_steps["logisticregression"].coef_[0]]))
+    _, _, names = prepare(tr, te, allc)
+    out["lr_full_std_coefs"] = dict(zip(names, [float(x) for x in clf.named_steps["logisticregression"].coef_[0]]))
     if do_gbdt:
         r_gb, _, _ = fit_eval(tr, te, allc, "gb"); out["models"]["gbdt_full"] = r_gb
         print(f"  GBDT full           logloss={r_gb['logloss']:.4f}", flush=True)
@@ -326,10 +358,19 @@ def main():
     # coverage of the process fields
     res["process_coverage"] = {c: float(G[f"prev_{c}"].notna().mean()) for c in PROC}
     print("process coverage:", {k: round(v, 3) for k, v in res["process_coverage"].items()}, flush=True)
-    run(G, "all_games", 2019, res)
-    tracked = G[G["prev_speed1_mean"].notna() & G["prev_rally_mean"].notna() & G["cum_speed1_mean"].notna()]
-    print(f"\ntracked subset: {len(tracked)} games", flush=True)
-    run(tracked, "tracked_subset", 2019, res)
+    # The slam feed carries both draws. Hold rates differ by roughly ten points and the ATP prior
+    # only joins to the men's draw, so the men's games are the primary population here.
+    men = G[G["p_blend"].notna()].copy()
+    women = G[G["p_blend"].isna()].copy()
+    res["n_men"], res["n_women"] = int(len(men)), int(len(women))
+    print(f"\nmen {len(men)} (hold {men['hold'].mean():.4f}), "
+          f"women {len(women)} (hold {women['hold'].mean():.4f})", flush=True)
+    run(men, "men_all", 2019, res)
+    tracked = men[men["prev_speed1_mean"].notna() & men["prev_rally_mean"].notna()
+                  & men["cum_speed1_mean"].notna()]
+    print(f"\nmen, tracked subset: {len(tracked)} games", flush=True)
+    run(tracked, "men_tracked", 2019, res)
+    run(women, "women_all", 2019, res, do_gbdt=False)
     with open(OUT, "w") as f: json.dump(res, f, indent=1)
     print("\nwrote", OUT, flush=True)
 
