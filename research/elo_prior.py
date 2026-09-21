@@ -142,19 +142,27 @@ def build_elo(m, K0=250.0, Koff=5.0, Kexp=0.4, surface_weight=0.5):
     return m, overall, surf, cnt
 
 # ------------------------------------------------------------------ rolling serve/return priors
-def rolling_priors(m, months=12, k_shrink=200.0):
+def rolling_priors(m, months=12, k_shrink=200.0, strict_overlap=True):
     """Long player-match table with as-of rolling serve/return rates.
 
     The window covers matches whose tournament started strictly before this one, so no match
     feeds its own prior. Sackmann stamps every match of a tournament with the tournament start
     date, which leaves within-tournament order ambiguous; excluding the whole tournament is the
     only clean as-of definition, and it also keeps the (player, match) join key unique.
+
+    strict_overlap additionally drops matches from events that had started earlier but were
+    still being played on this match's start date: a 14-day Slam overlaps the Challengers that
+    start during its second week, so its late rounds would otherwise land in their priors.
+    Sackmann publishes no end date, so the span is inferred from the level and draw size.
     """
-    cols = ["date","match_key","pid","oid","surface","best_of","svpt","w1","w2","o_svpt","o_w1","o_w2"]
-    a = m[["date","match_key","winner_id","loser_id","surface","best_of",
+    span = np.where(m["tourney_level"].isin(["G"]), 14,
+            np.where(m["tourney_level"].isin(["M", "F", "D"]), 12, 7))
+    m = m.assign(t_end=m["date"] + pd.to_timedelta(span, unit="D"))
+    cols = ["date","t_end","match_key","pid","oid","surface","best_of","svpt","w1","w2","o_svpt","o_w1","o_w2"]
+    a = m[["date","t_end","match_key","winner_id","loser_id","surface","best_of",
            "w_svpt","w_1stWon","w_2ndWon","l_svpt","l_1stWon","l_2ndWon"]].copy()
     a.columns = cols
-    b = m[["date","match_key","loser_id","winner_id","surface","best_of",
+    b = m[["date","t_end","match_key","loser_id","winner_id","surface","best_of",
            "l_svpt","l_1stWon","l_2ndWon","w_svpt","w_1stWon","w_2ndWon"]].copy()
     b.columns = cols
     a["won"] = 1; b["won"] = 0
@@ -170,11 +178,16 @@ def rolling_priors(m, months=12, k_shrink=200.0):
     for pid, d in long.groupby("pid", sort=False):
         d = d.sort_values("date")
         dates = d["date"].to_numpy(); keys = d["match_key"].to_numpy()
+        ends = d["t_end"].to_numpy()
         cs = {c: np.concatenate([[0.0], d[c].to_numpy().cumsum()]) for c in ["spw_k","spw_n","rpw_k","rpw_n"]}
         lo = np.searchsorted(dates, dates - win, side="left")   # window start
         hi = np.searchsorted(dates, dates, side="left")         # strictly earlier tournaments
         for i in range(len(d)):
             j, e = lo[i], hi[i]
+            if strict_overlap:
+                # walk back past any earlier event that was still running on this date
+                while e > j and ends[e-1] > dates[i]:
+                    e -= 1
             recs.append((pid, keys[i],
                          cs["spw_k"][e]-cs["spw_k"][j], cs["spw_n"][e]-cs["spw_n"][j],
                          cs["rpw_k"][e]-cs["rpw_k"][j], cs["rpw_n"][e]-cs["rpw_n"][j], int(e)))
