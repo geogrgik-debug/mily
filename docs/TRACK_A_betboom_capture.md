@@ -178,6 +178,7 @@ python tennis/ingest/betboom/extract_schema.py vendor-core-*.js \
 
 # 2. сгенерировать классы
 pip install grpcio-tools websockets
+mkdir -p tennis/ingest/betboom/generated      # protoc сам его не создаёт
 python -m grpc_tools.protoc -I tennis/ingest/betboom/proto \
     --python_out=tennis/ingest/betboom/generated \
     tennis/ingest/betboom/proto/bb_sport_ws_v1.proto

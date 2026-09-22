@@ -26,6 +26,7 @@ prices**, from one socket with one clock — the pair, not half of it.
 
 ```bash
 pip install grpcio-tools websockets
+mkdir -p tennis/ingest/betboom/generated      # protoc does not create it
 python -m grpc_tools.protoc -I tennis/ingest/betboom/proto \
     --python_out=tennis/ingest/betboom/generated \
     tennis/ingest/betboom/proto/bb_sport_ws_v1.proto
