@@ -13,8 +13,8 @@ later from closed day files; it is not the write path.
 
 Written gzipped by default, because the feed repeats itself: BetBoom reprices
 by resending every stake on a match, so a minute of six matches is 2.1 MB of
-raw JSONL that gzip takes to 394 KB -- 5.4x, measured on a real capture. That
-turns ~2 GB a day into ~400 MB. The line-level crash guarantee survives
+raw JSONL that gzip takes to 394 KB -- 5.4x on that sample, 4.8x on a live WTT
+capture. For six matches that turns ~3 GB a day into ~0.55 GB. The line-level crash guarantee survives
 compression: every fsync is preceded by a zlib Z_SYNC_FLUSH, so bytes already
 written stay decodable, and a reader that hits a torn final member stops there
 with everything before it intact. `compress=False` writes plain JSONL when a
@@ -51,7 +51,7 @@ class RawLog:
     frame while recording something irreplaceable and rare.
 
     `compress` writes `.jsonl.gz` instead of `.jsonl`. It is on by default:
-    the saving is 5.4x on real captures and the crash guarantee is unchanged,
+    the saving is 4.8-5.4x on real captures and the crash guarantee is unchanged,
     because each fsync is preceded by a Z_SYNC_FLUSH. Turn it off only when a
     human or `grep` needs to read the file directly.
     """

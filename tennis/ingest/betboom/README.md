@@ -8,15 +8,21 @@ possible. The reasoning and the measurements are in
 |---|---|
 | `extract_schema.py` | Recovers the feed's protobuf schema from the shipped JS bundle. Re-run on every `APP_BUILD` change. |
 | `proto/` | The recovered schema. 223 messages, 1012 fields, 25 enums. Compiles under `protoc`. |
-| `client.py` | The recorder: subscribes to live tennis, writes every frame raw, follows the delta pushes. |
+| `client.py` | The recorder: subscribes to live tennis, writes every frame raw, follows the pushed snapshots, and subscribes to game outcomes one by one so a reprice inside a game is recorded too. |
 | `generated/` | protoc output. Not in git — rebuild it. |
 
 ## Short version
 
 BetBoom's sportsbook is a white-label of sporthub.bet. The line is served
 **only** over `wss://ru-ws2.sporthub.bet:443/api/tree_ws/v1` as protobuf, as a
-delta subscription: one full snapshot per match, then one message per price
-change. There is no HTTP line endpoint.
+per-match subscription: a full snapshot of the match's markets, then a fresh
+full snapshot on every score change (median 13.5 s apart). Per-price messages
+(`newsletters_stake`) exist too, but only for outcomes named in a
+`stakes_subscribe`; since 3f695d8 the recorder sends one for every game
+outcome, because without it a reprice during a rally never reached the log.
+Two earlier drafts here got this wrong in opposite directions: the first said
+per-price pushes arrive unasked, the second that there are none.
+There is no HTTP line endpoint.
 
 That makes volume a question of staying connected rather than polling harder,
 and it means the feed hands over the **score and the serving side alongside the
@@ -34,8 +40,9 @@ python -m grpc_tools.protoc -I tennis/ingest/betboom/proto \
 python -m tennis.ingest.betboom.client --discover --max-matches 3
 ```
 
-Needs a host that can open a WebSocket: it will not run behind an HTTP CONNECT
-proxy that does not pass upgrades.
+Needs a host that can open a WebSocket. An HTTP CONNECT proxy that passes the
+upgrade is fine -- the agent sandbox's does, measured, after a first draft here
+claimed otherwise.
 
 ## What is verified and what is not
 
@@ -44,7 +51,8 @@ speaks it, a tennis match in the tree gets a full-market subscription, the
 concurrency cap holds, every frame reaches the raw log before parsing, and a
 malformed frame neither kills the session nor is lost.
 
-Not verified, and only one live session away: whether the server demands more of
-the handshake, whether game markets are offered on Challenger and ITF events,
-and how many concurrent `subscribe_full` subscriptions it tolerates. Start
-`--max-matches` low.
+Verified live on 22.09.2026 (`docs/TRACK_A_betboom_capture.md`): no handshake
+beyond the subscription is demanded; 10 concurrent `subscribe_full`
+subscriptions were all accepted with code 200; game-winner markets exist at
+every level, the exact-score market from Challenger and WTA 125 upward, and
+WTT/ITF carry only the two-way game market.

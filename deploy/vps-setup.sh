@@ -2,8 +2,9 @@
 # Set up the BetBoom capture on a fresh Linux host.
 #
 # Every step below was run end to end on a clean clone before being written
-# here: clone, venv, protobuf build, 393 tests, and a live recorder run that
-# subscribed to tennis and wrote a compressed log.
+# here: clone, venv, protobuf build, the tests, and a live recorder run that
+# subscribed to tennis and wrote a compressed log. Re-run 22.09.2026 on the
+# sparse clone deploy/README.md prescribes, which is what a capture host has.
 #
 #   bash deploy/vps-setup.sh            # from inside the repository
 #
@@ -20,6 +21,7 @@ echo "repository: $ROOT"
 # cannot run the capture, and that is worth knowing in the first ten seconds.
 echo
 echo "== checking the feed host is reachable =="
+command -v curl >/dev/null || { echo "  curl is missing: sudo apt install -y curl" >&2; exit 1; }
 if ! curl -sS --max-time 15 -o /dev/null -w '  HTTP %{http_code} from sporthub.bet\n' \
      --http1.1 "https://ru-ws2.sporthub.bet/api/tree_ws/v1" \
      -H 'Upgrade: websocket' -H 'Connection: Upgrade' \
@@ -57,7 +59,27 @@ echo "  built: $(ls tennis/ingest/betboom/generated/*_pb2.py | xargs -n1 basenam
 # --- 3. prove it works before trusting it with a night --------------------------
 echo
 echo "== tests =="
+set +e
 ./.venv/bin/python -m pytest tennis/ -q
+rc=$?
+set -e
+if [ "$rc" -eq 5 ]; then
+  # pytest's "no tests collected". The sparse checkout in deploy/README.md
+  # must include tennis/tests/ -- without it this used to stop here silently.
+  echo "  pytest found no tests: tennis/tests/ is missing from this checkout." >&2
+  echo "  On a sparse clone run:  git sparse-checkout add '/tennis/tests/**'" >&2
+  exit 1
+elif [ "$rc" -ne 0 ]; then
+  exit "$rc"
+fi
+
+# --- 4. the one directory the service may write --------------------------------
+# The unit confines writes to data/ (ReadWritePaths=), and systemd refuses to
+# start a unit whose ReadWritePaths= does not exist. Creating the empty
+# directory is the only thing this script ever does under data/.
+mkdir -p data/raw
+echo
+echo "== data/raw ready =="
 
 echo
 echo "== done =="
@@ -76,6 +98,6 @@ Or install it as a service that survives logout and reboot:
   sudo systemctl enable --now betboom-capture
   journalctl -u betboom-capture -f
 
-Disk: 0.3-0.9 GB a day for ten matches, measured. A month is 10-27 GB, so
+Disk: 0.3-0.9 GB a day for ten matches, measured. A month is 9-27 GB, so
 check free space before leaving it unattended.
 TXT
