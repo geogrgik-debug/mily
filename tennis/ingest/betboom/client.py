@@ -108,6 +108,7 @@ class BetBoomRecorder:
         self.sports_asked: set[int] = set()
         self.categories_asked: set[tuple[int, int]] = set()
         self.tournaments_asked: set[int] = set()
+        self.match_tier: dict[int, tuple[str, str]] = {}
 
     def uid(self, tag: str) -> str:
         self._uid += 1
@@ -242,6 +243,11 @@ class BetBoomRecorder:
                     await self._take_sport(ws, sport)
         elif which == "newsletters_sport":
             await self._take_sport(ws, body.sport)
+        elif which == "state_subscribe_sports":
+            for item in body.sports:
+                self._check_code("state_subscribe_sports.item", item)
+                if item.HasField("sport"):
+                    await self._take_sport(ws, item.sport)
         elif which == "state_subscribe_by_categories":
             for state in body.states:
                 for category in state.categories:
@@ -266,6 +272,11 @@ class BetBoomRecorder:
             self._note_stake(body.stake)
         elif which == "matches_subscribe_full":
             for item in body.full_matches:
+                self._check_code("matches_subscribe_full.item", item)
+                mid = item.match.info.id
+                if mid and (item.HasField("tournament") or item.HasField("category")):
+                    self.match_tier[mid] = (item.category.info.name,
+                                            item.tournament.info.name)
                 self._note_match(item.match)
 
     def _check_code(self, which: str, body) -> None:
@@ -318,7 +329,7 @@ class BetBoomRecorder:
         n_matches = sum(len(getattr(t, "matches", [])) for t in tournaments)
         self.sports_seen[(info.name or slug or str(info.id),
                           len(tournaments), n_matches)] += 1
-        if self.sport not in slug and self.sport not in name and "теннис" not in name:
+        if not self._is_wanted_sport(slug, name):
             return
 
         for tournament in tournaments:
@@ -327,15 +338,34 @@ class BetBoomRecorder:
         if info.id in self.sports_asked:
             return
         self.sports_asked.add(info.id)
+        # Measured live: state_subscribe_by_categories is the esports path only
+        # (sport_id must be 1, and the categories it returns are Dota 2, CS2,
+        # R6...). A real sport is subscribed with state_subscribe_sports, whose
+        # reply carries the whole tree -- ~100 KB for tennis, 27 tournaments,
+        # 68 matches -- and is followed by newsletters_match pushes.
         req = self.pb.MainRequest()
-        req.state_subscribe_by_categories.uid = self.uid("cats")
-        req.state_subscribe_by_categories.sport_id = info.id
-        req.state_subscribe_by_categories.types.append(self.pb.TREE_TYPES_LIVE)
-        await self._send(ws, req, tag=f"subscribe_categories:{info.id}")
+        req.state_subscribe_sports.uid = self.uid("sport")
+        item = req.state_subscribe_sports.sports.add()
+        item.uid = self.uid("s")
+        item.type = self.pb.TREE_TYPES_LIVE
+        item.sport_id = info.id
+        await self._send(ws, req, tag=f"subscribe_sport:{info.id}")
         print(f"[tree] sport {info.name!r} id={info.id} "
               f"tournaments={getattr(info, 'tournaments_count', 0)} "
-              f"matches={getattr(info, 'matches_count', 0)} -> asking categories",
+              f"matches={getattr(info, 'matches_count', 0)} -> subscribing",
               file=sys.stderr)
+
+    def _is_wanted_sport(self, slug: str, name: str) -> bool:
+        """Exact match on the slug, or on the name as a fallback.
+
+        This used to be a substring test, and the first end-to-end run filled
+        all six slots with Setka Cup -- table tennis, whose name contains
+        "теннис" and whose tree happened to arrive before tennis did. The
+        tennis sport carries url_slug 'tennis' exactly (id 4 on this feed).
+        """
+        want = self.sport.lower()
+        names = {"tennis": {"tennis", "теннис"}}.get(want, {want})
+        return slug == want or name in names
 
     async def _take_category(self, ws, category) -> None:
         info = category.info
@@ -442,6 +472,9 @@ class BetBoomRecorder:
 
         print(f"\n  subscribed to {len(self.subscribed)} match(es): "
               f"{sorted(self.subscribed)}", file=sys.stderr)
+        for mid in sorted(self.subscribed):
+            cat, tour = self.match_tier.get(mid, ("?", "?"))
+            print(f"    {mid}  [{cat}] {tour}", file=sys.stderr)
 
 
 def main(argv: list[str] | None = None) -> int:

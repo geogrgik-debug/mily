@@ -118,6 +118,23 @@ def test_non_tennis_sport_is_ignored(tmp_path):
     assert rec.subscribed == set()
 
 
+def test_table_tennis_is_not_tennis(tmp_path):
+    """Setka Cup filled every slot on the first end-to-end run."""
+    msg = pb.MainResponse()
+    state = msg.state_subscribe_by_sports.states.add()
+    sport = state.sports.add()
+    sport.info.id = 26
+    sport.info.name = "Настольный теннис"
+    sport.info.url_slug = "table-tennis"
+    sport.info.matches_count = 21
+    tour = sport.tournaments.add()
+    tour.info.name = "Setka Cup"
+    tour.matches.add().info.id = 5962314
+    rec, ws, _ = run_session(tmp_path, [msg.SerializeToString()])
+    assert rec.subscribed == set()
+    assert rec.sports_asked == set()
+
+
 def test_every_frame_is_logged_raw_before_parsing(tmp_path):
     frames = [tennis_tree(1), stake_push("Точный счёт гейма", "1-й сет, 6-й гейм", 4.3),
               b"\x00\xffnot-a-valid-message"]
@@ -166,20 +183,55 @@ def lazy_sports_tree() -> bytes:
     return msg.SerializeToString()
 
 
-def test_lazy_sports_layer_triggers_a_category_request(tmp_path):
-    """The bug that made the first live session silent."""
+def test_lazy_sports_layer_triggers_a_sport_subscription(tmp_path):
+    """The bug that made the first live session silent.
+
+    And the second one: the first fix asked state_subscribe_by_categories,
+    which the live server refuses for anything but esports (sport_id must be
+    1). A real sport is subscribed with state_subscribe_sports.
+    """
     rec, ws, _ = run_session(tmp_path, [lazy_sports_tree()])
     reqs = []
     for raw in ws.sent:
         r = pb.MainRequest(); r.ParseFromString(raw)
         reqs.append(r)
     kinds = [r.WhichOneof("type") for r in reqs]
-    assert "state_subscribe_by_categories" in kinds
-    cats = next(r for r in reqs
-                if r.WhichOneof("type") == "state_subscribe_by_categories")
-    assert cats.state_subscribe_by_categories.sport_id == 4
-    assert list(cats.state_subscribe_by_categories.types) == [pb.TREE_TYPES_LIVE]
+    assert "state_subscribe_by_categories" not in kinds
+    assert "state_subscribe_sports" in kinds
+    sub = next(r for r in reqs if r.WhichOneof("type") == "state_subscribe_sports")
+    item = sub.state_subscribe_sports.sports[0]
+    assert item.sport_id == 4
+    assert item.type == pb.TREE_TYPES_LIVE
     assert rec.sports_asked == {4}
+
+
+def test_sport_subscription_reply_carries_the_tree(tmp_path):
+    """The reply to state_subscribe_sports is the tree itself (~100 KB live)."""
+    msg = pb.MainResponse()
+    msg.state_subscribe_sports.code = 200
+    item = msg.state_subscribe_sports.sports.add()
+    item.code = 200
+    item.sport.info.id = 4
+    item.sport.info.name = "Теннис"
+    item.sport.info.url_slug = "tennis"
+    tour = item.sport.tournaments.add()
+    tour.info.id = 38997
+    tour.info.name = "WTA 125. Анкара. Хард. Турция"
+    for mid in (5961569, 5950399):
+        tour.matches.add().info.id = mid
+    rec, ws, _ = run_session(tmp_path, [msg.SerializeToString()])
+    assert rec.subscribed == {5961569, 5950399}
+
+
+def test_full_reply_records_the_tier(tmp_path, capsys):
+    msg = pb.MainResponse()
+    item = msg.matches_subscribe_full.full_matches.add()
+    item.code = 200
+    item.match.info.id = 5961569
+    item.category.info.name = "WTA"
+    item.tournament.info.name = "WTA 125. Анкара. Хард. Турция"
+    rec, _, _ = run_session(tmp_path, [msg.SerializeToString()])
+    assert rec.match_tier[5961569] == ("WTA", "WTA 125. Анкара. Хард. Турция")
 
 
 def test_category_layer_is_asked_only_once_per_sport(tmp_path):
@@ -196,7 +248,7 @@ def test_category_layer_is_asked_only_once_per_sport(tmp_path):
     for raw in ws.sent:
         r = pb.MainRequest(); r.ParseFromString(raw)
         kinds.append(r.WhichOneof("type"))
-    assert kinds.count("state_subscribe_by_categories") == 1
+    assert kinds.count("state_subscribe_sports") == 1
 
 
 def test_tennis_arriving_as_a_sport_push_is_taken(tmp_path):
