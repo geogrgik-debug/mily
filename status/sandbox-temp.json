@@ -1,0 +1,12 @@
+{
+  "age_s": 0.9,
+  "checked_at_s": 1790089194.4413743,
+  "disk_free_bytes": 27623878656,
+  "disk_free_days": 30.7,
+  "files": 1,
+  "newest_bytes": 4292635,
+  "newest_file": "/tmp/claude-0/-home-user-mily/7720f925-9d1e-5817-9093-04ae65b02e20/scratchpad/longrun/provider=betboom/date=2026-09-22/run-1790088293-702-1e2beb.jsonl.gz",
+  "ok": true,
+  "reason": "пишет, последний кадр 1 с назад",
+  "total_bytes": 4292635
+}
