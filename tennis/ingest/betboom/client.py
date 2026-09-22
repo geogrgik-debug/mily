@@ -170,8 +170,11 @@ class BetBoomRecorder:
         await self._send(ws, req, tag="state_subscribe_by_sports")
 
         asyncio.create_task(self._ping_loop(ws))
-        if self.discover:
-            asyncio.create_task(self._heartbeat_loop())
+        # Always, not only under --discover. The long-running capture is the
+        # mode that most needs to say it is alive: a silent process is
+        # indistinguishable from a hung one, and that is the mode left running
+        # for days. --discover only makes it chattier.
+        asyncio.create_task(self._heartbeat_loop(15.0 if self.discover else 60.0))
 
         async for frame in ws:
             if isinstance(frame, str):
