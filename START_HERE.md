@@ -128,10 +128,25 @@ Python 3.11 или новее.
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate          # Windows PowerShell: .venv\Scripts\Activate.ps1
+source .venv/bin/activate
 pip install -r requirements.txt
 python -m pytest tennis/ -q
 ```
+
+**В PowerShell активацию лучше не делать вообще.** `Activate.ps1` падает с
+`PSSecurityException` на машине, где не разрешён запуск скриптов, а это состояние
+по умолчанию. Вместо этого зови интерпретатор venv напрямую — он тот же самый:
+
+```powershell
+cd путь\к\mily            # именно в корень репозитория, иначе не найдётся requirements.txt
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m pytest tennis/ -q
+```
+
+Команды вводить **по одной**. Вставленный блоком многострочник PowerShell
+склеивает через `>>` и выполняет не так, как ожидаешь — на этом уже потеряли
+один заход.
 
 Ожидаемый результат: **305 прошло, 1 пропущен.** Один пропуск — это весь модуль
 тестов рекордера сразу (пять тестов), ему нужны сгенерированные классы protobuf.
@@ -163,8 +178,9 @@ python -m pytest tennis/ -q
 
 ### Про VS Code конкретно
 
-- **Интерпретатор.** Ctrl+Shift+P → «Python: Select Interpreter» → `.venv`.
-  Без этого тесты в панели Testing не найдутся.
+- **Интерпретатор.** Ctrl+Shift+P → «Python: Select Interpreter» → путь
+  `.venv\Scripts\python.exe` внутри репозитория (не системный Python и не venv,
+  случайно созданный уровнем выше). Без этого тесты в панели Testing не найдутся.
 - **`import tennis` работает из корня** благодаря `conftest.py`, который кладёт
   корень репозитория в `sys.path`. Запускать pytest надо из корня, не из
   подкаталога.
@@ -358,6 +374,13 @@ research/              ЛАБОРАТОРНЫЙ ЖУРНАЛ. Скрипты, п
   ядра исходнику держит `tennis/markov/tests/test_equivalence.py`.
 - PowerShell подменяет `curl` на `Invoke-WebRequest`, поэтому bash-синтаксис с
   `\` и `| head -c` там не работает. Нужен `curl.exe` одной строкой.
+- `.venv\Scripts\Activate.ps1` падает с `PSSecurityException`, если запуск
+  скриптов не разрешён — а это состояние Windows по умолчанию. Политику менять не
+  нужно: `.venv\Scripts\python.exe` работает и без активации.
+- Многострочные команды, вставленные в PowerShell блоком, склеиваются через `>>`
+  и выполняются не по одной. Плюс отдельная классика: запуск из родительского
+  каталога вместо корня репозитория даёт `Errno 2` на `requirements.txt` и venv
+  не в том месте.
 
 **Две мои ошибки, которые стоит знать, потому что они про суждение, а не про код.**
 
