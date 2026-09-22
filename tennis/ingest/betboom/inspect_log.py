@@ -23,7 +23,7 @@ from collections import Counter
 from pathlib import Path
 
 from tennis.ingest.betboom.client import load_pb
-from tennis.ingest.rawlog import read_raw
+from tennis.ingest.rawlog import find_logs, read_raw
 
 SCALARS = (bool, int, float, str, bytes)
 
@@ -145,9 +145,9 @@ def main(argv: list[str] | None = None) -> int:
               f"data/raw); run it from the repository root, or pass the path.",
               file=sys.stderr)
         return 1
-    files = sorted(root.rglob("*.jsonl")) if root.is_dir() else [root]
+    files = find_logs(root)
     if not files:
-        print(f"no .jsonl under {root}", file=sys.stderr)
+        print(f"no .jsonl or .jsonl.gz under {root}", file=sys.stderr)
         return 1
     print(f"log files: {[str(f) for f in files]}")
 

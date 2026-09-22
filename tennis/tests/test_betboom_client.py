@@ -15,7 +15,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tennis.ingest.clock import FakeClock
-from tennis.ingest.rawlog import RawLog, read_raw
+from tennis.ingest.rawlog import RawLog, find_logs, read_raw
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ingest/betboom/generated"))
 
@@ -75,7 +75,7 @@ class FakeWS:
 
 
 def run_session(tmp_path, frames, **kw):
-    log = RawLog(tmp_path, provider="betboom", clock=FakeClock())
+    log = RawLog(tmp_path, provider="betboom", clock=FakeClock(), compress=False)
     log.open()
     rec = BetBoomRecorder(log, **kw)
     ws = FakeWS(frames)
@@ -139,7 +139,7 @@ def test_every_frame_is_logged_raw_before_parsing(tmp_path):
     frames = [tennis_tree(1), stake_push("Точный счёт гейма", "1-й сет, 6-й гейм", 4.3),
               b"\x00\xffnot-a-valid-message"]
     rec, _, log = run_session(tmp_path, frames)
-    path = next(Path(tmp_path).rglob("*.jsonl"))
+    path = find_logs(tmp_path)[0]
     rx = [r["payload"] for r in read_raw(path) if r["dir"] == "rx"]
     assert rx == frames            # including the frame that failed to parse
     assert rec.stakes_seen == 1

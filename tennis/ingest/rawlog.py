@@ -11,15 +11,26 @@ either fully survives or does not: a process killed mid-write loses at most
 the last line, and the reader skips it. Parquet is the *compacted* form, built
 later from closed day files; it is not the write path.
 
+Written gzipped by default, because the feed repeats itself: BetBoom reprices
+by resending every stake on a match, so a minute of six matches is 2.1 MB of
+raw JSONL that gzip takes to 394 KB -- 5.4x, measured on a real capture. That
+turns ~2 GB a day into ~400 MB. The line-level crash guarantee survives
+compression: every fsync is preceded by a zlib Z_SYNC_FLUSH, so bytes already
+written stay decodable, and a reader that hits a torn final member stops there
+with everything before it intact. `compress=False` writes plain JSONL when a
+file needs to be readable by eye or by `grep`.
+
 Nothing here ever rewrites. Corrections are appended.
 """
 
 from __future__ import annotations
 
 import base64
+import gzip
 import json
 import os
 import threading
+import zlib
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -38,17 +49,26 @@ class RawLog:
     `fsync_every` trades durability against write cost. The default of 1
     second bounds a crash to one second of frames; set it to 0 to fsync every
     frame while recording something irreplaceable and rare.
+
+    `compress` writes `.jsonl.gz` instead of `.jsonl`. It is on by default:
+    the saving is 5.4x on real captures and the crash guarantee is unchanged,
+    because each fsync is preceded by a Z_SYNC_FLUSH. Turn it off only when a
+    human or `grep` needs to read the file directly.
     """
 
     def __init__(self, root: str | Path, *, provider: str,
-                 clock: Clock | None = None, fsync_every: float = 1.0):
+                 clock: Clock | None = None, fsync_every: float = 1.0,
+                 compress: bool = True):
         self.root = Path(root)
         self.provider = provider
         self.clock = clock or Clock()
         self.fsync_every = fsync_every
+        self.compress = compress
         self.run_id = new_run_id(self.clock.now().wall_ns)
         self._lock = threading.Lock()
-        self._fh = None
+        self._sink = None          # what lines are written to (bytes)
+        self._gz = None            # the GzipFile, when compressing
+        self._raw = None           # the OS-level file, the thing we fsync
         self._day = None
         self._last_fsync = 0.0
         self.frames = 0
@@ -74,36 +94,67 @@ class RawLog:
         })
 
     def close(self) -> None:
-        if self._fh is not None:
+        if self._sink is not None:
             self._write_meta("run_end", {
                 "frames": self.frames,
                 "bytes": self.bytes,
                 "seconds": self.clock.now() - self._start,
             })
             with self._lock:
-                self._fh.flush()
-                os.fsync(self._fh.fileno())
-                self._fh.close()
-                self._fh = None
+                self._close_sink()
 
     # -- writing -----------------------------------------------------------
 
     def _path_for(self, at: Instant) -> tuple[Path, str]:
         day = datetime.fromtimestamp(at.wall_ns / 1e9, timezone.utc).strftime("%Y-%m-%d")
-        return self.root / f"provider={self.provider}" / f"date={day}" / f"{self.run_id}.jsonl", day
+        suffix = ".jsonl.gz" if self.compress else ".jsonl"
+        return (self.root / f"provider={self.provider}" / f"date={day}"
+                / f"{self.run_id}{suffix}"), day
 
-    def _fh_for(self, at: Instant):
+    def _sink_for(self, at: Instant):
         path, day = self._path_for(at)
-        if self._fh is None or day != self._day:
-            if self._fh is not None:
-                self._fh.flush(); os.fsync(self._fh.fileno()); self._fh.close()
+        if self._sink is None or day != self._day:
+            self._close_sink()
             path.parent.mkdir(parents=True, exist_ok=True)
             # Append mode: a run that is restarted onto the same path extends
             # it rather than truncating it. Opening 'w' here would be the one
-            # bug that silently destroys a day.
-            self._fh = open(path, "a", encoding="utf-8")
+            # bug that silently destroys a day. For gzip this appends a second
+            # member, which every gzip reader concatenates transparently.
+            self._raw = open(path, "ab")
+            if self.compress:
+                # mtime from our own clock, not the wall: a FakeClock run then
+                # produces byte-identical output, which is what makes the
+                # compressed path testable at all.
+                self._gz = gzip.GzipFile(fileobj=self._raw, mode="ab",
+                                         mtime=int(at.wall_ns // 1_000_000_000))
+                self._sink = self._gz
+            else:
+                self._gz = None
+                self._sink = self._raw
             self._day = day
-        return self._fh
+        return self._sink
+
+    def _flush_sink(self) -> None:
+        """Make everything written so far readable by another process.
+
+        Z_SYNC_FLUSH ends the current deflate block and pads to a byte
+        boundary without resetting the dictionary, so the bytes on disk are a
+        decodable prefix and compression barely suffers. Without it a crash
+        would lose the whole in-memory deflate window, not one line.
+        """
+        if self._gz is not None:
+            self._gz.flush(zlib.Z_SYNC_FLUSH)
+        self._raw.flush()
+        os.fsync(self._raw.fileno())
+
+    def _close_sink(self) -> None:
+        if self._sink is None:
+            return
+        self._flush_sink()
+        if self._gz is not None:
+            self._gz.close()            # writes the gzip trailer
+        self._raw.close()
+        self._sink = self._gz = self._raw = None
 
     def write(self, payload: bytes | str, *, direction: str = "rx",
               channel: str = "", ts_source_ns: int | None = None,
@@ -135,13 +186,13 @@ class RawLog:
             row["meta"] = meta
         line = json.dumps(row, ensure_ascii=False, separators=(",", ":"))
         with self._lock:
-            fh = self._fh_for(at)
-            fh.write(line + "\n")
+            sink = self._sink_for(at)
+            sink.write((line + "\n").encode("utf-8"))
             self.frames += 1
             self.bytes += len(payload)
             elapsed = at.mono_ns / 1e9
             if self.fsync_every <= 0 or elapsed - self._last_fsync >= self.fsync_every:
-                fh.flush(); os.fsync(fh.fileno())
+                self._flush_sink()
                 self._last_fsync = elapsed
         return eid
 
@@ -150,21 +201,58 @@ class RawLog:
                    direction="meta", channel="_run")
 
 
+LOG_GLOBS = ("*.jsonl", "*.jsonl.gz")
+
+
+def find_logs(root: str | Path):
+    """Every log file under `root`, compressed or not, in a stable order.
+
+    Callers should use this rather than globbing `*.jsonl` themselves, which
+    silently matches nothing once capture is compressed.
+    """
+    root = Path(root)
+    if root.is_file():
+        return [root]
+    found = []
+    for pattern in LOG_GLOBS:
+        found.extend(root.rglob(pattern))
+    return sorted(set(found))
+
+
 def read_raw(path: str | Path):
-    """Replay a raw log, skipping a torn final line.
+    """Replay a raw log, skipping a torn tail. Handles .jsonl and .jsonl.gz.
 
     A truncated last line is the expected shape of a crash, not corruption of
-    the file, so it is dropped rather than raising.
+    the file, so it is dropped rather than raising. The same applies one layer
+    down for a compressed log: a process killed mid-write leaves a gzip member
+    without its trailer, and the decompressor raises at that point. Everything
+    before it is intact and is yielded; the error ends iteration rather than
+    propagating, because losing the last second of a capture is the documented
+    cost of the fsync interval, not a failure to report.
     """
-    with open(path, encoding="utf-8") as fh:
-        for line in fh:
+    path = Path(path)
+    opener = gzip.open if path.suffix == ".gz" else open
+    fh = opener(path, "rb")
+    try:
+        while True:
+            try:
+                line = fh.readline()
+            except (OSError, EOFError, zlib.error):
+                # gzip.BadGzipFile is an OSError; a truncated member can also
+                # surface as EOFError or a raw zlib error depending on where
+                # the process died.
+                break
+            if not line:
+                break
             line = line.strip()
             if not line:
                 continue
             try:
                 row = json.loads(line)
-            except json.JSONDecodeError:
+            except (json.JSONDecodeError, UnicodeDecodeError):
                 continue
             if row.get("enc") == "b64":
                 row["payload"] = base64.b64decode(row["payload"])
             yield row
+    finally:
+        fh.close()

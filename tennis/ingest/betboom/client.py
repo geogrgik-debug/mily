@@ -488,6 +488,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--sport", default="tennis")
     ap.add_argument("--discover", action="store_true",
                     help="print the market inventory as it arrives")
+    ap.add_argument("--no-compress", action="store_true",
+                    help="write plain .jsonl instead of .jsonl.gz. Costs about "
+                         "5x the disk (measured); use it only to read a capture "
+                         "by eye")
     ap.add_argument("--time-filter", default="",
                     help="value for settings_set.time_filter. Left empty the "
                          "call is skipped, because sending it without one is "
@@ -495,7 +499,7 @@ def main(argv: list[str] | None = None) -> int:
                          "tree works without it")
     args = ap.parse_args(argv)
 
-    with RawLog(args.out, provider="betboom") as log:
+    with RawLog(args.out, provider="betboom", compress=not args.no_compress) as log:
         rec = BetBoomRecorder(log, url=args.url, max_matches=args.max_matches,
                               sport=args.sport, discover=args.discover,
                               time_filter=args.time_filter)
