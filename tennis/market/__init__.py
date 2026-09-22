@@ -11,6 +11,10 @@ game a price belongs to, and every downstream join is impossible.
 more than one; how the excess is removed is a modelling choice with real
 consequences, so the choices are named and separate rather than folded into a
 single "implied probability" helper.
+
+`diff` says what moved. The feed re-sends the whole board every dozen seconds
+rather than pushing a price change, so which prices changed is only knowable
+by differencing two consecutive snapshots.
 """
 from tennis.market.names import (
     MarketRef,
@@ -26,6 +30,7 @@ from tennis.market.overround import (
     shin,
 )
 from tennis.market.fit import fit_point_prob, ExactScoreFit
+from tennis.market.diff import PriceChange, diff_snapshots
 
 __all__ = [
     "MarketRef",
@@ -39,4 +44,6 @@ __all__ = [
     "shin",
     "fit_point_prob",
     "ExactScoreFit",
+    "PriceChange",
+    "diff_snapshots",
 ]
