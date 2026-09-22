@@ -1,0 +1,16 @@
+{
+  "age_s": 2.1,
+  "checked_at_s": 1790102101.6328304,
+  "disk_free_bytes": 25116508160,
+  "disk_free_days": 27.9,
+  "files": 1,
+  "last_stake_age_s": 16.3,
+  "newest_bytes": 474063,
+  "newest_file": "data/raw/provider=betboom/date=2026-09-22/run-1790102024-356580-2b06c7.jsonl.gz",
+  "ok": true,
+  "reason": "пишет, 10 подписок, 5231 котировок",
+  "reconnects": 0,
+  "stakes_seen": 5231,
+  "subscribed": 10,
+  "total_bytes": 474063
+}
