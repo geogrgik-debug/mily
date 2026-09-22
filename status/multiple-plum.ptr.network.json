@@ -1,16 +1,16 @@
 {
-  "age_s": 0.4,
-  "checked_at_s": 1790104801.631543,
-  "disk_free_bytes": 25102888960,
+  "age_s": 2.0,
+  "checked_at_s": 1790105101.5217326,
+  "disk_free_bytes": 25101750272,
   "disk_free_days": 27.9,
   "files": 1,
   "last_stake_age_s": 16.4,
-  "newest_bytes": 13443678,
+  "newest_bytes": 14537525,
   "newest_file": "data/raw/provider=betboom/date=2026-09-22/run-1790102024-356580-2b06c7.jsonl.gz",
   "ok": true,
-  "reason": "пишет, 10 подписок, 186952 котировок",
+  "reason": "пишет, 10 подписок, 202479 котировок",
   "reconnects": 0,
-  "stakes_seen": 186952,
+  "stakes_seen": 202479,
   "subscribed": 10,
-  "total_bytes": 13443678
+  "total_bytes": 14537525
 }
