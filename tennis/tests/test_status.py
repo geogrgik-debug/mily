@@ -83,14 +83,14 @@ def test_cli_writes_atomically_and_sets_the_exit_code(tmp_path, capsys):
     assert main([str(tmp_path / "gone")]) == 1
 
 
-def _sidecar(root, **fields):
+def _sidecar(root, run_id="r", **fields):
     import json, time
-    base = {"run_id": "r", "written_at_s": time.time(), "frames": 1000,
+    base = {"run_id": run_id, "written_at_s": time.time(), "frames": 1000,
             "subscribed": 10, "stakes_seen": 5000,
             "last_stake_at_s": time.time() - 5, "reconnects": 0,
             "errors": 0, "bad_codes": 0}
     base.update(fields)
-    (root / "_recorder.json").write_text(json.dumps(base))
+    (root / f"_recorder-{run_id}.json").write_text(json.dumps(base))
 
 
 def test_growing_file_with_no_subscriptions_is_not_ok(tmp_path):
@@ -137,6 +137,32 @@ def test_without_a_sidecar_the_verdict_says_it_is_file_only(tmp_path):
 
 def test_a_corrupt_sidecar_is_ignored_not_fatal(tmp_path):
     root = _capture(tmp_path)
-    (root / "_recorder.json").write_text("{not json")
+    (root / "_recorder-x.json").write_text("{not json")
     st = capture_status(root)
     assert st.ok and st.subscribed is None
+
+
+def test_a_dead_probes_sidecar_does_not_speak_for_the_live_capture(tmp_path):
+    """Observed live: a two-minute --discover probe exited and left its status
+    file; the hour-old real capture kept writing beside it. One shared sidecar
+    name meant the checker would have called the live capture dead."""
+    import time
+    root = _capture(tmp_path)
+    _sidecar(root, run_id="probe", subscribed=3, stakes_seen=40,
+             written_at_s=time.time() - 3600)            # exited an hour ago
+    _sidecar(root, run_id="live", subscribed=10, stakes_seen=68412)
+    st = capture_status(root)
+    assert st.ok, st.reason
+    assert st.subscribed == 10 and st.stakes_seen == 68412
+
+
+def test_only_a_stale_sidecar_is_ignored_not_trusted(tmp_path):
+    """A crashed run's file must not make a still-writing capture look dead,
+    nor be mistaken for proof that it is alive."""
+    import time
+    root = _capture(tmp_path)
+    _sidecar(root, run_id="crashed", subscribed=0, written_at_s=time.time() - 3600)
+    st = capture_status(root)
+    assert st.ok                       # the log itself is fresh
+    assert st.subscribed is None       # and no live counters were claimed
+    assert "только по файлу" in st.reason

@@ -367,7 +367,8 @@ def test_recorder_publishes_its_counters_beside_the_log(tmp_path):
     asyncio.run(rec._session(FakeWS([tennis_tree(555),
                                      stake_push("Исход", "", 1.8)])))
     rec._write_sidecar()
-    side = json.loads((tmp_path / "_recorder.json").read_text())
+    side = json.loads(rec.sidecar_path().read_text())
+    assert rec.sidecar_path().name == f"_recorder-{log.run_id}.json"
     assert side["subscribed"] == 1
     assert side["stakes_seen"] == 1
     assert side["last_stake_at_s"] is not None
@@ -436,3 +437,15 @@ def test_skip_report_names_the_tournaments(tmp_path, capsys):
     err = capsys.readouterr().err
     assert "tournaments not subscribed" in err
     assert "ESportsBattle" in err and "Пары" in err
+
+
+def test_sidecar_is_removed_on_clean_exit(tmp_path):
+    log = RawLog(tmp_path, provider="betboom", clock=FakeClock(), compress=False)
+    log.open()
+    rec = BetBoomRecorder(log)
+    rec._write_sidecar()
+    assert rec.sidecar_path().exists()
+    rec._remove_sidecar()
+    assert not rec.sidecar_path().exists()
+    rec._remove_sidecar()                       # idempotent
+    log.close()

@@ -41,7 +41,7 @@ STALE_AFTER_S = 300.0
 # the subscriptions are gone even though the log keeps growing.
 NO_STAKES_AFTER_S = 600.0
 
-SIDECAR = "_recorder.json"
+SIDECAR_GLOB = "_recorder*.json"
 
 
 @dataclass(frozen=True)
@@ -85,7 +85,7 @@ def capture_status(root: str | Path, *, clock: Clock | None = None,
         free = 0
     free_days = (free / bytes_per_day) if bytes_per_day > 0 else None
 
-    side = _read_sidecar(root)
+    side = _read_sidecar(root, now, stale_after_s)
 
     def result(ok, reason, newest=None, newest_bytes=0, age=None,
                files=0, total=0):
@@ -158,12 +158,31 @@ def capture_status(root: str | Path, *, clock: Clock | None = None,
                         f"(счётчиков рекордера нет — только по файлу)", **common)
 
 
-def _read_sidecar(root: Path) -> dict:
-    """The recorder's own counters, if it left any. Absence is not an error."""
-    try:
-        return json.loads((root / SIDECAR).read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+def _read_sidecar(root: Path, now: float, max_age_s: float) -> dict:
+    """The freshest recorder sidecar, or {} if none is recent enough to trust.
+
+    There can be several: one per run, and a crashed run leaves its file
+    behind. The one written most recently describes the process that is
+    actually alive. A sidecar older than `max_age_s` is ignored outright --
+    the live recorder rewrites its file every heartbeat, so an old one belongs
+    to a process that is gone, and judging the capture by it would report a
+    dead run while a live one keeps writing next to it. That exact false
+    alarm was observed: a two-minute probe's file outlived the probe.
+    """
+    best, best_at = {}, -1.0
+    for path in root.glob(SIDECAR_GLOB):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        at = data.get("written_at_s")
+        if not isinstance(at, (int, float)):
+            continue
+        if at > best_at:
+            best, best_at = data, at
+    if best and now - best_at > max_age_s:
         return {}
+    return best
 
 
 def main(argv=None) -> int:

@@ -235,6 +235,17 @@ class BetBoomRecorder:
                   file=sys.stderr)
             self._write_sidecar()
 
+    def sidecar_path(self) -> Path:
+        return Path(self.log.root) / f"_recorder-{self.log.run_id}.json"
+
+    def _remove_sidecar(self) -> None:
+        """A recorder that exits cleanly must not leave a status file behind
+        claiming to be alive. Only a crash leaves one, and status.py ages it out."""
+        try:
+            self.sidecar_path().unlink(missing_ok=True)
+        except OSError:
+            pass
+
     def _write_sidecar(self) -> None:
         """Publish live internal state beside the log, for an outside checker.
 
@@ -247,7 +258,11 @@ class BetBoomRecorder:
         decompression -- so a checker can run every few minutes.
         """
         try:
-            path = Path(self.log.root) / "_recorder.json"
+            # One file per run. A single shared name meant the last recorder to
+            # exit -- a two-minute probe -- overwrote the live capture's status
+            # with its own, and an outside checker would have called the live
+            # one dead. Stale files from crashes are ignored by age in status.py.
+            path = self.sidecar_path()
             path.parent.mkdir(parents=True, exist_ok=True)
             payload = {
                 "run_id": self.log.run_id,
@@ -627,6 +642,7 @@ def main(argv: list[str] | None = None) -> int:
             pass
         finally:
             rec.report()
+            rec._remove_sidecar()
             print(f"\n{log.frames} frames, {log.bytes} bytes -> {log.root}",
                   file=sys.stderr)
     return 0
