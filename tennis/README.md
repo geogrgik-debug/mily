@@ -22,7 +22,7 @@ starts at the probability core.
 | `ingest/names.py` | Cross-provider match identity: `initial.surname` normalisation and match keys. | done |
 | `ingest/rawlog.py` | Append-only, crash-safe raw frame log. Gzipped by default -- 4.8x measured on live capture -- with the per-line crash guarantee preserved through a Z_SYNC_FLUSH before every fsync. | done |
 | `ingest/betboom/` | The BetBoom line recorder. See its README. | done |
-| `ratings/` | Elo and as-of priors, with serialisable state so the live process loads ratings instead of recomputing 270k matches. | next |
+| `ratings/` | Elo and as-of serve priors (Elo inversion blended with Barnett–Clarke), configured from the B1c sweep, with a snapshot the live process loads in 0.12 s instead of replaying 270k matches. Elo bit-identical to `research/elo_prior.py`; B1 numbers reproduced to four decimals. See its README. | done |
 | `market/` | Market-name parsing, overround, Shin, and the single-p fit behind a game book. Measured: the bookmaker prices the *next* game 74% of the time. See its README. | done |
 | `state/` `features/` `models/` `replay/` `eval/` | Live match state, snapshot features, residual model, replay backtest, metrics. | not started |
 
