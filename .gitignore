@@ -7,3 +7,6 @@ tennis/ingest/betboom/generated/
 data/
 *.jsonl
 *.parquet
+
+# local virtual environment (was committed by accident in 474f62f)
+.venv/
