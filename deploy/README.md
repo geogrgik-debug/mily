@@ -1,12 +1,16 @@
 # deploy/ — запись на отдельной машине
 
 Полный порядок от пустого VPS до записи, которая переживает перезагрузку и сама
-докладывает о себе. Каждый шаг ниже либо прогнан с чистого клона, либо помечен
-как непроверенный.
+докладывает о себе. Каждый шаг ниже либо прогнан 22.09.2026 через **настоящий
+разреженный клон** — такой, какой описан в шаге 2, а не полный — либо помечен
+как непроверенный. Непроверенным остался один: юнит systemd.
 
 Требования к машине: Linux с systemd, Python 3.11+ (Ubuntu 24.04 или Debian 12;
-**не** Ubuntu 22.04 — там 3.10), 1 ГБ памяти, 40 ГБ диска на два месяца записи
-(0.3–0.9 ГБ в сутки на десять матчей, измерено).
+**не** Ubuntu 22.04 — там 3.10), 1 ГБ памяти. Диск: 0.3–0.9 ГБ в сутки на
+десять матчей, измерено; 40 ГБ — это 44 дня по верхней границе и четыре месяца
+по нижней, на два месяца с запасом нужно 60 ГБ. Часы должны синхронизироваться
+по NTP — решающее число проекта это задержка, и метка времени с расстроенных
+часов её испортит: `timedatectl` → `System clock synchronized: yes`.
 
 ## 1. Доступ к репозиторию с машины
 
@@ -27,20 +31,31 @@ deploy key**, вставить, **поставить галочку «Allow writ
 
 ```bash
 ssh -T git@github.com
+# на первый вопрос про отпечаток хоста ответить yes — это же нужно cron в шаге 5
 # ожидается: Hi geogrgik-debug/mily! You've successfully authenticated...
 ```
 
 ## 2. Только код записи, без документов проекта
 
+Ветка по умолчанию у репозитория — `main`, и она пустая: README и фото. Вся
+работа лежит в ветке разработки, и её надо назвать явно. Без `--branch` шаг 3
+упадёт с «No such file: deploy/vps-setup.sh» — раннбук так и был написан до
+22.09.
+
 ```bash
-sudo apt update && sudo apt install -y git python3-venv
-git clone --depth 1 --filter=blob:none --sparse git@github.com:geogrgik-debug/mily.git capture
+sudo apt update && sudo apt install -y git curl python3-venv
+git clone --depth 1 --filter=blob:none --sparse \
+    --branch claude/tennis-prediction-audit-kskn26 \
+    git@github.com:geogrgik-debug/mily.git capture
 cd capture
-git sparse-checkout set --no-cone '/tennis/__init__.py' '/tennis/ingest/**' '/deploy/**' '/requirements.txt' '/conftest.py'
+git sparse-checkout set --no-cone '/tennis/__init__.py' '/tennis/ingest/**' \
+    '/tennis/tests/**' '/deploy/**' '/requirements.txt' '/conftest.py'
 ```
 
-Проверено: на диске 340 КБ — рекордер, `deploy/`, зависимости, и ничего из
-`docs/`, `research/`, `markov/`, `market/`.
+Проверено: на диске ~420 КБ — рекордер, его тесты, `deploy/`, зависимости, и
+ничего из `docs/`, `research/`, `markov/`, `market/`. `tennis/tests/` нужны:
+без них `vps-setup.sh` останавливается на шаге тестов с «no tests ran» (код 5)
+и не доходит до конца — так было в первой редакции.
 
 ## 3. Окружение
 
@@ -50,7 +65,9 @@ bash deploy/vps-setup.sh
 
 Первой строкой проверяет, достаёт ли машина до фида — ждёт `HTTP 101`. Если
 нет, дальше идти бессмысленно: провайдер режет исходящий трафик. Потом venv,
-зависимости, классы protobuf, тесты. Прогнан с чистого клона целиком.
+зависимости, классы protobuf, тесты рекордера (60 штук; ядро `markov/` на эту
+машину не попадает) и пустой `data/raw` — единственный каталог, куда службе
+разрешено писать. Прогнан с чистого разреженного клона целиком.
 
 ## 4. Служба
 
@@ -59,25 +76,45 @@ sudo cp deploy/betboom-capture.service /etc/systemd/system/
 sudo sed -i "s#__ROOT__#$(pwd)#; s#__USER__#$(id -un)#" /etc/systemd/system/betboom-capture.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now betboom-capture
-journalctl -u betboom-capture -f        # раз в минуту строка [hb]
+systemctl status betboom-capture --no-pager   # ожидается: active (running)
+journalctl -u betboom-capture -f              # раз в минуту строка [hb]
 ```
 
-Перезапускается всегда, без лимита попыток. Юнит-файл тестами не покрыт —
-проверяется первым запуском на месте.
+Перезапускается всегда, без лимита попыток. Пишет только в `data/`: юнит
+закрывает остальную файловую систему (`ProtectHome=read-only`,
+`ReadWritePaths=…/data`), поэтому `data/` обязан существовать до первого
+запуска — иначе systemd не поднимет службу вовсе (`status=226/NAMESPACE`).
+`vps-setup.sh` его создаёт.
+
+**Это единственный шаг, не прогнанный вживую** — в песочнице нет systemd.
+Проверяется первым запуском на месте. Если `status` показывает не
+`active (running)`, присылать вывод обеих команд выше плюс
+`journalctl -u betboom-capture -n 50 --no-pager`.
 
 ## 5. Отчёт о себе
 
 ```bash
+systemctl is-active cron    # active; если нет: sudo apt install -y cron
 crontab -e
 # добавить строку (путь подставить свой):
 */5 * * * * cd /home/USER/capture && bash deploy/heartbeat-push.sh >> /tmp/hb.log 2>&1
 ```
 
 Раз в пять минут кладёт `status/<hostname>.json` в ветку `capture-status`.
-Проверено против настоящего удалённого: ветка создаётся сама, в ней только
-статус. Раз в два часа отдельная сессия читает эту ветку и будит владельца, если
-запись встала или машина замолчала (routine `trig_01KZG924NGgJccJgn27NxiRN`,
-см. `HANDOFF.md`).
+Первый раз запустить руками и посмотреть на вывод:
+
+```bash
+bash deploy/heartbeat-push.sh
+# последняя строка: pushed <hostname> to capture-status
+```
+
+Проверено из такого же мелкого разреженного клона против копии удалённого
+репозитория, в обоих состояниях — когда ветка `capture-status` уже есть и когда
+её нет: в ветку попадает только `status/<hostname>.json`, рабочий каталог записи
+не трогается. Раз в два часа отдельная сессия читает эту ветку и будит
+владельца, если запись встала или машина замолчала (routine
+`trig_01KZG924NGgJccJgn27NxiRN`, см. `HANDOFF.md`); задержка обнаружения —
+до двух с небольшим часов.
 
 Ручная проверка с самой машины, в любой момент:
 
@@ -100,8 +137,12 @@ rsync -avz --progress USER@VPS:/home/USER/capture/data/raw/ ./data/raw/
 
 | Симптом | Причина | Что делать |
 |---|---|---|
+| после `git clone` нет `deploy/` | клон без `--branch` попал в пустой `main` | клонировать заново, как в шаге 2 |
 | `vps-setup.sh` не даёт `HTTP 101` | провайдер режет исходящий трафик | другой VPS; из Европы фид доступен, проверено |
+| `vps-setup.sh`: `no tests ran`, выход с кодом 1 | в разреженном наборе нет `tennis/tests/` | `git sparse-checkout add '/tennis/tests/**'` и повторить |
+| `systemctl status` → `status=226/NAMESPACE` | нет каталога `data/` или неверный `__ROOT__` в юните | `mkdir -p data/raw`, сверить пути в `/etc/systemd/system/betboom-capture.service`, `daemon-reload`, `restart` |
 | `[hb] ... 0 subscribed` при растущем файле | подписки потеряны после обрыва | должно чиниться само (переподписка после реконнекта); если нет — `systemctl restart betboom-capture` и присылать `journalctl` |
 | `heartbeat-push.sh` не пушит | у deploy key нет write access | перевыпустить ключ с галочкой |
+| `heartbeat-push.sh`: `outside of your sparse-checkout definition` или `could not push after 3 attempts` при живом ключе | старая версия скрипта: worktree унаследовал разреженность, мелкий клон не видел `origin/capture-status` | `git pull` — исправлено 22.09 |
 | Много `[sub]` на турниры «Пары» | старая версия кода | `git pull` — парные и симулятор не подписываются с `36cfe9c` |
 | `APP_BUILD` конторы сменился | схема protobuf устарела, поля молча разъехались | пересобрать схему: `tennis/ingest/betboom/extract_schema.py`, рецепт в `docs/TRACK_A_betboom_capture.md` |
