@@ -91,8 +91,10 @@ def test_subscribes_to_tennis_match_with_full_markets(tmp_path):
         r = pb.MainRequest(); r.ParseFromString(raw)
         reqs.append(r)
     kinds = [r.WhichOneof("type") for r in reqs]
-    assert kinds[0] == "settings_set"
-    assert kinds[1] == "state_subscribe_by_sports"
+    # settings_set is no longer sent: the live server refuses it with code 400
+    # and a violation on `time_filter`, and the tree works without it.
+    assert "settings_set" not in kinds
+    assert kinds[0] == "state_subscribe_by_sports"
     assert "matches_subscribe_full" in kinds
     full = next(r for r in reqs if r.WhichOneof("type") == "matches_subscribe_full")
     # one match per request, as the client's own config caps it
@@ -131,3 +133,142 @@ def test_garbage_frame_does_not_kill_the_session(tmp_path):
     frames = [b"\x00\xffgarbage", tennis_tree(7)]
     rec, _, _ = run_session(tmp_path, frames)
     assert rec.subscribed == {7}   # recovered and kept going
+
+
+def test_settings_set_is_sent_only_with_a_time_filter(tmp_path):
+    """The one value the schema does not supply has to come from the caller."""
+    _, ws, _ = run_session(tmp_path, [], time_filter="all")
+    kinds = []
+    for raw in ws.sent:
+        r = pb.MainRequest(); r.ParseFromString(raw)
+        kinds.append(r.WhichOneof("type"))
+    assert kinds[0] == "settings_set"
+    first = pb.MainRequest(); first.ParseFromString(ws.sent[0])
+    assert first.settings_set.time_filter == "all"
+
+
+def lazy_sports_tree() -> bytes:
+    """The sports layer as the live server actually sends it: counts, no children.
+
+    Measured 2026-09-22: 16 sports, tennis id=4 with matches_count=62 and
+    tournaments_count=28, and not one tournament inline.
+    """
+    msg = pb.MainResponse()
+    msg.state_subscribe_by_sports.code = 200
+    state = msg.state_subscribe_by_sports.states.add()
+    state.type = pb.TREE_TYPES_LIVE
+    sport = state.sports.add()
+    sport.info.id = 4
+    sport.info.name = "Теннис"
+    sport.info.url_slug = "tennis"
+    sport.info.matches_count = 62
+    sport.info.tournaments_count = 28
+    return msg.SerializeToString()
+
+
+def test_lazy_sports_layer_triggers_a_category_request(tmp_path):
+    """The bug that made the first live session silent."""
+    rec, ws, _ = run_session(tmp_path, [lazy_sports_tree()])
+    reqs = []
+    for raw in ws.sent:
+        r = pb.MainRequest(); r.ParseFromString(raw)
+        reqs.append(r)
+    kinds = [r.WhichOneof("type") for r in reqs]
+    assert "state_subscribe_by_categories" in kinds
+    cats = next(r for r in reqs
+                if r.WhichOneof("type") == "state_subscribe_by_categories")
+    assert cats.state_subscribe_by_categories.sport_id == 4
+    assert list(cats.state_subscribe_by_categories.types) == [pb.TREE_TYPES_LIVE]
+    assert rec.sports_asked == {4}
+
+
+def test_category_layer_is_asked_only_once_per_sport(tmp_path):
+    """The same sport arrives repeatedly as newsletters_sport pushes."""
+    push = pb.MainResponse()
+    push.newsletters_sport.code = 200
+    push.newsletters_sport.sport.info.id = 4
+    push.newsletters_sport.sport.info.name = "Теннис"
+    push.newsletters_sport.sport.info.url_slug = "tennis"
+    push.newsletters_sport.sport.info.tournaments_count = 28
+    frame = push.SerializeToString()
+    _, ws, _ = run_session(tmp_path, [lazy_sports_tree(), frame, frame, frame])
+    kinds = []
+    for raw in ws.sent:
+        r = pb.MainRequest(); r.ParseFromString(raw)
+        kinds.append(r.WhichOneof("type"))
+    assert kinds.count("state_subscribe_by_categories") == 1
+
+
+def test_tennis_arriving_as_a_sport_push_is_taken(tmp_path):
+    """Tennis came as newsletters_sport, not inside the subscription reply."""
+    push = pb.MainResponse()
+    push.newsletters_sport.sport.info.id = 4
+    push.newsletters_sport.sport.info.name = "Теннис"
+    push.newsletters_sport.sport.info.url_slug = "tennis"
+    push.newsletters_sport.sport.info.tournaments_count = 28
+    rec, _, _ = run_session(tmp_path, [push.SerializeToString()])
+    assert rec.sports_asked == {4}
+
+
+def test_category_with_no_tournaments_asks_the_next_layer(tmp_path):
+    msg = pb.MainResponse()
+    state = msg.state_subscribe_by_categories.states.add()
+    cat = state.categories.add()
+    cat.info.id = 302
+    cat.info.sport_id = 4
+    cat.info.name = "ATP"
+    cat.info.tournaments_count = 3
+    rec, ws, _ = run_session(tmp_path, [msg.SerializeToString()])
+    reqs = []
+    for raw in ws.sent:
+        r = pb.MainRequest(); r.ParseFromString(raw)
+        reqs.append(r)
+    sub = next(r for r in reqs
+               if r.WhichOneof("type") == "state_subscribe_categories")
+    item = sub.state_subscribe_categories.categories[0]
+    assert (item.sport_id, item.category_id) == (4, 302)
+    assert rec.categories_asked == {(4, 302)}
+
+
+def test_tournament_with_no_matches_asks_the_next_layer(tmp_path):
+    msg = pb.MainResponse()
+    msg.newsletters_tournament.tournament.info.id = 40349
+    msg.newsletters_tournament.tournament.info.name = "Hangzhou"
+    msg.newsletters_tournament.tournament.info.matches_count = 4
+    rec, ws, _ = run_session(tmp_path, [msg.SerializeToString()])
+    reqs = []
+    for raw in ws.sent:
+        r = pb.MainRequest(); r.ParseFromString(raw)
+        reqs.append(r)
+    sub = next(r for r in reqs
+               if r.WhichOneof("type") == "state_subscribe_tournaments")
+    assert sub.state_subscribe_tournaments.tournaments[0].tournament_id == 40349
+    assert rec.tournaments_asked == {40349}
+
+
+def test_a_match_push_gets_a_full_subscription(tmp_path):
+    msg = pb.MainResponse()
+    msg.newsletters_match.match.info.id = 40354739
+    rec, _, _ = run_session(tmp_path, [msg.SerializeToString()])
+    assert rec.subscribed == {40354739}
+
+
+def test_a_refused_request_is_reported_not_swallowed(tmp_path, capsys):
+    """How the real server rejected settings_set: inside the typed response."""
+    msg = pb.MainResponse()
+    msg.settings_set.code = 400
+    msg.settings_set.status = 2
+    msg.settings_set.error.message = "Данные не прошли валидацию"
+    details = pb.common_BadRequestErrorDetails()
+    v = details.violations.add(); v.reason = "time_filter"; v.message = "Не корректно"
+    msg.settings_set.error.details.value = details.SerializeToString()
+    rec, _, _ = run_session(tmp_path, [msg.SerializeToString()])
+    assert rec.bad_codes and "code=400" in rec.bad_codes[0]
+    assert "Данные не прошли валидацию" in rec.bad_codes[0]
+    assert "time_filter: Не корректно" in rec.bad_codes[0]
+    assert "[bad]" in capsys.readouterr().err
+
+
+def test_a_two_hundred_response_is_not_reported_as_bad(tmp_path):
+    rec, _, _ = run_session(tmp_path, [lazy_sports_tree()])
+    assert rec.bad_codes == []

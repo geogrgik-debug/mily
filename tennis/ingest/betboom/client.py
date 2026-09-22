@@ -82,7 +82,8 @@ def load_pb():
 class BetBoomRecorder:
     def __init__(self, log: RawLog, *, url: str = DEFAULT_URL,
                  max_matches: int = 8, sport: str = "tennis",
-                 discover: bool = False, clock: Clock | None = None):
+                 discover: bool = False, clock: Clock | None = None,
+                 time_filter: str = ""):
         self.log = log
         self.url = url
         self.max_matches = max_matches
@@ -101,6 +102,12 @@ class BetBoomRecorder:
         self.kinds = Counter()
         self.sports_seen = Counter()
         self.errors: list[str] = []
+        self.bad_codes: list[str] = []
+        # The live tree is lazy, so each layer is asked for exactly once.
+        self.time_filter = time_filter
+        self.sports_asked: set[int] = set()
+        self.categories_asked: set[tuple[int, int]] = set()
+        self.tournaments_asked: set[int] = set()
 
     def uid(self, tag: str) -> str:
         self._uid += 1
@@ -143,10 +150,18 @@ class BetBoomRecorder:
 
     async def _session(self, ws) -> None:
         pb = self.pb
-        req = pb.MainRequest()
-        req.settings_set.uid = self.uid("set")
-        req.settings_set.language = pb.LANGUAGES_RU
-        await self._send(ws, req, tag="settings_set")
+        # settings_set is skipped unless a time filter is supplied. Sending it
+        # without one is rejected: the server answers code 400 with a violation
+        # on `time_filter`, and the value it wants is not in the schema (a bare
+        # string with no enum beside it). Nothing is lost -- the tree comes back
+        # code 200 regardless, and already in Russian, which is the only reason
+        # the call was there.
+        if self.time_filter:
+            req = pb.MainRequest()
+            req.settings_set.uid = self.uid("set")
+            req.settings_set.language = pb.LANGUAGES_RU
+            req.settings_set.time_filter = self.time_filter
+            await self._send(ws, req, tag="settings_set")
 
         req = pb.MainRequest()
         req.state_subscribe_by_sports.uid = self.uid("tree")
@@ -198,48 +213,188 @@ class BetBoomRecorder:
     async def _handle(self, ws, msg) -> None:
         which = msg.WhichOneof("type")
         self.kinds[which or "(no oneof set)"] += 1
+        if which is None:
+            return
+        body = getattr(msg, which)
+        self._check_code(which, body)
+
         if which == "error":
             # Previously swallowed: a refused subscription looked exactly like
             # an idle socket, which is the worst possible failure mode here.
-            text = str(msg.error).strip().replace("\n", " ")
+            text = str(body).strip().replace("\n", " ")
             self.errors.append(text)
             print(f"[error] {text}", file=sys.stderr)
             return
-        if which == "state_subscribe_by_sports":
-            for state in msg.state_subscribe_by_sports.states:
-                for sport in state.sports:
-                    await self._maybe_take_sport(ws, sport)
-        elif which in ("newsletters_stake",):
-            self._note_stake(msg.newsletters_stake.stake)
-        elif which == "matches_subscribe_full":
-            for item in msg.matches_subscribe_full.full_matches:
-                for stake in getattr(item.match, "stakes", []):
-                    self._note_stake(stake)
 
-    async def _maybe_take_sport(self, ws, sport) -> None:
+        # -- the tree, layer by layer.
+        #
+        # The live tree is lazy and arrives in three steps, which is why an
+        # earlier version sat silent with frames on disk and nothing
+        # subscribed: it read `sport.tournaments` straight off the sports
+        # response, and the server sends the sports layer with counts only.
+        # Measured on a live session: 16 sports, tennis carrying
+        # matches_count=62 and tournaments_count=28, and not one tournament
+        # inline. Each layer below is also delivered as a newsletters_* push,
+        # so both paths feed the same handlers.
+        if which == "state_subscribe_by_sports":
+            for state in body.states:
+                for sport in state.sports:
+                    await self._take_sport(ws, sport)
+        elif which == "newsletters_sport":
+            await self._take_sport(ws, body.sport)
+        elif which == "state_subscribe_by_categories":
+            for state in body.states:
+                for category in state.categories:
+                    await self._take_category(ws, category)
+        elif which == "state_subscribe_categories":
+            for state in getattr(body, "states", []):
+                for category in getattr(state, "categories", []):
+                    await self._take_category(ws, category)
+        elif which == "newsletters_category":
+            await self._take_category(ws, body.category)
+        elif which == "state_subscribe_tournaments":
+            for state in getattr(body, "states", []):
+                for tournament in getattr(state, "tournaments", []):
+                    await self._take_tournament(ws, tournament)
+        elif which in ("newsletters_tournament", "newsletters_full_tournament"):
+            await self._take_tournament(ws, body.tournament)
+        elif which == "newsletters_match":
+            await self._take_match(ws, body.match)
+        elif which == "newsletters_full_match":
+            self._note_match(body.match)
+        elif which == "newsletters_stake":
+            self._note_stake(body.stake)
+        elif which == "matches_subscribe_full":
+            for item in body.full_matches:
+                self._note_match(item.match)
+
+    def _check_code(self, which: str, body) -> None:
+        """Report a non-200 status on any typed response.
+
+        The `error` member of MainResponse is not the only way a refusal
+        arrives: a typed response carries its own code/status/error, and that
+        is how the real server rejected settings_set -- code 400, message
+        "Данные не прошли валидацию", with the offending field named in the
+        details. That went unnoticed because nothing looked at `code`.
+        """
+        code = getattr(body, "code", None)
+        if code in (None, 0, 200):
+            return
+        detail = f"{which} code={code}"
+        message = (getattr(getattr(body, "error", None), "message", "") or "").strip()
+        if message:
+            detail += f": {message}"
+        for violation in self._violations(getattr(body, "error", None)):
+            detail += f" [{violation}]"
+        self.bad_codes.append(detail)
+        print(f"[bad] {detail}", file=sys.stderr)
+
+    def _violations(self, error) -> list[str]:
+        """Field-level violations out of the error's packed details, if any."""
+        out: list[str] = []
+        details = getattr(error, "details", None)
+        if details is None:
+            return out
+        for any_msg in (details if hasattr(details, "__iter__") else [details]):
+            value = getattr(any_msg, "value", b"")
+            if not value:
+                continue
+            try:
+                parsed = self.pb.common_BadRequestErrorDetails()
+                parsed.ParseFromString(value)
+            except Exception:
+                continue
+            for v in parsed.violations:
+                out.append(f"{v.reason}: {v.message}".strip(": "))
+        return out
+
+    # -- tree walk ---------------------------------------------------------
+
+    async def _take_sport(self, ws, sport) -> None:
         info = sport.info
         slug = (getattr(info, "url_slug", "") or "").lower()
         name = (getattr(info, "name", "") or "").lower()
-        n_tournaments = len(getattr(sport, "tournaments", []))
-        n_matches = sum(len(getattr(t, "matches", []))
-                        for t in getattr(sport, "tournaments", []))
+        tournaments = list(getattr(sport, "tournaments", []))
+        n_matches = sum(len(getattr(t, "matches", [])) for t in tournaments)
         self.sports_seen[(info.name or slug or str(info.id),
-                          n_tournaments, n_matches)] += 1
+                          len(tournaments), n_matches)] += 1
         if self.sport not in slug and self.sport not in name and "теннис" not in name:
             return
-        for tournament in getattr(sport, "tournaments", []):
-            for match in getattr(tournament, "matches", []):
-                mid = match.info.id
-                if mid in self.subscribed or len(self.subscribed) >= self.max_matches:
-                    continue
-                self.subscribed.add(mid)
-                req = self.pb.MainRequest()
-                req.matches_subscribe_full.uid = self.uid("full")
-                item = req.matches_subscribe_full.full_matches.add()
-                item.uid = self.uid("m")
-                item.match_id = mid
-                await self._send(ws, req, tag=f"subscribe_full:{mid}")
-                print(f"[sub] match {mid}", file=sys.stderr)
+
+        for tournament in tournaments:
+            await self._take_tournament(ws, tournament)
+
+        if info.id in self.sports_asked:
+            return
+        self.sports_asked.add(info.id)
+        req = self.pb.MainRequest()
+        req.state_subscribe_by_categories.uid = self.uid("cats")
+        req.state_subscribe_by_categories.sport_id = info.id
+        req.state_subscribe_by_categories.types.append(self.pb.TREE_TYPES_LIVE)
+        await self._send(ws, req, tag=f"subscribe_categories:{info.id}")
+        print(f"[tree] sport {info.name!r} id={info.id} "
+              f"tournaments={getattr(info, 'tournaments_count', 0)} "
+              f"matches={getattr(info, 'matches_count', 0)} -> asking categories",
+              file=sys.stderr)
+
+    async def _take_category(self, ws, category) -> None:
+        info = category.info
+        tournaments = list(getattr(category, "tournaments", []))
+        for tournament in tournaments:
+            await self._take_tournament(ws, tournament)
+        if tournaments or not getattr(info, "tournaments_count", 0):
+            return
+        key = (getattr(info, "sport_id", 0), info.id)
+        if key in self.categories_asked:
+            return
+        self.categories_asked.add(key)
+        req = self.pb.MainRequest()
+        req.state_subscribe_categories.uid = self.uid("cat")
+        item = req.state_subscribe_categories.categories.add()
+        item.uid = self.uid("c")
+        item.type = self.pb.TREE_TYPES_LIVE
+        item.sport_id = getattr(info, "sport_id", 0)
+        item.category_id = info.id
+        await self._send(ws, req, tag=f"subscribe_category:{info.id}")
+
+    async def _take_tournament(self, ws, tournament) -> None:
+        info = tournament.info
+        matches = list(getattr(tournament, "matches", []))
+        for match in matches:
+            await self._take_match(ws, match)
+        if matches or not getattr(info, "matches_count", 0):
+            return
+        if info.id in self.tournaments_asked:
+            return
+        self.tournaments_asked.add(info.id)
+        req = self.pb.MainRequest()
+        req.state_subscribe_tournaments.uid = self.uid("tours")
+        item = req.state_subscribe_tournaments.tournaments.add()
+        item.uid = self.uid("t")
+        item.type = self.pb.TREE_TYPES_LIVE
+        item.tournament_id = info.id
+        await self._send(ws, req, tag=f"subscribe_tournament:{info.id}")
+
+    async def _take_match(self, ws, match) -> None:
+        mid = match.info.id
+        if not mid or mid in self.subscribed:
+            self._note_match(match)
+            return
+        if len(self.subscribed) >= self.max_matches:
+            return
+        self.subscribed.add(mid)
+        req = self.pb.MainRequest()
+        req.matches_subscribe_full.uid = self.uid("full")
+        item = req.matches_subscribe_full.full_matches.add()
+        item.uid = self.uid("m")
+        item.match_id = mid
+        await self._send(ws, req, tag=f"subscribe_full:{mid}")
+        print(f"[sub] match {mid}", file=sys.stderr)
+        self._note_match(match)
+
+    def _note_match(self, match) -> None:
+        for stake in getattr(match, "stakes", []):
+            self._note_stake(stake)
 
     def _note_stake(self, stake) -> None:
         self.stakes_seen += 1
@@ -275,6 +430,16 @@ class BetBoomRecorder:
             for text in self.errors[:10]:
                 print(f"  {text}", file=sys.stderr)
 
+        if self.bad_codes:
+            print(f"\n--- {len(self.bad_codes)} refused request(s) ---",
+                  file=sys.stderr)
+            for text in self.bad_codes[:10]:
+                print(f"  {text}", file=sys.stderr)
+
+        print(f"\n  layers asked: sports={sorted(self.sports_asked)} "
+              f"categories={len(self.categories_asked)} "
+              f"tournaments={len(self.tournaments_asked)}", file=sys.stderr)
+
         print(f"\n  subscribed to {len(self.subscribed)} match(es): "
               f"{sorted(self.subscribed)}", file=sys.stderr)
 
@@ -290,11 +455,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--sport", default="tennis")
     ap.add_argument("--discover", action="store_true",
                     help="print the market inventory as it arrives")
+    ap.add_argument("--time-filter", default="",
+                    help="value for settings_set.time_filter. Left empty the "
+                         "call is skipped, because sending it without one is "
+                         "refused (code 400, violation on time_filter) and the "
+                         "tree works without it")
     args = ap.parse_args(argv)
 
     with RawLog(args.out, provider="betboom") as log:
         rec = BetBoomRecorder(log, url=args.url, max_matches=args.max_matches,
-                              sport=args.sport, discover=args.discover)
+                              sport=args.sport, discover=args.discover,
+                              time_filter=args.time_filter)
         try:
             asyncio.run(rec.run())
         except KeyboardInterrupt:

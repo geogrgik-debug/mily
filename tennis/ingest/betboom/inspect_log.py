@@ -27,6 +27,10 @@ from tennis.ingest.rawlog import read_raw
 
 SCALARS = (bool, int, float, str, bytes)
 
+# Set once in main(); _unpack needs the generated module and is called from
+# deep inside the walk, where threading it through every frame would be noise.
+_PB: list = [None]
+
 
 def _is_repeated(descriptor, value) -> bool:
     """True for a repeated or map field.
@@ -52,6 +56,29 @@ def _is_map(descriptor) -> bool:
         return bool(message_type.GetOptions().map_entry)
     except Exception:
         return False
+
+
+def _unpack(value: bytes) -> list[str]:
+    """Best-effort decode of a packed detail blob.
+
+    Errors arrive with their specifics in a `google.protobuf.Any`, and the one
+    that matters names the field the server refused. Trying the known detail
+    type is cheap; a blob of any other shape just fails to parse and is left as
+    bytes.
+    """
+    pb = _PB[0]
+    if pb is None:
+        return []
+    detail = getattr(pb, "common_BadRequestErrorDetails", None)
+    if detail is None:
+        return []
+    try:
+        parsed = detail()
+        parsed.ParseFromString(value)
+    except Exception:
+        return []
+    return [f"violation {v.reason!r}: {v.message!r}" for v in parsed.violations] \
+        or ["(decoded as BadRequestErrorDetails, no violations)"]
 
 
 def _describe(msg, depth: int, max_items: int, indent: int = 0) -> list[str]:
@@ -83,9 +110,16 @@ def _describe(msg, depth: int, max_items: int, indent: int = 0) -> list[str]:
                     out.extend(_describe(item, depth - 1, max_items, indent + 2))
             if len(items) > max_items:
                 out.append(f"{pad}  ... {len(items) - max_items} more")
+        elif isinstance(value, bytes):
+            # Never silently truncate: the first version showed value[:40], and
+            # the one blob that mattered -- a packed error detail naming the
+            # field the server refused -- was longer than that, so it could not
+            # be decoded from the printed output. Length first, then the bytes.
+            out.append(f"{pad}{name} = <{len(value)} bytes> {value!r}")
+            for line in _unpack(value):
+                out.append(f"{pad}  ^ {line}")
         elif isinstance(value, SCALARS):
-            shown = value if not isinstance(value, bytes) else value[:40]
-            out.append(f"{pad}{name} = {shown!r}")
+            out.append(f"{pad}{name} = {value!r}")
         else:
             out.append(f"{pad}{name}:")
             if depth > 0:
@@ -118,6 +152,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"log files: {[str(f) for f in files]}")
 
     pb = load_pb()
+    _PB[0] = pb
 
     frames = Counter()          # (dir, channel)
     tags = Counter()            # tx tags, so the request side is visible too

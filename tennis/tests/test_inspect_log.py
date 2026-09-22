@@ -138,7 +138,7 @@ def test_recorder_surfaces_a_server_error(tmp_path, capsys):
     rec = _recorder(tmp_path)
     msg = pb.MainResponse()
     msg.error.SetInParent()
-    asyncio.run(rec._handle(None, msg))
+    asyncio.run(rec._handle(CollectingWS(), msg))
     assert rec.errors, "the error was swallowed"
     assert "[error]" in capsys.readouterr().err
     assert rec.kinds["error"] == 1
@@ -151,7 +151,7 @@ def test_recorder_counts_response_types(tmp_path):
     for kind in ("newsletters_state_await", "newsletters_state_ready"):
         msg = pb.MainResponse()
         getattr(msg, kind).SetInParent()
-        asyncio.run(rec._handle(None, msg))
+        asyncio.run(rec._handle(CollectingWS(), msg))
     assert rec.kinds["newsletters_state_await"] == 1
     assert rec.kinds["newsletters_state_ready"] == 1
 
@@ -162,6 +162,16 @@ def test_report_says_so_when_no_tree_arrived(tmp_path, capsys):
     err = capsys.readouterr().err
     assert "no sports tree arrived" in err
     assert "subscribed to 0 match(es)" in err
+
+
+class CollectingWS:
+    """Swallows what the recorder sends; the tree walk now asks for layers."""
+
+    def __init__(self):
+        self.sent: list[bytes] = []
+
+    async def send(self, data):
+        self.sent.append(data)
 
 
 def test_report_lists_sports_with_their_match_counts(tmp_path, capsys):
@@ -176,9 +186,34 @@ def test_report_lists_sports_with_their_match_counts(tmp_path, capsys):
     sport.info.name = "Теннис"
     sport.info.url_slug = "tennis"
     sport.info.matches_count = 42          # the server claims 42 live matches
-    asyncio.run(rec._handle(None, msg))    # but sends none inline
+    asyncio.run(rec._handle(CollectingWS(), msg))   # but sends none inline
     rec.report()
     err = capsys.readouterr().err
     assert "sports in the tree" in err
     assert "tournaments=   0" in err
     assert "matches=    0" in err
+
+
+def test_inspector_decodes_the_violation_the_server_packed(tmp_path, capsys):
+    """The first version printed value[:40] and the blob that named the refused
+    field was longer, so it could not be decoded from the output."""
+    details = pb.common_BadRequestErrorDetails()
+    v = details.violations.add()
+    v.reason = "time_filter"
+    v.message = "Не корректно"
+
+    msg = pb.MainResponse()
+    msg.settings_set.code = 400
+    msg.settings_set.error.message = "Данные не прошли валидацию"
+    packed = msg.settings_set.error.details          # a single Any, not a list
+    packed.type_url = "type.googleapis.com/bb.sport_ws.v1.common.BadRequestErrorDetails"
+    packed.value = details.SerializeToString()
+
+    root = tmp_path / "raw"
+    with RawLog(root, provider="betboom", clock=FakeClock()) as log:
+        log.write(msg.SerializeToString(), direction="rx", channel="tree_ws")
+
+    assert inspect_log.main([str(root)]) == 0
+    out = capsys.readouterr().out
+    assert "violation 'time_filter': 'Не корректно'" in out
+    assert "bytes>" in out                      # length shown, nothing cut
