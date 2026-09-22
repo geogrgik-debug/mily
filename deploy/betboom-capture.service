@@ -4,7 +4,8 @@
 # or edit __ROOT__ and __USER__ by hand.
 #
 # Not exercised in this repository's tests -- the capture itself is, the unit
-# file is not. What it encodes is the operational intent: restart on failure,
+# file is not. Exercised live on 22.09.2026 on the capture host (Ubuntu 26.04):
+# active, reporting ok. What it encodes is the operational intent: restart on failure,
 # never give up permanently, and take the whole machine's uptime rather than a
 # login session's.
 

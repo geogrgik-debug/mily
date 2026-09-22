@@ -1,5 +1,7 @@
 """The capture reporter exists to catch a silent failure, so its own failure
 modes are what get tested: a dead capture must not read as a healthy one."""
+import collections
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -11,6 +13,23 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tennis.ingest.clock import FakeClock
 from tennis.ingest.rawlog import RawLog
 from tennis.ingest.status import capture_status
+
+# A terabyte free: years of recording at the measured upper end.
+_PLENTY = collections.namedtuple("usage", "total used free")(1 << 40, 0, 1 << 40)
+
+
+@pytest.fixture(autouse=True)
+def _disk_is_not_the_hosts(monkeypatch):
+    """Judge the logic, not the disk the tests happen to run on.
+
+    Every capture here lives in pytest's tmp_path, so the free-space check
+    measured the host's temp directory. On Ubuntu 26.04 that is a RAM-backed
+    tmpfs of about 1 GB -- 1.1 days at 0.9 GB a day, under the 2-day floor --
+    and on 22.09 nine of these tests failed on the capture host itself, which
+    stopped vps-setup.sh before the service was installed. The low-disk branch
+    keeps its own test, which shrinks the disk through bytes_per_day.
+    """
+    monkeypatch.setattr(shutil, "disk_usage", lambda path: _PLENTY)
 
 
 def _capture(tmp_path, clock=None):
