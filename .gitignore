@@ -1,2 +1,9 @@
 __pycache__/
 *.pyc
+
+# generated protobuf classes: rebuilt from proto/ by grpc_tools.protoc
+tennis/ingest/betboom/generated/
+# captured data never goes in git
+data/
+*.jsonl
+*.parquet
