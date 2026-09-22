@@ -23,7 +23,7 @@ starts at the probability core.
 | `ingest/rawlog.py` | Append-only, crash-safe raw frame log. Gzipped by default -- 4.8x measured on live capture -- with the per-line crash guarantee preserved through a Z_SYNC_FLUSH before every fsync. | done |
 | `ingest/betboom/` | The BetBoom line recorder. See its README. | done |
 | `ratings/` | Elo and as-of priors, with serialisable state so the live process loads ratings instead of recomputing 270k matches. | next |
-| `market/` | Odds inversion, overround, Shin. | needs a recorded odds stream |
+| `market/` | Market-name parsing, overround, Shin, and the single-p fit behind a game book. Measured: the bookmaker prices the *next* game 74% of the time. See its README. | done |
 | `state/` `features/` `models/` `replay/` `eval/` | Live match state, snapshot features, residual model, replay backtest, metrics. | not started |
 
 ```bash
