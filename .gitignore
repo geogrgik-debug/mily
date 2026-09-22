@@ -7,3 +7,9 @@ tennis/ingest/betboom/generated/
 data/
 *.jsonl
 *.parquet
+
+# virtualenvs: build output, never source. A Linux venv was committed once
+# by mistake (6,443 files, 30 MB) and is still in history; do not repeat it.
+.venv/
+venv/
+.env/
