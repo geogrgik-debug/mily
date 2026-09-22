@@ -375,3 +375,64 @@ def test_recorder_publishes_its_counters_beside_the_log(tmp_path):
     assert side["frames"] == log.frames
     assert not list(tmp_path.glob("*.tmp"))
     log.close()
+
+
+def _tree_with(tournaments):
+    """A sport-subscription reply carrying the given (category, name, match_id)s."""
+    msg = pb.MainResponse()
+    msg.state_subscribe_sports.code = 200
+    item = msg.state_subscribe_sports.sports.add()
+    item.code = 200
+    item.sport.info.id = 4
+    item.sport.info.name = "Теннис"
+    item.sport.info.url_slug = "tennis"
+    for i, (cat, name, mid) in enumerate(tournaments):
+        t = item.sport.tournaments.add()
+        t.info.id = 1000 + i
+        t.info.name = name
+        t.category.info.name = cat
+        t.matches.add().info.id = mid
+    return msg.SerializeToString()
+
+
+LIVE_TREE = [
+    ("WTA", "WTA 125. Анкара. Хард. Турция", 1),
+    ("WTA", "WTA 125. Анкара. Хард. Пары", 2),
+    ("Кибертеннис", "ESportsBattle eTennis ATP Championship", 3),
+    ("Challenger", "ATP Challenger. Генуя. Грунт. Италия", 4),
+    ("WTT", "WTT 25. Сетубал. Хард. Пары", 5),
+]
+
+
+def test_doubles_and_simulators_do_not_take_subscription_slots(tmp_path):
+    """Measured live: 12 of 32 tennis tournaments were doubles or a simulator.
+
+    With --max-matches 10 taking the tree in order, those ate slots meant for
+    singles. They are now skipped at subscription time only -- whatever the
+    feed pushes is still recorded raw.
+    """
+    rec, _, _ = run_session(tmp_path, [_tree_with(LIVE_TREE)])
+    assert rec.subscribed == {1, 4}
+    reasons = {r for (r, _) in rec.skipped}
+    assert reasons == {"doubles", "simulator"}
+    assert sum(rec.skipped.values()) == 3
+
+
+def test_skips_are_opt_out(tmp_path):
+    log = RawLog(tmp_path, provider="betboom", clock=FakeClock(), compress=False)
+    log.open()
+    rec = BetBoomRecorder(log)
+    rec.include_doubles = True
+    rec.include_sim = True
+    asyncio.run(rec._session(FakeWS([_tree_with(LIVE_TREE)])))
+    assert rec.subscribed == {1, 2, 3, 4, 5}
+    assert not rec.skipped
+    log.close()
+
+
+def test_skip_report_names_the_tournaments(tmp_path, capsys):
+    rec, _, _ = run_session(tmp_path, [_tree_with(LIVE_TREE)])
+    rec.report()
+    err = capsys.readouterr().err
+    assert "tournaments not subscribed" in err
+    assert "ESportsBattle" in err and "Пары" in err

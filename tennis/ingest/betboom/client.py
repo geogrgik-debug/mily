@@ -58,6 +58,13 @@ from tennis.ingest.clock import Clock
 from tennis.ingest.rawlog import RawLog
 
 DEFAULT_URL = "wss://ru-ws2.sporthub.bet:443/api/tree_ws/v1"
+
+# Tournaments inside the tennis tree that are not what a serve model wants.
+# Measured on a live tree: 12 of 32 tournaments -- 11 doubles and one
+# simulator -- 37% of what --max-matches would otherwise spend its slots on.
+# Doubles are singles' rules on a different game; the simulator is not tennis.
+DOUBLES_MARKERS = ("пары", "doubles", "пара ", "/ ")
+SIM_MARKERS = ("esportsbattle", "etennis", "кибертеннис", "cybertennis", "simulated")
 ORIGIN = "https://betboom.ru"
 USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36")
@@ -112,6 +119,9 @@ class BetBoomRecorder:
         self.categories_asked: set[tuple[int, int]] = set()
         self.tournaments_asked: set[int] = set()
         self.match_tier: dict[int, tuple[str, str]] = {}
+        self.skipped = Counter()          # why a tournament was not subscribed
+        self.include_doubles = False
+        self.include_sim = False
 
     def uid(self, tag: str) -> str:
         self._uid += 1
@@ -448,8 +458,36 @@ class BetBoomRecorder:
         item.category_id = info.id
         await self._send(ws, req, tag=f"subscribe_category:{info.id}")
 
+    def _unwanted(self, tournament) -> str | None:
+        """Why a tournament should not spend a subscription slot, or None.
+
+        Judged from the tournament's own name and category, because that is
+        where the feed says it: "WTT 25. Сетубал. Хард. Пары" is doubles, and
+        "ESportsBattle eTennis" sits in category "Кибертеннис". Nothing in the
+        match record itself distinguishes them.
+
+        This only decides what to *subscribe* to. Anything the feed pushes
+        anyway is still recorded raw -- the rule that bytes land before
+        anyone judges them is not bent here.
+        """
+        info = tournament.info
+        name = (getattr(info, "name", "") or "").lower()
+        cat = ""
+        if tournament.HasField("category"):
+            cat = (tournament.category.info.name or "").lower()
+        if not self.include_sim and (
+                any(m in name for m in SIM_MARKERS) or any(m in cat for m in SIM_MARKERS)):
+            return "simulator"
+        if not self.include_doubles and any(m in name for m in DOUBLES_MARKERS):
+            return "doubles"
+        return None
+
     async def _take_tournament(self, ws, tournament) -> None:
         info = tournament.info
+        reason = self._unwanted(tournament)
+        if reason:
+            self.skipped[(reason, info.name)] += 1
+            return
         matches = list(getattr(tournament, "matches", []))
         for match in matches:
             await self._take_match(ws, match)
@@ -528,6 +566,16 @@ class BetBoomRecorder:
             for text in self.bad_codes[:10]:
                 print(f"  {text}", file=sys.stderr)
 
+        if self.skipped:
+            by_reason = Counter()
+            for (reason, _), n in self.skipped.items():
+                by_reason[reason] += 1
+            print(f"\n--- tournaments not subscribed: "
+                  f"{', '.join(f'{r}={n}' for r, n in by_reason.items())} ---",
+                  file=sys.stderr)
+            for (reason, name), _ in sorted(self.skipped.items())[:12]:
+                print(f"  {reason:10s} {name}", file=sys.stderr)
+
         print(f"\n  layers asked: sports={sorted(self.sports_asked)} "
               f"categories={len(self.categories_asked)} "
               f"tournaments={len(self.tournaments_asked)}", file=sys.stderr)
@@ -550,6 +598,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--sport", default="tennis")
     ap.add_argument("--discover", action="store_true",
                     help="print the market inventory as it arrives")
+    ap.add_argument("--include-doubles", action="store_true",
+                    help="also subscribe to doubles tournaments (skipped by "
+                         "default: singles' serve model does not apply)")
+    ap.add_argument("--include-sim", action="store_true",
+                    help="also subscribe to simulator 'tennis' such as "
+                         "ESportsBattle eTennis (skipped by default: not tennis)")
     ap.add_argument("--no-compress", action="store_true",
                     help="write plain .jsonl instead of .jsonl.gz. Costs about "
                          "5x the disk (measured); use it only to read a capture "
@@ -565,6 +619,8 @@ def main(argv: list[str] | None = None) -> int:
         rec = BetBoomRecorder(log, url=args.url, max_matches=args.max_matches,
                               sport=args.sport, discover=args.discover,
                               time_filter=args.time_filter)
+        rec.include_doubles = args.include_doubles
+        rec.include_sim = args.include_sim
         try:
             asyncio.run(rec.run())
         except KeyboardInterrupt:
