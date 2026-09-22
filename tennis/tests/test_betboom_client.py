@@ -449,3 +449,160 @@ def test_sidecar_is_removed_on_clean_exit(tmp_path):
     assert not rec.sidecar_path().exists()
     rec._remove_sidecar()                       # idempotent
     log.close()
+
+
+# ------------------------------------------------- following single outcomes
+
+
+def full_match_push(match_id: int, markets, active: bool = True) -> bytes:
+    """A full-board snapshot. `markets` is (stake_id, market_name) pairs."""
+    msg = pb.MainResponse()
+    msg.newsletters_full_match.code = 200
+    match = msg.newsletters_full_match.match
+    match.info.id = match_id
+    for stake_id, market_name in markets:
+        stake = match.stakes.add()
+        stake.stake_id = stake_id
+        stake.match_id = match_id
+        stake.market_name = market_name
+        stake.name = "П1"
+        stake.factor = 1.85
+        stake.is_active = active
+    return msg.SerializeToString()
+
+
+def sent_stake_subscriptions(ws):
+    out = []
+    for raw in ws.sent:
+        req = pb.MainRequest()
+        req.ParseFromString(raw)
+        if req.WhichOneof("type") == "stakes_subscribe":
+            out.append(req.stakes_subscribe)
+    return out
+
+
+def test_game_outcomes_are_followed_one_by_one(tmp_path):
+    """A price change moves no score, so the board push never carries it.
+
+    Measured live 2026-09-22 on 16 outcomes over 7 minutes: 97% of value
+    changes reached the per-stake stream first, p90 78 s ahead of the snapshot
+    that eventually showed them, and one change no snapshot showed at all.
+    Without this subscription the capture is blind to movement inside a game.
+    """
+    frames = [tennis_tree(555),
+              full_match_push(555, [("s1", "2-й сет 8-й гейм: Исход"),
+                                    ("s2", "2-й сет 8-й гейм: Точный счёт")])]
+    rec, ws, _ = run_session(tmp_path, frames)
+
+    subs = sent_stake_subscriptions(ws)
+    assert len(subs) == 1
+    assert [(it.match_id, it.stake_id) for it in subs[0].stakes] == \
+        [(555, "s1"), (555, "s2")]
+    assert rec.stakes_asked == {"s1", "s2"}
+
+
+def test_only_game_markets_are_followed(tmp_path):
+    """A whole board is some 126 outcomes per match; the game is the target."""
+    frames = [tennis_tree(555),
+              full_match_push(555, [("g", "1-й сет 3-й гейм: Исход"),
+                                    ("s", "1-й сет: Гонка до 2 геймов"),
+                                    ("m", "Фора по геймам")])]
+    rec, ws, _ = run_session(tmp_path, frames)
+
+    subs = sent_stake_subscriptions(ws)
+    assert [it.stake_id for it in subs[0].stakes] == ["g"]
+    assert rec.stakes_asked == {"g"}
+
+
+def test_an_outcome_is_asked_for_once(tmp_path):
+    """The board is re-sent on every score change, the ids in it unchanged."""
+    board = [("s1", "2-й сет 8-й гейм: Исход")]
+    frames = [tennis_tree(555), full_match_push(555, board),
+              full_match_push(555, board), full_match_push(555, board)]
+    _, ws, _ = run_session(tmp_path, frames)
+
+    assert len(sent_stake_subscriptions(ws)) == 1
+
+
+def test_a_new_game_is_followed_when_it_opens(tmp_path):
+    """Game markets are replaced as play moves on; the new ones need asking."""
+    frames = [tennis_tree(555),
+              full_match_push(555, [("g8", "2-й сет 8-й гейм: Исход")]),
+              full_match_push(555, [("g8", "2-й сет 8-й гейм: Исход"),
+                                    ("g9", "2-й сет 9-й гейм: Исход")])]
+    rec, ws, _ = run_session(tmp_path, frames)
+
+    subs = sent_stake_subscriptions(ws)
+    assert [[it.stake_id for it in s.stakes] for s in subs] == [["g8"], ["g9"]]
+    assert rec.stakes_asked == {"g8", "g9"}
+
+
+def test_subscriptions_are_batched_at_forty(tmp_path):
+    """No documented limit for stakes; 40 is the largest batch seen accepted."""
+    board = [(f"s{i}", "2-й сет 8-й гейм: Точный счёт") for i in range(95)]
+    frames = [tennis_tree(555), full_match_push(555, board)]
+    _, ws, _ = run_session(tmp_path, frames)
+
+    sizes = [len(s.stakes) for s in sent_stake_subscriptions(ws)]
+    assert sizes == [40, 40, 15]
+
+
+def test_outcomes_of_an_unsubscribed_match_are_not_followed(tmp_path):
+    """Past --max-matches the board still arrives; following it would cheat."""
+    frames = [tennis_tree(555),
+              full_match_push(999, [("x", "1-й сет 1-й гейм: Исход")])]
+    rec, ws, _ = run_session(tmp_path, frames)
+
+    assert sent_stake_subscriptions(ws) == []
+    assert rec.stakes_asked == set()
+
+
+def test_reconnect_forgets_the_outcomes_it_was_following(tmp_path):
+    """The same trap as the layer memos: a new socket follows nothing.
+
+    Kept as its own test because the failure is invisible from outside -- the
+    log keeps growing on the tour-wide score stream while not one price change
+    inside a game is recorded.
+    """
+    board = [("s1", "2-й сет 8-й гейм: Исход")]
+    log = RawLog(tmp_path, provider="betboom", clock=FakeClock(), compress=False)
+    log.open()
+    rec = BetBoomRecorder(log)
+
+    ws1 = FakeWS([tennis_tree(555), full_match_push(555, board)])
+    asyncio.run(rec._session(ws1))
+    assert rec.stakes_asked == {"s1"}
+
+    rec._forget_subscriptions()
+    assert rec.stakes_asked == set()
+
+    ws2 = FakeWS([tennis_tree(555), full_match_push(555, board)])
+    asyncio.run(rec._session(ws2))
+    assert len(sent_stake_subscriptions(ws2)) == 1, \
+        "the outcomes were not followed again on the new socket"
+    log.close()
+
+
+def test_a_per_stake_push_is_counted(tmp_path):
+    """`stake_pushes` is what says the per-stake stream is alive.
+
+    A capture can hold its match subscriptions and still follow no outcome, in
+    which case the board keeps arriving and prices inside a game do not.
+    """
+    frames = [tennis_tree(555),
+              stake_push("2-й сет 8-й гейм: Исход", "", 1.91)]
+    rec, _, log = run_session(tmp_path, frames)
+
+    assert rec.stake_pushes == 1
+    assert rec.stakes_seen >= 1
+
+
+def test_a_refused_outcome_subscription_is_reported(tmp_path):
+    """A silently refused follow looks exactly like a quiet market."""
+    msg = pb.MainResponse()
+    msg.stakes_subscribe.code = 200
+    item = msg.stakes_subscribe.stakes.add()
+    item.code = 404
+    rec, _, _ = run_session(tmp_path, [msg.SerializeToString()])
+
+    assert any("stakes_subscribe.item code=404" in line for line in rec.bad_codes)

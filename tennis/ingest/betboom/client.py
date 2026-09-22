@@ -15,12 +15,21 @@ APP_BUILD changes.
 Why this shape
 --------------
 The feed is delta-push, not polling. After a `matches_subscribe_full` you get
-one full snapshot of every market on the match, then a `newsletters_stake`
-message per price change carrying a CREATE/UPDATE/DELETE action, and a
-`newsletters_full_match` per score change. So volume is not a rate-limit
-problem: a single live tennis match emits hundreds of stake updates by itself,
-and thousands of observations is a question of staying connected, not of
-polling harder.
+one full snapshot of every market on the match, and a `newsletters_full_match`
+with the whole board again **on every score change** -- not on a timer. So
+volume is not a rate-limit problem: a single live tennis match emits hundreds
+of stake updates by itself, and thousands of observations is a question of
+staying connected, not of polling harder.
+
+A price change on its own moves no score, so it pushes nothing. That is why
+`stakes_subscribe` is sent as well: it names individual outcomes and makes the
+server push a `newsletters_stake` per change to each. It was previously assumed
+to arrive unasked, and it does not -- 27,000 captured frames contained zero of
+them. Measured 2026-09-22 over 7 minutes on 16 game outcomes: 97% of value
+changes reached the per-stake stream first, median 0.5 s ahead of the snapshot
+that eventually carried them, p90 78 s, max 153 s, and one change no snapshot
+ever showed. Without this subscription a capture is blind to price movement
+inside a game, which is the one movement this project exists to measure.
 
 Two limits from the client's own runtime-env.js shape the driver:
 
@@ -56,6 +65,7 @@ from pathlib import Path
 
 from tennis.ingest.clock import Clock
 from tennis.ingest.rawlog import RawLog
+from tennis.market.names import parse_market
 
 DEFAULT_URL = "wss://ru-ws2.sporthub.bet:443/api/tree_ws/v1"
 
@@ -122,6 +132,11 @@ class BetBoomRecorder:
         self.skipped = Counter()          # why a tournament was not subscribed
         self.include_doubles = False
         self.include_sim = False
+        # Outcomes followed one by one, so a reprice that moves no score is
+        # still pushed. Batched at 40 per request: the platform documents no
+        # limit for stakes, and 40 is the largest batch seen accepted live.
+        self.stakes_asked: set[str] = set()
+        self.stake_pushes = 0
 
     def uid(self, tag: str) -> str:
         self._uid += 1
@@ -181,6 +196,7 @@ class BetBoomRecorder:
         self.sports_asked.clear()
         self.categories_asked.clear()
         self.tournaments_asked.clear()
+        self.stakes_asked.clear()
 
     async def _session(self, ws) -> None:
         pb = self.pb
@@ -231,7 +247,10 @@ class BetBoomRecorder:
             kinds = ", ".join(f"{k}={n}" for k, n in self.kinds.most_common(6))
             print(f"[hb] {self.log.frames} frames, "
                   f"{len(self.subscribed)} subscribed, "
-                  f"{self.stakes_seen} stakes | {kinds or 'no responses yet'}",
+                  f"{len(self.stakes_asked)} outcomes followed, "
+                  f"{self.stakes_seen} stakes, "
+                  f"{self.stake_pushes} per-stake pushes "
+                  f"| {kinds or 'no responses yet'}",
                   file=sys.stderr)
             self._write_sidecar()
 
@@ -270,6 +289,8 @@ class BetBoomRecorder:
                 "frames": self.log.frames,
                 "subscribed": len(self.subscribed),
                 "stakes_seen": self.stakes_seen,
+                "stakes_followed": len(self.stakes_asked),
+                "stake_pushes": self.stake_pushes,
                 "last_stake_at_s": self.last_stake_at,
                 "reconnects": self.reconnects,
                 "errors": len(self.errors),
@@ -354,8 +375,13 @@ class BetBoomRecorder:
             await self._take_match(ws, body.match)
         elif which == "newsletters_full_match":
             self._note_match(body.match)
+            await self._take_stakes(ws, body.match)
         elif which == "newsletters_stake":
+            self.stake_pushes += 1
             self._note_stake(body.stake)
+        elif which == "stakes_subscribe":
+            for item in body.stakes:
+                self._check_code("stakes_subscribe.item", item)
         elif which == "matches_subscribe_full":
             for item in body.full_matches:
                 self._check_code("matches_subscribe_full.item", item)
@@ -364,6 +390,7 @@ class BetBoomRecorder:
                     self.match_tier[mid] = (item.category.info.name,
                                             item.tournament.info.name)
                 self._note_match(item.match)
+                await self._take_stakes(ws, item.match)
 
     def _check_code(self, which: str, body) -> None:
         """Report a non-200 status on any typed response.
@@ -536,6 +563,33 @@ class BetBoomRecorder:
         print(f"[sub] match {mid}", file=sys.stderr)
         self._note_match(match)
 
+    async def _take_stakes(self, ws, match) -> None:
+        """Follow this match's game outcomes one by one.
+
+        Only game markets, because they are what the project models and a
+        whole board would be some 126 subscriptions per match. The ids come
+        from the snapshot that just arrived, so nothing is guessed; each is
+        asked for once, and a reconnect forgets them all.
+        """
+        mid = match.info.id
+        if not mid or mid not in self.subscribed:
+            return
+        fresh = [s.stake_id for s in getattr(match, "stakes", [])
+                 if s.stake_id and s.stake_id not in self.stakes_asked
+                 and parse_market(s.market_name).is_game]
+        if not fresh:
+            return
+        self.stakes_asked.update(fresh)
+        for start in range(0, len(fresh), 40):
+            req = self.pb.MainRequest()
+            req.stakes_subscribe.uid = self.uid("stakes")
+            for stake_id in fresh[start:start + 40]:
+                item = req.stakes_subscribe.stakes.add()
+                item.uid = self.uid("k")
+                item.match_id = mid
+                item.stake_id = stake_id
+            await self._send(ws, req, tag=f"subscribe_stakes:{mid}")
+
     def _note_match(self, match) -> None:
         for stake in getattr(match, "stakes", []):
             self._note_stake(stake)
@@ -594,6 +648,13 @@ class BetBoomRecorder:
         print(f"\n  layers asked: sports={sorted(self.sports_asked)} "
               f"categories={len(self.categories_asked)} "
               f"tournaments={len(self.tournaments_asked)}", file=sys.stderr)
+
+        print(f"\n  following {len(self.stakes_asked)} game outcome(s) one by one; "
+              f"{self.stake_pushes} per-stake push(es) arrived",
+              file=sys.stderr)
+        if self.stakes_asked and not self.stake_pushes:
+            print("  none arrived -- prices inside a game were NOT recorded",
+                  file=sys.stderr)
 
         print(f"\n  subscribed to {len(self.subscribed)} match(es): "
               f"{sorted(self.subscribed)}", file=sys.stderr)
