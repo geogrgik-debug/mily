@@ -324,3 +324,54 @@ def test_a_refused_request_is_reported_not_swallowed(tmp_path, capsys):
 def test_a_two_hundred_response_is_not_reported_as_bad(tmp_path):
     rec, _, _ = run_session(tmp_path, [lazy_sports_tree()])
     assert rec.bad_codes == []
+
+
+def test_reconnect_resubscribes_from_scratch(tmp_path):
+    """After a dropped socket every layer must be asked for again.
+
+    Observed on the first long run: one ConnectionClosedError, a successful
+    reconnect, and then hours of a growing log with no prices in it. The
+    reconnect path cleared `subscribed` but not the per-layer memo sets, so
+    the sport was treated as already requested and nothing below it was ever
+    asked for again.
+    """
+    log = RawLog(tmp_path, provider="betboom", clock=FakeClock(), compress=False)
+    log.open()
+    rec = BetBoomRecorder(log)
+
+    ws1 = FakeWS([lazy_sports_tree()])
+    asyncio.run(rec._session(ws1))
+    assert rec.sports_asked == {4}
+    first = [pb.MainRequest.FromString(r).WhichOneof("type") for r in ws1.sent]
+    assert first.count("state_subscribe_sports") == 1
+
+    # the socket drops; this is what the reconnect loop does before dialling
+    rec._forget_subscriptions()
+    assert rec.sports_asked == set() and rec.subscribed == set()
+
+    ws2 = FakeWS([lazy_sports_tree()])
+    asyncio.run(rec._session(ws2))
+    second = [pb.MainRequest.FromString(r).WhichOneof("type") for r in ws2.sent]
+    assert second.count("state_subscribe_sports") == 1, \
+        "the sport was not re-requested on the new socket"
+    log.close()
+
+
+def test_recorder_publishes_its_counters_beside_the_log(tmp_path):
+    """The sidecar is what lets an outside checker tell 'writing' from
+    'writing what we came for'."""
+    import json
+    log = RawLog(tmp_path, provider="betboom", clock=FakeClock(), compress=False)
+    log.open()
+    rec = BetBoomRecorder(log)
+    asyncio.run(rec._session(FakeWS([tennis_tree(555),
+                                     stake_push("Исход", "", 1.8)])))
+    rec._write_sidecar()
+    side = json.loads((tmp_path / "_recorder.json").read_text())
+    assert side["subscribed"] == 1
+    assert side["stakes_seen"] == 1
+    assert side["last_stake_at_s"] is not None
+    assert side["reconnects"] == 0
+    assert side["frames"] == log.frames
+    assert not list(tmp_path.glob("*.tmp"))
+    log.close()

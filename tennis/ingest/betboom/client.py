@@ -49,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import sys
 from collections import Counter
 from pathlib import Path
@@ -101,6 +102,8 @@ class BetBoomRecorder:
         # and makes silence informative.
         self.kinds = Counter()
         self.sports_seen = Counter()
+        self.last_stake_at: float | None = None
+        self.reconnects = 0
         self.errors: list[str] = []
         self.bad_codes: list[str] = []
         # The live tree is lazy, so each layer is asked for exactly once.
@@ -141,13 +144,33 @@ class BetBoomRecorder:
                 # A dropped socket is normal operation, not an error worth
                 # stopping for: the log keeps what was already written and the
                 # next connection appends to it.
+                self.reconnects += 1
                 self.log.write(f"reconnect after {type(exc).__name__}: {exc}",
                                direction="meta", channel="_conn")
                 print(f"[conn] {type(exc).__name__}: {exc}; retry in {backoff:.0f}s",
                       file=sys.stderr)
                 await asyncio.sleep(backoff)
                 backoff = min(backoff * 2, 60.0)
-                self.subscribed.clear()
+                self._forget_subscriptions()
+
+    def _forget_subscriptions(self) -> None:
+        """Drop every memory of what we asked for, before reconnecting.
+
+        A new socket carries none of the old subscriptions, so all of it has to
+        be asked for again. Clearing only `subscribed` -- which is what this
+        did -- left the layer sets populated, so `_take_sport` saw the sport as
+        already requested and returned early. The recorder then sat connected,
+        writing the cheap tour-wide score stream and not one price, for as long
+        as it was left running.
+
+        Observed live: one dropped socket, reconnect succeeded, and the capture
+        recorded no odds at all from that moment. It looks healthy from outside
+        -- the log keeps growing -- which is exactly what makes it dangerous.
+        """
+        self.subscribed.clear()
+        self.sports_asked.clear()
+        self.categories_asked.clear()
+        self.tournaments_asked.clear()
 
     async def _session(self, ws) -> None:
         pb = self.pb
@@ -200,6 +223,41 @@ class BetBoomRecorder:
                   f"{len(self.subscribed)} subscribed, "
                   f"{self.stakes_seen} stakes | {kinds or 'no responses yet'}",
                   file=sys.stderr)
+            self._write_sidecar()
+
+    def _write_sidecar(self) -> None:
+        """Publish live internal state beside the log, for an outside checker.
+
+        A growing log file is not proof the capture is working: the feed pushes
+        a tour-wide score stream whether or not anything is subscribed, so a
+        recorder that lost its subscriptions still writes. The counters that
+        distinguish the two live only in this process, so it writes them out.
+
+        Cheap by design -- a few hundred bytes every heartbeat, no
+        decompression -- so a checker can run every few minutes.
+        """
+        try:
+            path = Path(self.log.root) / "_recorder.json"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            payload = {
+                "run_id": self.log.run_id,
+                "written_at_s": self.clock.now().wall_ns / 1e9,
+                "frames": self.log.frames,
+                "subscribed": len(self.subscribed),
+                "stakes_seen": self.stakes_seen,
+                "last_stake_at_s": self.last_stake_at,
+                "reconnects": self.reconnects,
+                "errors": len(self.errors),
+                "bad_codes": len(self.bad_codes),
+            }
+            tmp = path.with_suffix(".json.tmp")
+            tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2,
+                                      sort_keys=True) + "\n", encoding="utf-8")
+            tmp.replace(path)
+        except OSError:
+            # Never let a status write kill a capture. The sidecar is a
+            # convenience; the log is the thing that must not stop.
+            pass
 
     async def _ping_loop(self, ws) -> None:
         pb = self.pb
@@ -431,6 +489,7 @@ class BetBoomRecorder:
 
     def _note_stake(self, stake) -> None:
         self.stakes_seen += 1
+        self.last_stake_at = self.clock.now().wall_ns / 1e9
         self.markets[(stake.market_name, stake.period_name)] += 1
         if self.discover and self.stakes_seen % 200 == 0:
             self.report()

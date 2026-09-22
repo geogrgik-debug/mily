@@ -81,3 +81,62 @@ def test_cli_writes_atomically_and_sets_the_exit_code(tmp_path, capsys):
     assert out.exists() and '"ok": true' in out.read_text()
     assert not list(out.parent.glob("*.tmp")), "temp file left behind"
     assert main([str(tmp_path / "gone")]) == 1
+
+
+def _sidecar(root, **fields):
+    import json, time
+    base = {"run_id": "r", "written_at_s": time.time(), "frames": 1000,
+            "subscribed": 10, "stakes_seen": 5000,
+            "last_stake_at_s": time.time() - 5, "reconnects": 0,
+            "errors": 0, "bad_codes": 0}
+    base.update(fields)
+    (root / "_recorder.json").write_text(json.dumps(base))
+
+
+def test_growing_file_with_no_subscriptions_is_not_ok(tmp_path):
+    """The blind spot the first version had: a lost subscription still writes.
+
+    Reproduced from a real capture: 0 subscribed, stakes frozen, log growing
+    on the tour-wide score stream, and the file-only check said fine.
+    """
+    root = _capture(tmp_path)
+    _sidecar(root, subscribed=0, reconnects=1)
+    st = capture_status(root)
+    assert not st.ok
+    assert "НЕ ПОДПИСАН" in st.reason
+    assert st.subscribed == 0 and st.reconnects == 1
+
+
+def test_growing_file_with_stale_prices_is_not_ok(tmp_path):
+    import time
+    root = _capture(tmp_path)
+    _sidecar(root, subscribed=10, last_stake_at_s=time.time() - 3600)
+    st = capture_status(root)
+    assert not st.ok
+    assert "котировок нет" in st.reason
+    assert st.last_stake_age_s > 3000
+
+
+def test_healthy_sidecar_reports_subscriptions_and_prices(tmp_path):
+    root = _capture(tmp_path)
+    _sidecar(root, subscribed=10, stakes_seen=68412)
+    st = capture_status(root)
+    assert st.ok, st.reason
+    assert "10 подписок" in st.reason and "68412 котировок" in st.reason
+    assert st.last_stake_age_s is not None and st.last_stake_age_s < 60
+
+
+def test_without_a_sidecar_the_verdict_says_it_is_file_only(tmp_path):
+    """An older recorder leaves no counters; the check must say so rather
+    than silently downgrade to the weaker test."""
+    st = capture_status(_capture(tmp_path))
+    assert st.ok
+    assert "только по файлу" in st.reason
+    assert st.subscribed is None
+
+
+def test_a_corrupt_sidecar_is_ignored_not_fatal(tmp_path):
+    root = _capture(tmp_path)
+    (root / "_recorder.json").write_text("{not json")
+    st = capture_status(root)
+    assert st.ok and st.subscribed is None
