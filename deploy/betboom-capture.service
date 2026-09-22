@@ -1,0 +1,42 @@
+# systemd unit for the BetBoom capture.
+#
+# Paths are placeholders: vps-setup.sh prints the sed command that fills them,
+# or edit __ROOT__ and __USER__ by hand.
+#
+# Not exercised in this repository's tests -- the capture itself is, the unit
+# file is not. What it encodes is the operational intent: restart on failure,
+# never give up permanently, and take the whole machine's uptime rather than a
+# login session's.
+
+[Unit]
+Description=BetBoom live odds capture
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__ROOT__
+ExecStart=__ROOT__/.venv/bin/python -m tennis.ingest.betboom.client --out data/raw --max-matches 10
+
+# The recorder reconnects on its own with a growing backoff, so a restart here
+# means it died outright. Always come back; a capture that stays down is the
+# one failure that costs data permanently, since a game market is gone a minute
+# after it is quoted.
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=0
+
+# Heartbeats and the exit report go to the journal: journalctl -u betboom-capture
+StandardOutput=journal
+StandardError=journal
+
+# The process only writes under its own working directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=__ROOT__/data
+
+[Install]
+WantedBy=multi-user.target
