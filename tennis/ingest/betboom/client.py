@@ -94,6 +94,13 @@ class BetBoomRecorder:
         self.subscribed: set[int] = set()
         self.markets = Counter()
         self.stakes_seen = 0
+        # Diagnostics. A first live session can end with frames on disk and
+        # nothing subscribed, and then the only question that matters is what
+        # the server actually sent. Counting every response type costs nothing
+        # and makes silence informative.
+        self.kinds = Counter()
+        self.sports_seen = Counter()
+        self.errors: list[str] = []
 
     def uid(self, tag: str) -> str:
         self._uid += 1
@@ -147,6 +154,8 @@ class BetBoomRecorder:
         await self._send(ws, req, tag="state_subscribe_by_sports")
 
         asyncio.create_task(self._ping_loop(ws))
+        if self.discover:
+            asyncio.create_task(self._heartbeat_loop())
 
         async for frame in ws:
             if isinstance(frame, str):
@@ -158,6 +167,20 @@ class BetBoomRecorder:
             except Exception:
                 continue                     # raw is already safe on disk
             await self._handle(ws, msg)
+
+    async def _heartbeat_loop(self, every: float = 15.0) -> None:
+        """Say what has arrived, so a session with no stakes is not silent.
+
+        The market inventory only prints every 200 stake updates, which never
+        fires when the count is zero -- the case that most needs explaining.
+        """
+        while True:
+            await asyncio.sleep(every)
+            kinds = ", ".join(f"{k}={n}" for k, n in self.kinds.most_common(6))
+            print(f"[hb] {self.log.frames} frames, "
+                  f"{len(self.subscribed)} subscribed, "
+                  f"{self.stakes_seen} stakes | {kinds or 'no responses yet'}",
+                  file=sys.stderr)
 
     async def _ping_loop(self, ws) -> None:
         pb = self.pb
@@ -174,6 +197,14 @@ class BetBoomRecorder:
 
     async def _handle(self, ws, msg) -> None:
         which = msg.WhichOneof("type")
+        self.kinds[which or "(no oneof set)"] += 1
+        if which == "error":
+            # Previously swallowed: a refused subscription looked exactly like
+            # an idle socket, which is the worst possible failure mode here.
+            text = str(msg.error).strip().replace("\n", " ")
+            self.errors.append(text)
+            print(f"[error] {text}", file=sys.stderr)
+            return
         if which == "state_subscribe_by_sports":
             for state in msg.state_subscribe_by_sports.states:
                 for sport in state.sports:
@@ -189,6 +220,11 @@ class BetBoomRecorder:
         info = sport.info
         slug = (getattr(info, "url_slug", "") or "").lower()
         name = (getattr(info, "name", "") or "").lower()
+        n_tournaments = len(getattr(sport, "tournaments", []))
+        n_matches = sum(len(getattr(t, "matches", []))
+                        for t in getattr(sport, "tournaments", []))
+        self.sports_seen[(info.name or slug or str(info.id),
+                          n_tournaments, n_matches)] += 1
         if self.sport not in slug and self.sport not in name and "теннис" not in name:
             return
         for tournament in getattr(sport, "tournaments", []):
@@ -216,6 +252,31 @@ class BetBoomRecorder:
               f"{len(self.markets)} (market, period) pairs ---", file=sys.stderr)
         for (market, period), n in self.markets.most_common(40):
             print(f"  {n:6d}  {market} | {period}", file=sys.stderr)
+
+        print(f"\n--- responses by type ---", file=sys.stderr)
+        if not self.kinds:
+            print("  none. The socket carried frames but no parseable "
+                  "MainResponse, or none arrived at all.", file=sys.stderr)
+        for kind, n in self.kinds.most_common():
+            print(f"  {n:6d}  {kind}", file=sys.stderr)
+
+        if self.sports_seen:
+            print(f"\n--- sports in the tree (name, tournaments, matches) ---",
+                  file=sys.stderr)
+            for (name, n_t, n_m), n in self.sports_seen.most_common(30):
+                print(f"  {n:4d}x  {name!r:34s} tournaments={n_t:4d} "
+                      f"matches={n_m:5d}", file=sys.stderr)
+        else:
+            print("\n--- no sports tree arrived ---", file=sys.stderr)
+
+        if self.errors:
+            print(f"\n--- {len(self.errors)} server error(s) ---",
+                  file=sys.stderr)
+            for text in self.errors[:10]:
+                print(f"  {text}", file=sys.stderr)
+
+        print(f"\n  subscribed to {len(self.subscribed)} match(es): "
+              f"{sorted(self.subscribed)}", file=sys.stderr)
 
 
 def main(argv: list[str] | None = None) -> int:
