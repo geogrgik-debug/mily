@@ -22,7 +22,10 @@ outcomes. Of 76,063 snapshot quotes of a pushed outcome, 63,811 carried its
 latest pushed price, none a price the pushes had left, and the other 12,252
 took the outcome off the board before a push said so: nothing rolls back.
 The push was first in every one of 57,638 paired changes, by a median of
-0.52 s, p90 0.61 s, max 10.63 s -- not the 78 s p90 of the first look.
+0.52 s, p90 0.61 s, max 10.63 s -- not the 78 s p90 of the first look. Another
+38 first pushes came at a price a snapshot had already moved to, 6.36 to
+14.89 s after it; were all 38 the snapshot's, the push would still be first
+in 57,638 of 57,676.
 
     python -m tennis.market.push_vs_snapshot PATH [--window 300]
 """
@@ -42,7 +45,7 @@ from tennis.market.lead_lag import _align, _clusters, quantile
 from tennis.market.streams import GAP_S, Quote, RunClock, _rows, betboom_quotes
 
 __all__ = ["WINDOW_S", "Agreement", "Change", "Lead", "agreement", "changes", "lead",
-           "load_quotes", "main"]
+           "late_first_pushes", "load_quotes", "main"]
 
 # How far apart a push and a snapshot of one change may be: about twice the
 # longest lead measured before, 153 s.
@@ -196,6 +199,41 @@ def lead(push: dict[tuple, list[Change]], snap: dict[tuple, list[Change]],
                 sum(len(snap.get(key, ())) for key in push), tuple(leads))
 
 
+def late_first_pushes(quotes: Iterable[Quote | None]) -> tuple[float, ...]:
+    """First pushes of an outcome that came at a price a snapshot had already
+    moved it to: seconds after that snapshot, one per outcome and stretch.
+
+    `changes` measures a first push from the price last quoted, so such a
+    push is no change of its own, and the snapshot's change stays unpaired --
+    the one place where the snapshot may have been first without showing as
+    first. Found in review; counted apart rather than guessed at, because a
+    first push can also be the server's answer to the subscription.
+    """
+    out: list[float] = []
+    last: dict[tuple, float] = {}                   # last bettable odds, either source
+    moved: dict[tuple, tuple[float, int]] = {}      # snapshot's move before any push
+    pushed: set[tuple] = set()
+    for q in quotes:
+        if q is None:
+            last.clear()
+            moved.clear()
+            pushed.clear()
+            continue
+        if not _bettable(q):
+            continue
+        key = (q.match, q.market, q.outcome)
+        prev = last.get(key)
+        if q.source == "full" and key not in pushed and prev is not None and prev != q.odds:
+            moved[key] = (q.odds, q.ts_mono_ns)
+        elif q.source == "stake" and key not in pushed:
+            pushed.add(key)
+            snap = moved.get(key)
+            if snap is not None and snap[0] == q.odds == prev:
+                out.append((q.ts_mono_ns - snap[1]) / 1e9)
+        last[key] = q.odds
+    return tuple(out)
+
+
 # --------------------------------------------------------------- input and report
 
 
@@ -226,7 +264,7 @@ def load_quotes(path: str | Path, pb) -> tuple[list[Quote | None], list[RunClock
 
 
 def print_report(path, clocks: Sequence[RunClock], ag: Agreement, ld: Lead,
-                 window_s: float) -> None:
+                 late: Sequence[float], window_s: float) -> None:
     hours = sum(c.end - c.start for c in clocks) / 3.6e12
     print(f"{path}: {len(clocks)} run(s), {hours:.1f} h, {ld.outcomes} outcomes pushed\n")
     print("(a) snapshot quotes of an outcome already pushed, against its latest push")
@@ -245,6 +283,10 @@ def print_report(path, clocks: Sequence[RunClock], ag: Agreement, ld: Lead,
               f"min {min(ld.leads):+.2f}")
     print(f"    seen by push only {ld.pushed - ld.paired}, by snapshot only "
           f"{ld.snapped - ld.paired}")
+    after = (f", after median {statistics.median(late):.2f} s, min {min(late):.2f}, "
+             f"max {max(late):.2f}" if late else "")
+    print(f"    first push at a price a snapshot had already moved to: {len(late)} "
+          f"(the snapshot may have been first){after}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -266,7 +308,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"refused: no pushes under {args.path} -- a recorder older than 3f695d8 "
               "does not ask for them", file=sys.stderr)
         return 2
-    print_report(args.path, clocks, agreement(quotes), ld, args.window)
+    print_report(args.path, clocks, agreement(quotes), ld, late_first_pushes(quotes),
+                 args.window)
     return 0
 
 

@@ -6,7 +6,15 @@ board on the next score change, and pushes carrying their market_name.
 """
 from tennis.ingest.clock import FakeClock
 from tennis.ingest.rawlog import RawLog
-from tennis.market.push_vs_snapshot import Agreement, Lead, agreement, changes, lead, main
+from tennis.market.push_vs_snapshot import (
+    Agreement,
+    Lead,
+    agreement,
+    changes,
+    late_first_pushes,
+    lead,
+    main,
+)
 from tennis.market.streams import Quote
 from tennis.market.tests.test_lead_lag import (  # noqa: F401 -- pb is a fixture
     BOOT,
@@ -113,6 +121,45 @@ def test_a_tie_is_neither_first():
     assert got.order == (1, 1, 1)
 
 
+def test_changes_pair_by_odds_not_by_the_nearest_time():
+    """The snapshot shows 1.85 at 11.9 s, a tenth of a second before the push
+    of the next price, 1.90: the pair is 1.85 with 1.85, 1.9 s apart."""
+    quotes = [q(0, "П1", 1.80, "full"), q(10, "П1", 1.85, "stake"),
+              q(11.9, "П1", 1.85, "full"), q(12, "П1", 1.90, "stake")]
+
+    got = lead(changes(quotes, "stake"), changes(quotes, "full"))
+
+    assert [round(x, 3) for x in got.leads] == [1.9]
+
+
+def test_a_first_push_a_snapshot_beat_is_counted_apart():
+    """Found in review: the snapshot moved the price at 10 s and the outcome's
+    first push came at 13 s. Measured from the price last quoted, the push is
+    no change, so nothing pairs and the snapshot's lead would go unseen."""
+    quotes = [q(0, "П1", 1.80, "full"), q(10, "П1", 1.85, "full"), q(13, "П1", 1.85, "stake")]
+
+    assert late_first_pushes(quotes) == (3.0,)
+    assert lead(changes(quotes, "stake"), changes(quotes, "full")).leads == ()
+
+
+def test_a_first_push_ahead_of_the_snapshot_is_the_push_first():
+    quotes = [q(0, "П1", 1.80, "full"), q(10, "П1", 1.85, "stake"), q(13, "П1", 1.85, "full")]
+
+    assert late_first_pushes(quotes) == ()
+    assert lead(changes(quotes, "stake"), changes(quotes, "full")).leads == (3.0,)
+
+
+def test_a_first_push_repeating_the_board_is_not_late():
+    """A first push at the price the snapshot started from moved nothing."""
+    assert late_first_pushes([q(0, "П1", 1.80, "full"), q(1, "П1", 1.80, "stake")]) == ()
+
+
+def test_a_break_forgets_what_the_snapshot_moved():
+    quotes = [q(0, "П1", 1.80, "full"), q(10, "П1", 1.85, "full"), None,
+              q(13, "П1", 1.85, "stake")]
+    assert late_first_pushes(quotes) == ()
+
+
 # --------------------------------------------------------------- rollbacks
 
 
@@ -189,6 +236,7 @@ def test_the_command_line_on_a_capture_with_pushes(pb, tmp_path, capsys):
             "at a price no push had shown 0") in out
     assert "4 changes by push, 4 by snapshot; 4 paired" in out
     assert "push first 4 (100.0%)" in out
+    assert "first push at a price a snapshot had already moved to: 0" in out
 
 
 def test_the_command_line_refuses_two_captures_at_once(pb, tmp_path, capsys):

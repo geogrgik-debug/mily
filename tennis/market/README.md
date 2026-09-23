@@ -91,6 +91,10 @@ two moves the book never made. Measured on the capture host's logs of 22-23.09
 * The push was first in all 57,638 paired changes: snapshot minus push median
   +0.52 s, p90 +0.61 s, max +10.63 s. The first look, 16 outcomes over 7
   minutes, had a p90 of 78 s; it does not hold.
+* Where the snapshot may have been first, the report says so apart: 38 first
+  pushes came at a price a snapshot had already moved to, 6.36 to 14.89 s
+  after it. Counted as the snapshot's, they leave the push first in 57,638
+  of 57,676 changes.
 
 So the meter's stream needs no guard against snapshots, and a game market's
 move is timed by its push. Only the capture host has pushes: the laptop's
