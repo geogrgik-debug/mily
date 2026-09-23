@@ -36,15 +36,20 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import Callable, Iterable
 
+from tennis.state import DEFAULT_N0
+
 # The tour holds its serve about this often; live_hold_rate is shrunk toward it
 # while a server has few games behind them, exactly as B2 shrank toward the
 # sample mean. A constant here, not measured per surface -- the prior already
 # carries the surface, and this only steadies the first few games.
 TOUR_HOLD_RATE = 0.80
 
-# Shrink strengths, carried over from research/slam_process_study.py: 40 phantom
-# serve points toward the prior, 6 phantom games toward the tour hold rate.
-SPW_SHRINK_POINTS = 40
+# live_spw is the live state's belief (tennis.state): the prior with the weight
+# of DEFAULT_N0 phantom serve points, fitted on history. The 40 carried over from
+# research/slam_process_study.py was too weak -- it lost 0.002-0.0035 of log
+# loss on every test segment (tennis/state/README.md). live_hold_rate keeps
+# research's 6 phantom games toward the tour hold rate.
+SPW_SHRINK_POINTS = DEFAULT_N0
 HOLD_SHRINK_GAMES = 6
 
 
