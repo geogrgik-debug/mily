@@ -25,7 +25,8 @@ starts at the probability core.
 | `ingest/onewin/` | The 1win recorder: config with no baked-in host, the three endpoints known to answer, a probe. The odds channel waits for one devtools request; see its README. | skeleton |
 | `ratings/` | Elo and as-of serve priors (Elo inversion blended with Barnett–Clarke), configured from the B1c sweep, with a snapshot the live process loads in 0.12 s instead of replaying 270k matches. Elo bit-identical to `research/elo_prior.py`; B1 numbers reproduced to four decimals. See its README. | done |
 | `market/` | Market-name parsing, overround, Shin, and the single-p fit behind a game book. Measured: the bookmaker prices the *next* game 74% of the time. `lead_lag.py`: which of two books moves a price first, by how much, and whether it is always the same one -- from logs of one machine only. See its README. | done |
-| `state/` `features/` `models/` `replay/` `eval/` | Live match state, snapshot features, residual model, replay backtest, metrics. | not started |
+| `model/` | Track B step 3: one row per service game from only what was known before it (`game_rows.py`). Leak safety is by construction -- a game enters the accumulators only after its own row is out -- and a test poisons the future to guard it. | step 3 done |
+| `state/` `features/` `replay/` `eval/` | Live match state, snapshot features, residual model, replay backtest, metrics. | not started |
 
 ```bash
 pip install pytest numpy
