@@ -35,7 +35,7 @@ N0_GRID = (5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 170, 20
            250, 300, 400, 500, 700, 1000)
 POINT_GRID = tuple(float(x) for x in np.geomspace(5, 2000, 61))
 TRANSFER_POINTS = (12, 18, 24, 37)          # the audit's A.5 rows, in serve points
-GAME_ROWS_N0 = 40                           # SPW_SHRINK_POINTS in tennis/model/game_rows.py
+GAME_ROWS_N0 = 40                           # game_rows' n0 before f61bda2, kept for the comparison
 
 
 @dataclass(frozen=True)

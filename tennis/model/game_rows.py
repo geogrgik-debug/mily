@@ -25,11 +25,14 @@ What a row carries, server's side first, all strictly before this game:
 * the same two for the returner, from his own service games so far, his
   `live_spw` shrunk toward the prior of his own serve.
 * `prev_hold` and its shape (easy, hard, broken) -- the last service game.
-* context -- game score, serving for the set, serving to stay in it, set number.
+* context -- game score, serving for the set, serving to stay in it, set number,
+  sets won by each, and whether the server broke in the game just before.
 
 The builder needs no data files and no pandas: the prior is supplied as a
 callable, so the same code runs in a test with a stub and live against a
-`RatingsSnapshot`.
+`RatingsSnapshot`. `prior_for_match` makes that callable from one
+`RatingsSnapshot.prior` call, so both players' serve priors come from one date
+and one surface by construction.
 """
 
 from __future__ import annotations
@@ -63,7 +66,8 @@ class GamePlay:
     `points` is the game point by point, 1 where the server won the point and 0
     where the returner did -- enough to decide the game and to feed the live
     per-point update (step 4). `server_games`/`returner_games` are the set score
-    *before* this game, which the feed always knows.
+    *before* this game, `server_sets`/`returner_sets` the sets each has won
+    before this set -- the feed always knows both.
     """
 
     server: int
@@ -72,6 +76,8 @@ class GamePlay:
     set_no: int
     server_games: int
     returner_games: int
+    server_sets: int = 0
+    returner_sets: int = 0
 
 
 @dataclass(frozen=True)
@@ -112,6 +118,11 @@ class GameRow:
     serving_for_set: int
     serving_to_stay: int
     games_in_set: int
+    server_sets: int
+    returner_sets: int
+    # the game just before was the returner's service game and the server won
+    # it; 0 after a tie-break, which is not a service game
+    server_just_broke: int
 
 
 def game_winner(points: Iterable[int]) -> int:
@@ -176,9 +187,15 @@ def build_game_rows(
     `prior_for(server, returner)` returns P(server wins a point on serve), the
     pre-match prior; it is called twice per game, once for each player's own
     serve (server first, then the returner's), and may be memoised by the
-    caller. Live it wraps `RatingsSnapshot.prior(...).p_serve_a`.
+    caller. Live, build it with `prior_for_match`.
+
+    `games` are the service games only: a tie-break is not one. After a
+    tie-break the next set opens with the player who served the last game
+    before it, so the game before a row with a different server is always the
+    one just played, and `server_just_broke` needs no tie-break flag.
     """
     hist: dict[int, _Serve] = {}
+    last: tuple[int, int] | None = None     # (server, hold) of the game before
 
     def serve_of(pid: int) -> _Serve:
         s = hist.get(pid)
@@ -225,13 +242,39 @@ def build_game_rows(
             serving_for_set=int(g.server_games >= 5 and g.server_games - g.returner_games >= 1),
             serving_to_stay=int(g.returner_games >= 5 and g.returner_games - g.server_games >= 1),
             games_in_set=g.server_games + g.returner_games,
+            server_sets=g.server_sets,
+            returner_sets=g.returner_sets,
+            server_just_broke=int(last is not None and last[0] == g.returner and last[1] == 0),
         )
         rows.append(row)
 
         # Only now does this game exist for the next row.
         me.fold(won, lost, hold)
+        last = (g.server, hold)
 
     return rows
+
+
+def prior_for_pair(a: int, b: int, p_serve_a: float, p_serve_b: float) -> Callable[[int, int], float]:
+    """`prior_for` for `build_game_rows` from one match prior, A's side first.
+
+    Both serves come from the same prior, so they cannot disagree on its date
+    or surface; a player outside the match is an error, not a silent 0.5.
+    """
+    def prior_for(server: int, returner: int) -> float:
+        if (server, returner) == (a, b):
+            return p_serve_a
+        if (server, returner) == (b, a):
+            return p_serve_b
+        raise ValueError(f"({server}, {returner}) is not this match ({a} v {b})")
+    return prior_for
+
+
+def prior_for_match(snapshot, a: int, b: int, surface: str, best_of: int, as_of) -> Callable[[int, int], float]:
+    """`prior_for` live: one `RatingsSnapshot.prior` call per match, as of the
+    tournament's start, and both players' serve priors read off it."""
+    pr = snapshot.prior(a, b, surface, best_of, as_of=as_of)
+    return prior_for_pair(a, b, pr.p_serve_a, pr.p_serve_b)
 
 
 def poison_future(games: list[GamePlay], keep: int) -> list[GamePlay]:

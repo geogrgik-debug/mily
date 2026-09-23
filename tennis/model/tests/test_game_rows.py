@@ -7,10 +7,14 @@ test keeps a later refactor honest.
 """
 
 import random
+from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 
-from tennis.model import GamePlay, GameRow, build_game_rows, game_winner
+from tennis.model import (
+    GamePlay, GameRow, build_game_rows, game_winner, prior_for_match, prior_for_pair,
+)
 from tennis.model.game_rows import poison_future
 from tennis.state import DEFAULT_N0, ServeBelief
 
@@ -204,3 +208,59 @@ def test_rows_are_frozen():
     with pytest.raises(Exception):
         row.hold = 0          # type: ignore[misc]
     assert isinstance(row, GameRow)
+
+
+# ---- sets and the break just before ----------------------------------------
+
+def test_sets_won_are_carried_from_the_play():
+    g = GamePlay(server=1, returner=2, points=(1, 1, 1, 1), set_no=3,
+                 server_games=2, returner_games=1, server_sets=0, returner_sets=2)
+    row = build_game_rows("m", [g], _flat_prior)[0]
+    assert (row.server_sets, row.returner_sets) == (0, 2)
+
+
+def test_the_server_just_broke_when_the_game_before_was_a_break():
+    # B is broken in the last game of _match; A serves next.
+    games = _match() + [GamePlay(server=1, returner=2, points=(1, 1, 1, 1), set_no=1,
+                                 server_games=3, returner_games=1)]
+    rows = build_game_rows("m1", games, _flat_prior)
+    assert [r.server_just_broke for r in rows] == [0, 0, 0, 0, 1]
+    # the break is the returner's game lost, not the server's own last game
+    assert rows[4].prev_broken == 0
+
+
+def test_no_break_carries_over_a_tie_break():
+    # 6-6, a tie-break (not a service game, so not in the list), then set 2 opens
+    # with the player who served the last game before it: that game is his own,
+    # not a break he made, even though he lost it.
+    before_tb = GamePlay(server=2, returner=1, points=(0, 0, 0, 0), set_no=1,
+                         server_games=5, returner_games=6)
+    set2 = GamePlay(server=2, returner=1, points=(1, 1, 1, 1), set_no=2,
+                    server_games=0, returner_games=0, server_sets=0, returner_sets=1)
+    rows = build_game_rows("m", [before_tb, set2], _flat_prior)
+    assert rows[1].server_just_broke == 0 and rows[1].prev_broken == 1
+
+
+# ---- one prior per match ---------------------------------------------------
+
+def test_prior_for_pair_reads_both_sides_of_one_prior():
+    pf = prior_for_pair(7, 9, 0.68, 0.63)
+    assert pf(7, 9) == 0.68 and pf(9, 7) == 0.63
+    with pytest.raises(ValueError):
+        pf(7, 8)
+
+
+def test_prior_for_match_asks_the_snapshot_once_with_one_date_and_surface():
+    calls = []
+
+    class Snap:
+        def prior(self, a, b, surface, best_of, as_of=None):
+            calls.append((a, b, surface, best_of, as_of))
+            return SimpleNamespace(p_serve_a=0.66, p_serve_b=0.61)
+
+    pf = prior_for_match(Snap(), 1, 2, "Clay", 3, "2026-09-21")
+    g = GamePlay(server=2, returner=1, points=(1, 1, 1, 1), set_no=1,
+                 server_games=0, returner_games=0)
+    row = build_game_rows("m", [g, replace(g, server=1, returner=2)], pf)
+    assert calls == [(1, 2, "Clay", 3, "2026-09-21")]
+    assert row[0].prior_p_serve == 0.61 and row[1].prior_p_serve == 0.66

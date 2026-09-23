@@ -8,6 +8,7 @@ covers the data, how to rerun it, and how the rows are built.
 ```bash
 python -m tennis.eval download data/sackmann       # ATP 54 files, Slams 90, pointbypoint 8 (~320 MB)
 python -m tennis.eval live-state --json data/eval/live_state.json    # about 6 minutes
+python -m tennis.eval calibrate --json data/eval/calibrate.json      # about 14 minutes; writes tennis/model/hold_v1.json
 ```
 
 Everything under `data/` is git-ignored: the files are CC BY-NC-SA 4.0,
@@ -81,9 +82,78 @@ The segments are Slams, tour and Challenger. Training is 2012–2018 for Slams
   - the gain by how many rated matches stand behind the server's Elo;
   - calibration by deciles.
 
+## Calibration (track B, step 5)
+
+`python -m tennis.eval calibrate` fits and scores `tennis.model.hold`: the
+live state plus a residual in the game's context, then a beta calibration.
+What the numbers are and what they say is in `tennis/model/README.md`. This
+section covers the data side.
+
+**Years.** Everything fitted is from before 2017, and everything scored is
+from 2017 on.
+
+| | Slams | tour, Challenger (tennis_pointbypoint) |
+|---|---|---|
+| residual (coefficients, L2 by 5-fold CV by match) | 2012–2014 | 2011–2014 |
+| beta calibration | 2015–2016 | 2015 |
+| test | 2019–2024 | 2017 |
+
+Slams 2017–2018 are in no role: the live state's n0 was fitted on Slams up to
+2018, so those years are not unseen. tennis_pointbypoint has no 2016.
+`calibrate.role_of` holds the split. A test poisons every test row and
+checks that the fitted parameters do not change.
+
+**Slams once.** tennis_pointbypoint carries the Slams' main draws too: 2600 of
+its joined matches are Slam main-draw rows in Sackmann's files. In a model
+for all three levels, one match could then sit in the fit as a Slam and in
+the test as tour 2017. So `calibrate` takes Slams from the Slam files only.
+It asserts that no Sackmann row is left in both sources. `live-state` still
+measures each segment on its own and keeps them, so its tour numbers include
+Slam matches.
+
+**Rows.** 931 115 regular service games, one row each.
+- `live_state.build` gives the live state's and the prior's P(hold) at each
+  level's n0.
+- `tennis.model.build_game_rows` gives the scoreboard, fed game by game by
+  `calibrate.to_plays` with both serves' priors from one `prior_for_pair`.
+
+The two are checked against each other row by row: match, target, service
+games so far, prior.
+
+`to_plays` rebuilds the set score from the games. A set ends on a tie-break,
+or at six games or more with a lead of two, which covers the advantage final
+sets. It was checked once against the sources' own set marks:
+- tennis_pointbypoint: 46 944 of 46 944 matches agree;
+- Slams: 4 698 of 4 699 agree.
+
+The one exception is 2020-ausopen-1156. Its `SetNo` column goes 1, 2, 3, 4
+with a one-game "set 3", while the games give 2-6 2-6 5-7.
+
+**Measured on the test years**, per level and pooled, 95 % by resampling
+whole matches:
+- log loss of the prior, the live state, plus the residual, and plus the
+  calibration, with the gain of each step;
+- calibration alone on the live state;
+- isotonic instead of beta;
+- the returner's serve added, measured apart and kept out of the parameters;
+- the residual refitted without each group of the context;
+- ECE on 15 equal-count bins with its noise floor;
+- Cox intercept and slope;
+- the coefficients, with intervals from 200 refits by match.
+
 ## Tests
 
 `tests/test_sources.py` covers the readers, the joins and the priors.
+
+`tests/test_calibrate.py` covers step 5 on simulated matches with real set
+structure:
+- the set score across tie-breaks and advantage sets;
+- rows that survive poisoned futures;
+- a scoreboard counted by hand;
+- a fit untouched by poisoned test years;
+- a planted context effect found again;
+- `tennis.model.p_hold`, played point by point, equal to the evaluated
+  forecast.
 
 `tests/test_live_state.py` runs the machinery on simulated matches where the
 truth is known. Each player's form is his prior plus a draw of known spread.

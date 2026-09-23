@@ -1,0 +1,266 @@
+"""Step 5's machinery on simulated matches: set scores right, no future in a
+row, no test year in the fit, and the fits find what was planted."""
+
+import numpy as np
+import pytest
+
+from tennis.eval.calibrate import (
+    FEATURES, GROUPS, Rows, beta_apply, build_rows, calibration_stats, ece, equal_count_edges, evaluate,
+    fit_params, isotonic_apply, isotonic_fit, role_of, to_plays,
+)
+from tennis.eval.join import PricedMatch
+from tennis.eval.points import Game, MatchPoints, valid_game
+from tennis.features import GameContext, vector
+from tennis.model.hold import expit, logit, p_hold, predict, start_state
+from tennis.state import N0, MatchState
+
+
+# ---- simulated matches with real set structure --------------------------------
+
+def _game(rng, server, p):
+    pts, a, b = [], 0, 0
+    while not (max(a, b) >= 4 and abs(a - b) >= 2):
+        w = int(rng.random() < p[server])
+        pts.append((server, w))
+        a, b = a + w, b + 1 - w
+    return Game(server, tuple(pts))
+
+
+def _tiebreak(rng, first, p):
+    pts, won, n = [], {1: 0, 2: 0}, 0
+    while not (max(won.values()) >= 7 and abs(won[1] - won[2]) >= 2):
+        srv = first if (n + 1) // 2 % 2 == 0 else 3 - first
+        w = int(rng.random() < p[srv])
+        pts.append((srv, w))
+        won[srv if w else 3 - srv] += 1
+        n += 1
+    g = Game(first, tuple(pts), tiebreak=True)
+    assert valid_game(g)
+    return g
+
+
+def sim_match(rng, key, year=2013, level="tour", p=None):
+    p = p or {1: float(rng.uniform(0.58, 0.70)), 2: float(rng.uniform(0.58, 0.70))}
+    games, sets, server = [], {1: 0, 2: 0}, 1
+    while max(sets.values()) < 2:
+        g = {1: 0, 2: 0}
+        while True:
+            game = _tiebreak(rng, server, p) if g[1] == g[2] == 6 else _game(rng, server, p)
+            games.append(game)
+            server = 3 - server
+            g[game.winner()] += 1
+            if game.tiebreak or (max(g.values()) >= 6 and abs(g[1] - g[2]) >= 2):
+                sets[game.winner()] += 1
+                break
+    m = MatchPoints(key=key, source="pbp", level=level, year=year, date="", event="",
+                    name1="a", name2="b", games=tuple(games))
+    return PricedMatch(match=m, date="", surface="Clay" if year % 2 else "Hard", best_of=3,
+                       p1=p[1], p2=p[2], rated1=50, rated2=50)
+
+
+def sim_priced(n, seed=0):
+    rng = np.random.default_rng(seed)
+    years = (2011, 2012, 2013, 2014, 2015, 2017)
+    return [sim_match(rng, str(k), years[k % len(years)], ("tour", "chall")[k // len(years) % 2])
+            for k in range(n)]
+
+
+# ---- set scores --------------------------------------------------------------
+
+def _hold(server, lose=False):
+    return Game(server, ((server, 0 if lose else 1),) * 4)
+
+
+def test_to_plays_counts_games_and_sets_with_a_tie_break_between():
+    games = []
+    for i in range(12):                                    # 6-6, every game held
+        games.append(_hold(1 + i % 2))
+    servers = [1 if (n + 1) // 2 % 2 == 0 else 2 for n in range(7)]
+    tb = tuple((srv, int(srv == 1)) for srv in servers)
+    games.append(Game(1, tb, tiebreak=True))               # player 1 takes it 7-0
+    games.append(_hold(2))                                 # set 2 opens with player 2
+    plays = to_plays(MatchPoints("k", "pbp", "tour", 2013, "", "", "a", "b", tuple(games)))
+    assert Game(1, tb, tiebreak=True).winner() == 1
+    assert len(plays) == 13
+    assert (plays[11].set_no, plays[11].server_games, plays[11].returner_games) == (1, 5, 6)
+    last = plays[12]
+    assert (last.set_no, last.server, last.server_games, last.returner_games) == (2, 2, 0, 0)
+    assert (last.server_sets, last.returner_sets) == (0, 1)
+
+
+def test_an_advantage_final_set_runs_past_six_all():
+    games = []
+    for i in range(12):                                    # a first set of held serves...
+        games.append(_hold(1 + i % 2, lose=(i == 11)))     # ...broken at 6-5: 7-5 to player 1
+    for i in range(14):                                    # the next "set" goes 7-7 on serve
+        games.append(_hold(1 + i % 2))
+    plays = to_plays(MatchPoints("k", "slam", "slam", 2013, "", "", "a", "b", tuple(games)))
+    assert plays[12].set_no == 2 and plays[12].server_sets == 1
+    assert plays[-1].set_no == 2 and plays[-1].server_games + plays[-1].returner_games == 13
+
+
+def test_the_ablation_groups_split_the_features_exactly():
+    grouped = [f for cols in GROUPS.values() for f in cols]
+    assert sorted(grouped) == sorted(FEATURES) and len(grouped) == len(set(grouped))
+
+
+def test_roles_follow_the_years():
+    def m(source, year):
+        return MatchPoints("k", source, "slam" if source == "slam" else "tour", year, "", "",
+                           "a", "b", ())
+    assert [role_of(m("slam", y)) for y in (2012, 2014, 2015, 2016, 2017, 2018, 2019, 2024)] == \
+        ["fit", "fit", "cal", "cal", "", "", "test", "test"]
+    assert [role_of(m("pbp", y)) for y in (2011, 2014, 2015, 2016, 2017)] == \
+        ["fit", "fit", "cal", "", "test"]
+
+
+# ---- the rows ------------------------------------------------------------------
+
+def test_rows_carry_the_live_state_at_each_levels_n0_and_the_scoreboard():
+    priced = sim_priced(6, seed=1)
+    rows = build_rows(priced)
+    assert rows.Z.shape == (len(rows.hold), len(FEATURES))
+    at = 0
+    for mi, pm in enumerate(priced):
+        s = MatchState.start(1, 2, pm.p1, pm.p2, N0[pm.match.level])
+        for g in pm.match.games:
+            if not g.tiebreak:
+                assert rows.match[at] == mi and rows.level[at] == pm.match.level
+                assert rows.h[at] == pytest.approx(s.p_hold_next(g.server), abs=1e-12)
+                at += 1
+            for srv, won in g.points:
+                s = s.after_point(srv, won)
+    assert at == len(rows.hold)
+
+
+def test_poisoning_later_games_leaves_earlier_rows_alone():
+    pm = sim_priced(1, seed=2)[0]
+    honest = build_rows([pm])
+    games = pm.match.games
+    regular = [i for i, g in enumerate(games) if not g.tiebreak]
+    for cut in (1, 5, 11, len(regular) - 1):
+        k = regular[cut]                                   # keep games[:k]; k is a service game
+        fake = tuple(Game(g.server, ((g.server, 0),) * 4) if not g.tiebreak else g
+                     for g in games[k:])
+        m2 = MatchPoints(**{**pm.match.__dict__, "games": games[:k] + fake})
+        poisoned = build_rows([PricedMatch(**{**pm.__dict__, "match": m2})])
+        n = cut                                            # rows before game k
+        assert np.array_equal(poisoned.Z[:n + 1], honest.Z[:n + 1])   # row k's context is pre-game
+        assert np.array_equal(poisoned.h[:n + 1], honest.h[:n + 1])
+        assert np.array_equal(poisoned.opp_dev[:n + 1], honest.opp_dev[:n + 1])
+
+
+def _lost(play):
+    return 2 * sum(play.points) < len(play.points)
+
+
+def _honest_context(pm, plays, i):
+    """The scoreboard before service game i, counted from the plays by hand."""
+    g = plays[i]
+    own = [p for p in plays[:i] if p.server == g.server]
+    return GameContext(level=pm.match.level, surface=pm.surface, best_of=pm.best_of,
+                       set_no=g.set_no, server_games=g.server_games,
+                       returner_games=g.returner_games, server_sets=g.server_sets,
+                       returner_sets=g.returner_sets, served_before=len(own),
+                       just_broke=i > 0 and plays[i - 1].server == g.returner and _lost(plays[i - 1]),
+                       was_broken=bool(own) and _lost(own[-1]))
+
+
+def test_the_context_of_a_row_is_the_scoreboard_before_it():
+    pm = sim_priced(1, seed=3)[0]
+    rows = build_rows([pm])
+    plays = to_plays(pm.match)
+    assert len(plays) == len(rows.hold)
+    for i in range(len(plays)):
+        assert np.array_equal(rows.Z[i], vector(_honest_context(pm, plays, i))), f"row {i}"
+
+
+# ---- the fit: roles only, and it finds what was planted --------------------------
+
+def _synthetic_rows(n=150_000, seed=0, planted=None):
+    rng = np.random.default_rng(seed)
+    k = len(FEATURES)
+    Z = rng.integers(0, 2, (n, k)).astype(float)
+    planted = np.zeros(k) if planted is None else planted
+    h = rng.uniform(0.55, 0.95, n)
+    y = (rng.random(n) < expit(logit(h) + 0.03 + Z @ planted)).astype(np.int64)
+    match = np.arange(n) // 10
+    role = np.array(["fit", "fit", "fit", "cal", "test", ""])[match % 6]
+    return Rows(match=match, level=np.array(["tour"] * n), role=role, hold=y, prior=h, h=h,
+                Z=Z, opp_dev=np.zeros(n))
+
+
+def test_the_fit_finds_a_planted_context_effect_and_leaves_calibration_alone():
+    planted = np.zeros(len(FEATURES))
+    planted[FEATURES.index("serving_for_set")] = -0.25
+    planted[FEATURES.index("chall")] = 0.15
+    params = fit_params(_synthetic_rows(planted=planted), l2_grid=(0.0, 100.0))
+    assert np.array(params.coef) == pytest.approx(planted, abs=0.05)
+    assert params.intercept == pytest.approx(0.03, abs=0.05)
+    # the model is right, so the calibration map on top is close to the identity
+    # (25 000 calibration rows: about 0.01 of noise at the thin ends)
+    grid = np.linspace(0.55, 0.97, 50)
+    assert np.abs(beta_apply(grid, params.calibration) - grid).max() < 0.02
+
+
+def test_poisoning_the_test_years_leaves_the_fit_unchanged():
+    rows = _synthetic_rows(n=30_000, seed=5)
+    rng = np.random.default_rng(9)
+    out = (rows.role == "test") | (rows.role == "")
+    poisoned = Rows(match=rows.match, level=rows.level, role=rows.role,
+                    hold=np.where(out, 1 - rows.hold, rows.hold),
+                    prior=rows.prior, h=np.where(out, rng.uniform(0.01, 0.99, len(out)), rows.h),
+                    Z=np.where(out[:, None], rng.normal(size=rows.Z.shape), rows.Z),
+                    opp_dev=rows.opp_dev)
+    assert fit_params(poisoned, l2_grid=(0.0, 100.0)) == fit_params(rows, l2_grid=(0.0, 100.0))
+
+
+# ---- scores ----------------------------------------------------------------------
+
+def test_ece_of_a_known_gap():
+    p = np.full(1000, 0.8)
+    y = (np.arange(1000) < 700).astype(float)
+    assert ece(p, y, np.array([0.0, 1.0])) == pytest.approx(0.1)
+
+
+def test_ece_of_calibrated_forecasts_sits_at_its_floor():
+    rng = np.random.default_rng(0)
+    p = rng.uniform(0.6, 0.95, 60_000)
+    y = (rng.random(p.size) < p).astype(float)
+    s = calibration_stats(p, y, np.arange(p.size) // 15, n_boot=50)
+    assert s["ece"] < 2.5 * s["ece_floor"]
+    assert s["cox_slope"] == pytest.approx(1.0, abs=0.1)
+    assert s["cox_slope_ci"][0] < 1.0 < s["cox_slope_ci"][1]
+    assert len(equal_count_edges(p)) == 16
+
+
+def test_isotonic_is_monotone_and_pools_violators():
+    p = np.array([0.1, 0.2, 0.3, 0.4])
+    y = np.array([0, 1, 0, 1])
+    fit = isotonic_fit(p, y)
+    assert list(fit[1]) == [0.0, 0.5, 1.0]
+    got = isotonic_apply(np.array([0.05, 0.25, 0.3, 0.9]), fit)
+    assert list(got) == [1e-3, 0.5, 0.5, 1 - 1e-3]
+
+
+# ---- end to end: the live call is the offline forecast -----------------------------
+
+def test_the_live_function_reproduces_the_evaluated_forecast():
+    priced = sim_priced(240, seed=4)
+    rows = build_rows(priced)
+    params, report = evaluate(rows, n_boot=20, n_boot_coef=0, l2_grid=(100.0,))
+    assert set(report["test"]) == {"tour", "chall", "all"}
+    final = predict(rows.h, rows.Z, params)
+    for pm in [pm for pm in priced if role_of(pm.match) == "test"][:2]:
+        idx = np.flatnonzero(rows.match == priced.index(pm))
+        plays = to_plays(pm.match)
+        s = start_state(params, pm.match.level, 1, 2, pm.p1, pm.p2)
+        at = 0
+        for g in pm.match.games:
+            if not g.tiebreak:
+                ctx = _honest_context(pm, plays, at)
+                assert p_hold(s, g.server, ctx, params) == pytest.approx(final[idx[at]], abs=1e-12)
+                at += 1
+            for srv, won in g.points:
+                s = s.after_point(srv, won)
+        assert at == len(idx)
