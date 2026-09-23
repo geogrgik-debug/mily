@@ -69,6 +69,14 @@ from tennis.market.names import parse_market
 
 DEFAULT_URL = "wss://ru-ws2.sporthub.bet:443/api/tree_ws/v1"
 
+# A subscribed match that has priced nothing for this long gives its slot back.
+# A game lasts minutes and every score change re-sends the board, so twenty
+# minutes of silence is a long rain break or a match the feed never announced
+# as over. It is not taken again for the cooldown, so a paused match cannot
+# cycle through a slot doing nothing.
+STALE_MATCH_S = 20 * 60
+STALE_COOLDOWN_S = 30 * 60
+
 # Tournaments inside the tennis tree that are not what a serve model wants.
 # Measured on a live tree: 12 of 32 tournaments -- 11 doubles and one
 # simulator -- 37% of what --max-matches would otherwise spend its slots on.
@@ -137,6 +145,19 @@ class BetBoomRecorder:
         # limit for stakes, and 40 is the largest batch seen accepted live.
         self.stakes_asked: set[str] = set()
         self.stake_pushes = 0
+        # Slots. `subscribed` used to only ever grow: once the first
+        # max_matches matches ended, every later one was turned away, and on
+        # the night of 22-23.09 the capture spent hours writing the tour-wide
+        # score stream and not one price, "10 subscribed" all along. A match
+        # now gives its slot back when the feed deletes it from the live tree,
+        # marks it finished, or goes silent (STALE_MATCH_S), and the next live
+        # match from the tour-wide stream takes the slot.
+        self.seen_at: dict[int, float] = {}        # subscribed match -> last price activity
+        self.stakes_of: dict[int, set[str]] = {}   # subscribed match -> outcomes followed
+        self.done: set[int] = set()                # finished, removed or unwanted: never again
+        self.cooldown: dict[int, float] = {}       # released as silent: not before this time
+        self.released = Counter()                  # why slots were given back
+        self.unwanted_tournaments: set[int] = set()
 
     def uid(self, tag: str) -> str:
         self._uid += 1
@@ -197,6 +218,10 @@ class BetBoomRecorder:
         self.categories_asked.clear()
         self.tournaments_asked.clear()
         self.stakes_asked.clear()
+        # Per-socket too. What is known about matches -- finished, unwanted,
+        # cooling down -- stays true across a reconnect and is kept.
+        self.seen_at.clear()
+        self.stakes_of.clear()
 
     async def _session(self, ws) -> None:
         pb = self.pb
@@ -224,6 +249,7 @@ class BetBoomRecorder:
         # indistinguishable from a hung one, and that is the mode left running
         # for days. --discover only makes it chattier.
         asyncio.create_task(self._heartbeat_loop(15.0 if self.discover else 60.0))
+        asyncio.create_task(self._release_loop(ws))
 
         async for frame in ws:
             if isinstance(frame, str):
@@ -249,7 +275,8 @@ class BetBoomRecorder:
                   f"{len(self.subscribed)} subscribed, "
                   f"{len(self.stakes_asked)} outcomes followed, "
                   f"{self.stakes_seen} stakes, "
-                  f"{self.stake_pushes} per-stake pushes "
+                  f"{self.stake_pushes} per-stake pushes, "
+                  f"{sum(self.released.values())} slots released "
                   f"| {kinds or 'no responses yet'}",
                   file=sys.stderr)
             self._write_sidecar()
@@ -295,6 +322,7 @@ class BetBoomRecorder:
                 "reconnects": self.reconnects,
                 "errors": len(self.errors),
                 "bad_codes": len(self.bad_codes),
+                "released": dict(self.released),
             }
             tmp = path.with_suffix(".json.tmp")
             tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2,
@@ -372,13 +400,24 @@ class BetBoomRecorder:
         elif which in ("newsletters_tournament", "newsletters_full_tournament"):
             await self._take_tournament(ws, body.tournament)
         elif which == "newsletters_match":
-            await self._take_match(ws, body.match)
+            if body.action == self.pb.NEWSLETTER_ACTIONS_DELETE:
+                await self._finish(ws, body.match.info.id, "deleted")
+            else:
+                await self._take_match(ws, body.match)
         elif which == "newsletters_full_match":
             self._note_match(body.match)
-            await self._take_stakes(ws, body.match)
+            mid = body.match.info.id
+            if body.action == self.pb.NEWSLETTER_ACTIONS_DELETE:
+                await self._finish(ws, mid, "deleted")
+            elif self._is_over(body.match):
+                await self._finish(ws, mid, "finished")
+            else:
+                self._touch(mid)
+                await self._take_stakes(ws, body.match)
         elif which == "newsletters_stake":
             self.stake_pushes += 1
             self._note_stake(body.stake)
+            self._touch(body.stake.match_id)
         elif which == "stakes_subscribe":
             for item in body.stakes:
                 self._check_code("stakes_subscribe.item", item)
@@ -390,6 +429,17 @@ class BetBoomRecorder:
                     self.match_tier[mid] = (item.category.info.name,
                                             item.tournament.info.name)
                 self._note_match(item.match)
+                # A match taken from the tour-wide stream arrives without its
+                # tournament; the reply names it, so the tier filter applies
+                # here too.
+                reason = self._unwanted_names(item.tournament.info.name,
+                                              item.category.info.name)
+                if mid in self.subscribed and reason:
+                    if item.tournament.info.id:
+                        self.unwanted_tournaments.add(item.tournament.info.id)
+                    await self._finish(ws, mid, reason)
+                    continue
+                self._touch(mid)
                 await self._take_stakes(ws, item.match)
 
     def _check_code(self, which: str, body) -> None:
@@ -513,10 +563,13 @@ class BetBoomRecorder:
         anyone judges them is not bent here.
         """
         info = tournament.info
-        name = (getattr(info, "name", "") or "").lower()
         cat = ""
         if tournament.HasField("category"):
-            cat = (tournament.category.info.name or "").lower()
+            cat = tournament.category.info.name or ""
+        return self._unwanted_names(getattr(info, "name", "") or "", cat)
+
+    def _unwanted_names(self, name: str, cat: str) -> str | None:
+        name, cat = (name or "").lower(), (cat or "").lower()
         if not self.include_sim and (
                 any(m in name for m in SIM_MARKERS) or any(m in cat for m in SIM_MARKERS)):
             return "simulator"
@@ -529,6 +582,8 @@ class BetBoomRecorder:
         reason = self._unwanted(tournament)
         if reason:
             self.skipped[(reason, info.name)] += 1
+            if info.id:
+                self.unwanted_tournaments.add(info.id)
             return
         matches = list(getattr(tournament, "matches", []))
         for match in matches:
@@ -548,12 +603,19 @@ class BetBoomRecorder:
 
     async def _take_match(self, ws, match) -> None:
         mid = match.info.id
+        if mid and self._is_over(match):
+            await self._finish(ws, mid, "finished")
+            return
         if not mid or mid in self.subscribed:
             self._note_match(match)
+            return
+        if (mid in self.done or self.cooldown.get(mid, 0.0) > self._now()
+                or match.info.tournament_id in self.unwanted_tournaments):
             return
         if len(self.subscribed) >= self.max_matches:
             return
         self.subscribed.add(mid)
+        self.seen_at[mid] = self._now()
         req = self.pb.MainRequest()
         req.matches_subscribe_full.uid = self.uid("full")
         item = req.matches_subscribe_full.full_matches.add()
@@ -580,6 +642,7 @@ class BetBoomRecorder:
         if not fresh:
             return
         self.stakes_asked.update(fresh)
+        self.stakes_of.setdefault(mid, set()).update(fresh)
         for start in range(0, len(fresh), 40):
             req = self.pb.MainRequest()
             req.stakes_subscribe.uid = self.uid("stakes")
@@ -589,6 +652,73 @@ class BetBoomRecorder:
                 item.match_id = mid
                 item.stake_id = stake_id
             await self._send(ws, req, tag=f"subscribe_stakes:{mid}")
+
+    def _now(self) -> float:
+        return self.clock.now().wall_ns / 1e9
+
+    def _is_over(self, match) -> bool:
+        return match.info.match_status.type == self.pb.MATCH_STATUSES_FINISHED
+
+    def _touch(self, mid: int) -> None:
+        """Price activity on a subscribed match: its slot is earning its keep."""
+        if mid in self.subscribed:
+            self.seen_at[mid] = self._now()
+
+    async def _finish(self, ws, mid: int, why: str) -> None:
+        """The feed says this match is over (or it is not wanted): never again."""
+        if not mid:
+            return
+        self.done.add(mid)
+        if mid in self.subscribed:
+            await self._release(ws, mid, why)
+
+    async def _release(self, ws, mid: int, why: str) -> None:
+        """Give a slot back and tell the server we are done with the match.
+
+        Its followed outcomes are released too, so a session that runs for
+        days does not pile up subscriptions the server keeps for nobody. Both
+        requests are best effort: their replies go through _check_code like
+        every other, so a refusal is reported, not swallowed.
+        """
+        self.subscribed.discard(mid)
+        self.seen_at.pop(mid, None)
+        stakes = sorted(self.stakes_of.pop(mid, set()))
+        self.stakes_asked.difference_update(stakes)
+        self.released[why] += 1
+        print(f"[unsub] match {mid}: {why}", file=sys.stderr)
+        req = self.pb.MainRequest()
+        req.matches_unsubscribe_full.uid = self.uid("unfull")
+        item = req.matches_unsubscribe_full.full_matches.add()
+        item.uid = self.uid("u")
+        item.match_id = mid
+        await self._send(ws, req, tag=f"unsubscribe_full:{mid}")
+        for start in range(0, len(stakes), 40):
+            req = self.pb.MainRequest()
+            req.stakes_unsubscribe.uid = self.uid("unstakes")
+            for stake_id in stakes[start:start + 40]:
+                it = req.stakes_unsubscribe.stakes.add()
+                it.uid = self.uid("uk")
+                it.match_id = mid
+                it.stake_id = stake_id
+            await self._send(ws, req, tag=f"unsubscribe_stakes:{mid}")
+
+    async def _release_stale(self, ws, now: float | None = None) -> list[int]:
+        """Release every subscribed match that has priced nothing for STALE_MATCH_S."""
+        now = self._now() if now is None else now
+        stale = sorted(m for m in self.subscribed
+                       if now - self.seen_at.get(m, now) > STALE_MATCH_S)
+        for mid in stale:
+            self.cooldown[mid] = now + STALE_COOLDOWN_S
+            await self._release(ws, mid, "stale")
+        return stale
+
+    async def _release_loop(self, ws, every: float = 60.0) -> None:
+        while True:
+            await asyncio.sleep(every)
+            try:
+                await self._release_stale(ws)
+            except Exception:
+                return                      # the socket is gone; the next session starts its own
 
     def _note_match(self, match) -> None:
         for stake in getattr(match, "stakes", []):
