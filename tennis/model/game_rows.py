@@ -22,7 +22,8 @@ What a row carries, server's side first, all strictly before this game:
   from `RatingsSnapshot.prior(server, returner, surface, best_of, as_of).p_serve_a`.
 * `live_spw` -- serve points won so far this match, shrunk toward the prior.
 * `live_hold_rate` -- service games held so far, shrunk toward the tour rate.
-* the same two for the returner, from the returner's own service games so far.
+* the same two for the returner, from his own service games so far, his
+  `live_spw` shrunk toward the prior of his own serve.
 * `prev_hold` and its shape (easy, hard, broken) -- the last service game.
 * context -- game score, serving for the set, serving to stay in it, set number.
 
@@ -44,8 +45,10 @@ from tennis.state import DEFAULT_N0
 # carries the surface, and this only steadies the first few games.
 TOUR_HOLD_RATE = 0.80
 
-# live_spw is the live state's belief (tennis.state): the prior with the weight
-# of DEFAULT_N0 phantom serve points, fitted on history. The 40 carried over from
+# live_spw is the live state's belief (tennis.state) at the tour's prior
+# strength, DEFAULT_N0 phantom serve points fitted on history; the live state
+# itself uses N0[level] when the level is known, which on the training years
+# costs this feature under 0.0002 of log loss. The 40 carried over from
 # research/slam_process_study.py was too weak -- it lost 0.002-0.0035 of log
 # loss on every test segment (tennis/state/README.md). live_hold_rate keeps
 # research's 6 phantom games toward the tour hold rate.
@@ -171,7 +174,8 @@ def build_game_rows(
     """Rows for every completed service game of one match, in order.
 
     `prior_for(server, returner)` returns P(server wins a point on serve), the
-    pre-match prior; it is called once per game and may be memoised by the
+    pre-match prior; it is called twice per game, once for each player's own
+    serve (server first, then the returner's), and may be memoised by the
     caller. Live it wraps `RatingsSnapshot.prior(...).p_serve_a`.
     """
     hist: dict[int, _Serve] = {}
@@ -188,6 +192,7 @@ def build_game_rows(
         lost = len(g.points) - won
         hold = game_winner(g.points)
         prior = prior_for(g.server, g.returner)
+        opp_prior = prior_for(g.returner, g.server)
 
         me = serve_of(g.server)
         opp = serve_of(g.returner)
@@ -208,7 +213,7 @@ def build_game_rows(
             live_hold_rate=me.hold_rate(),
             opp_cum_serve_points=opp.points,
             opp_cum_serve_won=opp.won,
-            opp_live_spw=opp.spw(1.0 - prior),
+            opp_live_spw=opp.spw(opp_prior),
             opp_cum_games=opp.games,
             opp_live_hold_rate=opp.hold_rate(),
             has_prev=int(me.prev_hold != -1),

@@ -12,6 +12,7 @@ import pytest
 
 from tennis.model import GamePlay, GameRow, build_game_rows, game_winner
 from tennis.model.game_rows import poison_future
+from tennis.state import DEFAULT_N0, ServeBelief
 
 
 # ---- game_winner: the target must be the real winner, not an approximation ----
@@ -149,20 +150,53 @@ def test_a_randomised_future_cannot_reach_back():
         assert build_game_rows("r", mixed, _flat_prior)[:keep] == full[:keep]
 
 
-def test_the_prior_flows_into_live_spw_and_the_opponent_gets_its_complement():
+def test_each_players_serve_is_shrunk_toward_his_own_serve_prior():
     seen = []
+    priors = {(1, 2): 0.70, (2, 1): 0.64}
 
     def prior_for(server, returner):
         seen.append((server, returner))
-        return 0.70
+        return priors[(server, returner)]
 
     g = GamePlay(server=1, returner=2, points=(1, 1, 1, 1), set_no=1,
                  server_games=0, returner_games=0)
     row = build_game_rows("m", [g], prior_for)[0]
-    assert seen == [(1, 2)]
+    assert seen == [(1, 2), (2, 1)]
     assert row.live_spw == pytest.approx(0.70)
-    # the returner, seen from their empty history, sits at the complement 0.30
-    assert row.opp_live_spw == pytest.approx(0.30)
+    # the returner, from an empty history, sits at the prior of his own serve --
+    # not at 1 - 0.70, which is his chance on return
+    assert row.opp_live_spw == pytest.approx(0.64)
+
+
+def _belief_mean(p, n, won):
+    b = ServeBelief.from_prior(p, DEFAULT_N0)
+    for w in [1] * won + [0] * (n - won):
+        b = b.observe(w)
+    return b.mean
+
+
+def test_live_spw_is_the_live_states_belief_at_the_fitted_strength():
+    # A serves 21 points (12 won) over five games, B serves 21 (8 won); the
+    # sixth game's row must hold both beliefs at n0 = DEFAULT_N0, so a revert
+    # of the constant (it was 40) fails here.
+    priors = {(1, 2): 0.66, (2, 1): 0.62}
+    a_games = [(1, 1, 1, 1), (1, 1, 1, 1), (0, 0, 0, 0), (0, 0, 0, 0), (1, 1, 0, 1, 1)]
+    b_games = [(1, 1, 1, 1), (0, 0, 0, 0), (0, 0, 0, 0), (1, 0, 1, 1, 1), (0, 0, 0, 0)]
+    games = []
+    for ga, gb in zip(a_games, b_games):
+        games.append(GamePlay(server=1, returner=2, points=ga, set_no=1,
+                              server_games=0, returner_games=0))
+        games.append(GamePlay(server=2, returner=1, points=gb, set_no=1,
+                              server_games=0, returner_games=0))
+    games.append(GamePlay(server=1, returner=2, points=(1, 1, 1, 1), set_no=1,
+                          server_games=0, returner_games=0))
+    row = build_game_rows("m", games, lambda s, r: priors[(s, r)])[-1]
+    assert (row.cum_serve_points, row.cum_serve_won) == (21, 12)
+    assert (row.opp_cum_serve_points, row.opp_cum_serve_won) == (21, 8)
+    assert row.live_spw == pytest.approx((12 + DEFAULT_N0 * 0.66) / (21 + DEFAULT_N0))
+    assert row.opp_live_spw == pytest.approx((8 + DEFAULT_N0 * 0.62) / (21 + DEFAULT_N0))
+    assert row.live_spw == pytest.approx(_belief_mean(0.66, 21, 12))
+    assert row.opp_live_spw == pytest.approx(_belief_mean(0.62, 21, 8))
 
 
 def test_rows_are_frozen():

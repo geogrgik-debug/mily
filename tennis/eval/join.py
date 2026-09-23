@@ -15,7 +15,8 @@ as of the tournament's start date, from every tournament that started strictly
 earlier. `stream_priors` replays the match files once and asks for each wanted
 prior just before its tournament's first match goes in -- the same snapshot
 `RatingsSnapshot.build(as_of=date)` would give, without a rebuild per date;
-`tests/test_join.py` pins the two equal.
+`tests/test_sources.py::test_streamed_priors_equal_a_snapshot_rebuilt_as_of_each_date`
+pins the two equal.
 """
 from __future__ import annotations
 
