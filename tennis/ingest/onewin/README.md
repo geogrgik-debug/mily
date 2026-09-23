@@ -6,57 +6,61 @@ bookmakers move a price, and it needs 1win's prices recorded **on the same
 machine** as BetBoom's. It checks that from the logs themselves and refuses
 logs from two machines.
 
-**Status: a skeleton.** Config, the endpoints known to answer, the raw log and
-a probe work. The odds channel does not exist yet, on purpose: it waits for
-one request from devtools, and nothing here guesses at it.
+**Status: records.** Live tennis singles, every market, from 1win's push
+server; checked live from the owner's laptop on 23.09 (21 live singles found,
+20 subscribed, 408 frames in 90 s, no reconnect).
 
 | File | What |
 |---|---|
-| `client.py` | `OneWinConfig` (API base and partner id, from flags or the environment, no defaults), `OneWinClient` (the known GETs, each answer logged before it is read), `OneWinRecorder` (`probe` works; `run` waits for the odds channel), and `ODDS_TODO` -- what the devtools request will decide |
+| `client.py` | `OneWinConfig` (gateway and partner id, from flags or the environment, no defaults), `OneWinClient` (the REST gateway: the live list, and the objects `--probe` asks for; every answer logged before it is read), `OneWinRecorder` (the push socket: subscribe, log every frame, answer pings, reconnect) |
 
-## What the reconnaissance established
+## How its prices travel
 
-From `HANDOFF.md`, "Второй источник: разведка API 1win":
+Found on 23.09 by listening to a live match page in a clean browser profile,
+then repeating each call from plain Python.
 
-| Fact | Status |
-|---|---|
-| The API host is `api-gateway.top-parser.com`; the site (`one-vv2420.com`) is a rotating mirror | established |
-| Public: the header `x-external-partner-id` is enough, no session token | checked from the owner's machine and from the sandbox |
-| `sports/get?sportId=`, `tournaments/get?tournamentId=`, `matches/get?matchId=` answer | no odds in any of them; tournaments are cached 600 s |
-| `markets/get`, `odds/get`, `outcomes/get`, `bets/get`, `lines/get`, `matches/get-markets`, `matches/get-list`, `matches/get?...&withMarkets=true` | 404 or no odds |
+* The "11 s json request" the first reconnaissance chased was **Kaspersky's
+  web antivirus** long-polling from inside the page
+  (`gc.kis.v2.scr.kaspersky-labs.com/.../longp`), not 1win.
+* Prices come over a **socket.io websocket** (Engine.IO 4) on the gateway:
+  `wss://api-gateway.top-parser.com/push-server-v2/?Language=ru&externalPartnerId=<id>&EIO=4&transport=websocket`.
+  Open `0{...}`, answer `40`, connected `40{...}`; the server pings `2`
+  every 25 s, the answer is `3`. No header needed.
+* Subscribe by match id (the number ending a match page's address) with
+  `subscribe-match-info` and `subscribe-match-odds` (`isBaseOddsGroups:
+  false` for every market). The board comes as `match-odds-snapshot`, then
+  `match-odds` with what changed; each odds item has a stable id, `cf`,
+  `status` (1 open, 2 suspended) and the server's `ts` in ms. Names, outcome
+  and set/game numbers come with the snapshot and when an item first appears.
+* Live matches: `POST matches/get-many {"service":"live","sportIds":[33]}`.
+  REST needs a browser User-Agent (403 without); `x-lang: ru` gives Russian
+  names beside the Latin slugs.
+* The API base has no path prefix: `https://api-gateway.top-parser.com`.
 
-Not recorded anywhere: the path on the host in front of `matches/get`, and
-the partner id. Both are in any Request URL / request of the devtools session,
-so both are config.
+The decoder is `onewin_quotes` in
+[`tennis/market/streams.py`](../../market/streams.py); matches are paired
+with BetBoom's by the players' names in
+[`tennis/market/join.py`](../../market/join.py).
 
 ## Config
 
 | Variable | Flag | What |
 |---|---|---|
-| `ONEWIN_API_BASE` | `--api-base` | `https://host/prefix` -- everything in the Request URL before `matches/get` |
-| `ONEWIN_PARTNER_ID` | `--partner-id` | the value of `x-external-partner-id` |
+| `ONEWIN_API_BASE` | `--api-base` | `https://api-gateway.top-parser.com` -- everything before `matches/get` |
+| `ONEWIN_PARTNER_ID` | `--partner-id` | the value of `x-external-partner-id` any browser on the site sends |
 
-No defaults: a host that has rotated away would otherwise fail quietly.
+No defaults: a host that has rotated away would otherwise fail quietly. The
+partner id is not a secret -- every visitor's browser sends it -- but it stays
+out of the repository and out of the log.
 
-## Probe
+## Run
 
 ```bash
-python -m tennis.ingest.onewin.client --probe --match 123456 \
-    --api-base https://api-gateway.top-parser.com/PREFIX --partner-id ID
+python -m tennis.ingest.onewin.client --out data/raw            # until stopped
+python -m tennis.ingest.onewin.client --out data/raw --seconds 900 --max-matches 25
+python -m tennis.ingest.onewin.client --probe --match 40403794  # one REST look
 ```
 
-Fetches each named sport, tournament and match once, writes the answers to
-`data/raw/provider=1win/`, and prints status, size, `cache-control` and the
-top-level JSON keys. Run it on the machine that records BetBoom: that is where
-the comparison has to come from.
-
-## What unblocks the odds
-
-On a live match page, F12 → Network, the `json` row that takes about ten
-seconds (11.36 s when it was seen): its **Request URL** and **Response**.
-Headers are not needed; no token goes into the repository or the chat.
-`ODDS_TODO` in `client.py` lists what each part decides -- host, the
-parameter naming the match, a cursor for the next poll, the hold time, the
-shape of a quote. After that: the polling loop here, a decoder
-`onewin_quotes` next to `betboom_quotes` in `tennis/market/streams.py`, and
-the meter compares the two books.
+Every frame of the socket is on disk before it is read; a reconnect writes a
+`_conn` row, which the meter reads as a break. `[hb]` once a minute says what
+has arrived. Run it on the machine that records BetBoom.
