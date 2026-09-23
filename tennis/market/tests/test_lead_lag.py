@@ -433,6 +433,25 @@ def test_a_wall_step_seen_by_both_captures_does_not_split_them():
     assert abs(clock_offset(a, b)) < 1e-3
 
 
+def test_a_step_back_while_both_run_does_not_split_one_machine():
+    """Found in review. After a backward step a wall reading occurs twice, and
+    the sample nearest in wall time can sit on the wrong side of the step: two
+    recorders on one machine stepping back 60 s, the second started 16 s later,
+    came out 60 s apart and were refused as two machines."""
+    a = run_clock("a", 34, 103, step_at_s=89, step_s=-60)
+    b = run_clock("b", 50, 103, step_at_s=89, step_s=-60)
+
+    assert clock_offset(a, b) == 0.0
+    streams = [Stream("A", "betboom", "", [], [a]), Stream("B", "1win", "", [], [b])]
+    assert check_same_clock(streams) == {("A", "B"): 0.0}
+
+
+def test_two_machines_are_refused_across_a_step_too():
+    a = run_clock("a", 0, 600, step_at_s=300, step_s=-6.6)
+    b = run_clock("b", 0, 600, boot=BOOT + 3_200_000_000, step_at_s=300, step_s=-6.6)
+    assert clock_offset(a, b) == pytest.approx(-3.2)
+
+
 def test_captures_from_two_machines_are_refused():
     """Two machines differ by their boot times; seconds are the least of it."""
     a = Stream("A", "betboom", "", [], [run_clock("a", 0, 600)])
@@ -583,12 +602,12 @@ def tour(pb, t, stakes):
     return row(pb, t, fill)
 
 
-def push(pb, t, name, factor, *, market=GAME_7, stake_id="", action=None):
+def push(pb, t, name, factor, *, market=GAME_7, stake_id="", action=None, match_id=MID):
     def fill(msg):
         body = msg.newsletters_stake
         body.action = action if action is not None else pb.NEWSLETTER_ACTIONS_UPDATE
         s = body.stake
-        s.match_id, s.market_name, s.name = MID, market, name
+        s.match_id, s.market_name, s.name = match_id, market, name
         s.factor, s.is_active, s.stake_id = factor, True, stake_id
     return row(pb, t, fill)
 
@@ -655,6 +674,16 @@ def test_a_stake_push_is_keyed_like_the_snapshot_that_named_it(pb):
 
     assert seen(betboom_quotes(rows, pb))[2:] == [
         ("Исход", "П1", 2.35, True), ("Исход", "П2", 1.45, True)]
+
+
+def test_a_stake_id_is_known_only_within_its_match(pb):
+    """A capture runs through many matches; an id named in one must not name
+    a stake of another, should the feed ever reuse it."""
+    rows = [full(pb, 0, [(GAME_7, "П1", 2.30, {"stake_id": "7145465172"}),
+                         (GAME_7, "П2", 1.47, {"stake_id": "7145465173"})]),
+            push(pb, 3, "", 2.35, market="", stake_id="7145465172", match_id=MID + 1)]
+
+    assert len(seen(betboom_quotes(rows, pb))) == 2
 
 
 def test_a_deleted_stake_is_gone(pb):

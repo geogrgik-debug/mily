@@ -247,12 +247,14 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
     of 2351 live) are not boards either, and are skipped as `measure` does.
 
     A per-stake push is keyed by its own market_name when it has one, and
-    otherwise by the snapshot that named its stake_id -- the recorder takes the
-    ids from that snapshot, so one always came first.
+    otherwise by the snapshot that named its stake_id in the same match -- the
+    recorder takes the ids from that snapshot, so one always came first. Within
+    the match, because a capture runs through many matches and nothing says
+    the feed never reuses an id in another.
     """
     full_last: dict[int, list] = {}
     tour_last: dict[int, dict] = {}
-    names_by_id: dict[str, tuple] = {}
+    names_by_id: dict[tuple[int, str], tuple] = {}
     delete = pb.NEWSLETTER_ACTIONS_DELETE
     for row in rows:
         if row is None:
@@ -281,7 +283,7 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
                     continue
                 stakes = [s for s in match.stakes if not _is_line(s)]
                 for s in stakes:
-                    names_by_id[s.stake_id] = (parse_market(s.market_name).key(), s.name)
+                    names_by_id[(mid, s.stake_id)] = (parse_market(s.market_name).key(), s.name)
                 for ch in diff_snapshots(full_last.get(mid, []), stakes):
                     yield Quote(*stamp, mid, ch.ref.key(), ch.outcome, ch.new, ch.is_active)
                 full_last[mid] = stakes
@@ -293,8 +295,8 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
                 continue
             if s.market_name:
                 market, outcome = parse_market(s.market_name).key(), s.name
-            elif s.stake_id in names_by_id:
-                market, outcome = names_by_id[s.stake_id]
+            elif (s.match_id, s.stake_id) in names_by_id:
+                market, outcome = names_by_id[(s.match_id, s.stake_id)]
             else:
                 continue
             gone = body.action == delete
@@ -337,7 +339,9 @@ class ClockMismatch(ValueError):
 
 @dataclass
 class RunClock:
-    """One capture's clock, sampled once a second: wall, and wall - monotonic."""
+    """One capture's clock, sampled once a second of monotonic time: the wall
+    reading, and wall - monotonic, at each sample. Across a backward step of
+    the wall clock the walls go back too, so nothing here assumes them sorted."""
 
     run_id: str
     walls: list[int]
@@ -345,11 +349,11 @@ class RunClock:
 
     @property
     def start(self) -> int:
-        return self.walls[0]
+        return min(self.walls)
 
     @property
     def end(self) -> int:
-        return self.walls[-1]
+        return max(self.walls)
 
 
 @dataclass
@@ -367,18 +371,26 @@ def clock_offset(a: RunClock, b: RunClock, near_s: float = 5.0) -> float | None:
     """How far apart the two captures' clocks are, in seconds.
 
     The median difference of their wall-minus-monotonic offsets at the same
-    moments. About zero on one machine; the difference in boot times on two.
+    moments: about zero on one machine, the difference in boot times on two.
     None when the captures never ran at the same time.
+
+    "The same moment" is the sample of `b` within `near_s` on the wall clock
+    whose offset is closest -- not the nearest in wall time. After a backward
+    wall step a reading occurs twice, before the step and after it, and the
+    nearest can be the wrong one: found in review, two recorders on one
+    machine stepping back 60 s, the second started 16 s later, came out 60 s
+    apart. On one machine one candidate is the same moment and agrees to
+    microseconds; on two machines none does, whichever is taken.
     """
     near_ns = int(near_s * 1e9)
+    samples = sorted(zip(b.walls, b.anchors))
+    walls = [wall for wall, _ in samples]
     diffs = []
     for wall, anchor in zip(a.walls, a.anchors):
-        k = bisect.bisect_left(b.walls, wall)
-        near = [i for i in (k - 1, k) if 0 <= i < len(b.walls)
-                and abs(b.walls[i] - wall) <= near_ns]
-        if near:
-            i = min(near, key=lambda i: abs(b.walls[i] - wall))
-            diffs.append(anchor - b.anchors[i])
+        lo = bisect.bisect_left(walls, wall - near_ns)
+        hi = bisect.bisect_right(walls, wall + near_ns)
+        if lo < hi:
+            diffs.append(min((anchor - samples[i][1] for i in range(lo, hi)), key=abs))
     if not diffs:
         return None
     return statistics.median(diffs) / 1e9
@@ -422,10 +434,10 @@ def _rows(files: Sequence[Path], clock: RunClock, provider: str, gap_s: float):
                 raise ValueError(f"{path} mixes providers: {row.get('provider')!r} "
                                  f"in a {provider!r} capture")
             wall, mono = row["ts_received_ns"], row["ts_mono_ns"]
-            if next_sample is None or wall >= next_sample:
+            if next_sample is None or mono >= next_sample:
                 clock.walls.append(wall)
                 clock.anchors.append(wall - mono)
-                next_sample = wall + 1_000_000_000
+                next_sample = mono + 1_000_000_000
             if last_mono is not None and mono - last_mono > gap_ns:
                 yield None
             last_mono = mono

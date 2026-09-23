@@ -102,7 +102,7 @@ research/   остаётся как лабораторный журнал
 conftest.py кладёт корень репозитория в sys.path, чтобы `import tennis` работал
 ```
 
-`python -m pytest tennis/ -q` → **506 прошло, 14 пропущено** (23.09, с `market/lead_lag.py` и `ingest/onewin/`), пока не собраны классы protobuf (они в `.gitignore`; пропуски — четыре модуля тестов рекордера, 59 тестов, и 10 тестов декодера BetBoom в `market/tests/test_lead_lag.py`; раньше здесь стояло «405 / 1», с pytest это не сходилось). После сборки (рецепт в `tennis/ingest/betboom/README.md`) → **575 прошло, 0 пропущено.** Число растёт с каждым коммитом; истина — вывод pytest, а не этот файл.
+`python -m pytest tennis/ -q` → **522 прошло, 15 пропущено** (23.09, с `model/`, `market/lead_lag.py` и `ingest/onewin/`), пока не собраны классы protobuf (они в `.gitignore`; пропуски — четыре модуля тестов рекордера, 59 тестов, и 11 тестов декодера BetBoom в `market/tests/test_lead_lag.py`; раньше здесь стояло «405 / 1», с pytest это не сходилось). После сборки (рецепт в `tennis/ingest/betboom/README.md`) → **592 прошло, 0 пропущено.** Число растёт с каждым коммитом; истина — вывод pytest, а не этот файл.
 
 ### Точки решения
 
