@@ -12,7 +12,7 @@
 |---|---|---|
 | Координатор | `START_HERE.md`, `HANDOFF.md`, `tennis/README.md`, этот файл, `docs/SESSION_PROMPTS.md`, остальные `docs/` кроме двух ниже, доска | раздаёт задачи, ведёт статусы |
 | Запись | `deploy/`, `tennis/ingest/` кроме `onewin/`, `tennis/tests/` кроме `test_onewin_client.py`, `docs/TRACK_A_betboom_capture.md` | правка обрывов на VPS — замер первого обрыва; дальше рекордер на ноутбуке |
-| Модель | `tennis/markov/`, `tennis/ratings/`, `tennis/model/`, будущие `tennis/state/` `features/` `replay/` `eval/` | шаг 4 (живое состояние) принят 23.09; дальше шаг 5 — калибровка, ждёт команды |
+| Модель | `tennis/markov/`, `tennis/ratings/`, `tennis/model/`, будущие `tennis/state/` `features/` `replay/` `eval/` | шаг 5 — калибровка, новая вкладка (шаг 4 принят 23.09) |
 | Рынок и латентность | `tennis/market/`, `tennis/ingest/onewin/`, `tennis/tests/test_onewin_client.py`, `docs/MARKET_MARGINS_2026-09-22.md` | 1win ждёт F12; пуши против снимков |
 | Ревьюер | ничего: только читает и запускает проверки | ждёт блок «НА РЕВЬЮ» |
 
@@ -114,8 +114,9 @@
   прирост к приору +0.0036…+0.0068 log loss (`HANDOFF.md`, «Трек B»). Мелочь на
   следующую правку: устаревший комментарий `GAME_ROWS_N0 = 40` в
   `tennis/eval/live_state.py:38`.
-- Дальше: шаг 5 — остаточная модель и калибровка на out-of-time; шаг 6 —
-  replay строго по `ts_received`.
+- Сейчас: шаг 5 — остаточная модель и калибровка на out-of-time, в новой
+  вкладке (прежняя закрыта на половине контекста); полный текст задачи —
+  `docs/SESSION_PROMPTS.md`. Потом шаг 6 — replay строго по `ts_received`.
 - Известное ограничение: данные рейтингов кончаются турнирами 1 июня 2026.
 - Сегмент решён владельцем 23.09: мужчины, ATP-тур + Challenger; женщины и ITF
   не входят.
