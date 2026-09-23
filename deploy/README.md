@@ -86,7 +86,7 @@ bash deploy/vps-setup.sh
 
 Первой строкой проверяет, достаёт ли машина до фида — ждёт `HTTP 101`. Если
 нет, дальше идти бессмысленно: провайдер режет исходящий трафик. Потом venv,
-зависимости, классы protobuf, тесты (350 проходят; ещё 101 — сверка ядра с
+зависимости, классы protobuf, тесты (367 проходят на 23.09; ещё 101 — сверка ядра с
 `research/elo_prior.py` — пропускаются, потому что `research/` на эту машину
 не попадает) и пустой `data/raw` — единственный каталог, куда службе разрешено
 писать. Прогнан с чистого разреженного клона целиком, в последний раз — на
@@ -180,6 +180,8 @@ rsync -avz --progress USER@VPS:/home/USER/capture/data/raw/ ./data/raw/
 | `No module named 'tennis.market'` в тестах или в `journalctl` | разреженный набор старше `3f695d8`: нет `market/` и `markov/` | `git sparse-checkout add '/tennis/market/**' '/tennis/markov/**'` и повторить шаг 3 |
 | `systemctl status` → `status=226/NAMESPACE` | нет каталога `data/` или неверный `__ROOT__` в юните | `mkdir -p data/raw`, сверить пути в `/etc/systemd/system/betboom-capture.service`, `daemon-reload`, `restart` |
 | `[hb] ... 0 subscribed` при растущем файле | подписки потеряны после обрыва | должно чиниться само (переподписка после реконнекта); если нет — `systemctl restart betboom-capture` и присылать `journalctl` |
+| в отчёте `reconnects` растёт сотнями, `subscribed: 0`, в `last_disconnect` — `3010 ... Access rejected` | фид отказывает сессиям на своей стороне (23.09 — четверть часа) | на машине ничего не делать: рекордер ждёт до минуты между попытками и сам подпишется, когда пустят. Дольше часа — проверить с другого адреса |
+| `reconnects` +200 за 5 минут, поля `last_disconnect` в отчёте нет | код старше `f35626c`: пауза сбрасывалась на каждом рукопожатии | `git pull && systemctl restart betboom-capture` |
 | `heartbeat-push.sh` не пушит | у deploy key нет write access | перевыпустить ключ с галочкой |
 | `heartbeat-push.sh`: `outside of your sparse-checkout definition` или `could not push after 3 attempts` при живом ключе | старая версия скрипта: worktree унаследовал разреженность, мелкий клон не видел `origin/capture-status` | `git pull` — исправлено 22.09 |
 | Много `[sub]` на турниры «Пары» | старая версия кода | `git pull` — парные и симулятор не подписываются с `36cfe9c` |

@@ -56,3 +56,11 @@ beyond the subscription is demanded; 10 concurrent `subscribe_full`
 subscriptions were all accepted with code 200; game-winner markets exist at
 every level, the exact-score market from Challenger and WTA 125 upward, and
 WTT/ITF carry only the two-way game market.
+
+Seen live on 23.09.2026: the server checks the handshake headers -- without
+`Origin` or `User-Agent` it closes the socket at once with 3009 "Access
+rejected". From about 11:37 to 11:51 MSK it also closed every session within a
+second of the handshake with 3010 "Access rejected", from two unrelated
+addresses, then accepted again with nothing changed on our side. The recorder
+backs off such refusals (`HEALTHY_SESSION_S`) and reports the last close reason
+as `last_disconnect` in its sidecar and in the machine's status report.
