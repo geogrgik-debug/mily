@@ -320,6 +320,42 @@ def test_a_reconnect_writes_a_break_and_asks_for_everything_again(log, tmp_path)
     assert len(asked) == 2                  # once per socket
 
 
+def test_refusals_wait_longer_and_a_session_that_lived_retries_at_once(log):
+    """Found in review: only the number of waits was held. The BetBoom recorder
+    reset its wait on every handshake and on 23.09 hammered a refusing feed
+    +200 times in 5 minutes (f35626c); the same rule is kept here."""
+    clock = FakeClock()
+    rec = OneWinRecorder(OneWinClient(OneWinConfig(BASE, PARTNER), log, FakeTransport(
+        {"matches/get-many": (200, {}, live_body(live_item(1)))})), clock=clock)
+
+    class Lives(FakeSocket):
+        async def recv(self):
+            if self.frames:
+                return self.frames.pop(0)
+            clock.advance(61)                 # a session that lived a minute
+            raise ConnectionError("dropped")
+
+    def refused():
+        raise ConnectionError("refused")
+
+    connects = [refused, refused, lambda: Lives([OPEN, CONNECTED]), refused]
+    waits = []
+
+    class Stop(Exception):
+        pass
+
+    async def sleep(seconds):
+        waits.append(seconds)
+        if len(waits) == 4:
+            raise Stop
+
+    rec._sleep = sleep
+    with pytest.raises(Stop):
+        asyncio.run(rec.run(connect=lambda: connects.pop(0)()))
+
+    assert waits == [1.0, 2.0, 0.0, 1.0]
+
+
 def test_the_partner_id_is_sent_but_never_logged(log, tmp_path):
     """Found in review: a refusal that echoed the socket's address went to the
     log verbatim, before the error's text was cleaned."""

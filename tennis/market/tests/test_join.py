@@ -41,6 +41,10 @@ def test_the_words_that_name_a_player(name, words):
     ("Вискандт М.", "Макс Висканд", True),
     ("Тимофеева М.", "Анна Роджерс", False),
     ("Ли Л.", "Ли На", False),                                   # too short to tell
+    # Found in review, live: one player, missed at a ratio of 0.833.
+    ("Лазаро Хункаделла М.", "Манель Ласаро Хункоделья", True),
+    ("Ласаро М.", "Манель Лазаро", True),                        # six letters, one apart
+    ("Пуяко А.", "Анна Пуяка", False),                           # five letters: exact only
 ])
 def test_the_same_player_in_two_books(a, b, same):
     assert same_player(a, b) is same

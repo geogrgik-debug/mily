@@ -97,11 +97,11 @@ owner's laptop:
 
     python -m tennis.market.lead_lag betboom=data/lab/trial/bb 1win=data/lab/trial/1w
 
-14 of 1win's 20 matches paired; one clock (offsets agree to 0.0 ms); 279
+15 of 1win's 20 matches paired; one clock (offsets agree to 0.0 ms); 322
 moves paired, 71% of the fewer, and a doubled window did not move the answer.
-BetBoom first 223 (79.9%), level 33 (11.8%), 1win first 23 (8.2%); 1win
-after BetBoom by a median of +2.09 s, p90 +4.06 s; BetBoom first in 91% of
-246 decided moves (95% interval 86-94%) and in 11 of 12 matches: stable.
+BetBoom first 265 (82.3%), level 34 (10.6%), 1win first 23 (7.1%); 1win
+after BetBoom by a median of +2.06 s, p90 +4.14 s; BetBoom first in 92% of
+288 decided moves (95% interval 88-95%) and in 12 of 13 matches: stable.
 Fifteen minutes of one evening is a first reading, not the answer -- that
 takes both recorders on the capture host for days.
 

@@ -41,9 +41,11 @@ def name_words(name: str) -> frozenset[str]:
 
 
 def _same_word(a: str, b: str) -> bool:
+    # 0.8, not 0.85: six letters one apart score 0.833, and review found a
+    # player missed on exactly that ("Лазаро"/"Ласаро").
     if a == b:
         return True
-    return min(len(a), len(b)) >= 6 and SequenceMatcher(None, a, b).ratio() >= 0.85
+    return min(len(a), len(b)) >= 6 and SequenceMatcher(None, a, b).ratio() >= 0.8
 
 
 def same_player(a: str, b: str) -> bool:
