@@ -532,14 +532,13 @@ def test_a_reconnect_and_a_silence_both_break_the_capture(tmp_path):
     assert not any(e.is_move for e in events)
 
 
-def test_a_1win_log_is_refused_until_its_odds_are_known(tmp_path):
-    """The 1win recorder logs the known endpoints, none of which carries a
-    price. Folding those into an empty stream would read as "1win never
-    moves"; the decoder is refused by name instead."""
-    with RawLog(tmp_path, provider="1win", clock=FakeClock(), compress=False) as log:
-        log.write(b'{"id": 31415, "service": "LIVE"}', channel="matches/get")
-    with pytest.raises(NotImplementedError, match="1win"):
-        load_stream("1win", tmp_path)
+def test_a_book_without_a_decoder_is_refused(tmp_path):
+    """Folding frames nobody can read into an empty stream would read as "this
+    book never moves"; the provider is refused by name instead."""
+    with RawLog(tmp_path, provider="pari", clock=FakeClock(), compress=False) as log:
+        log.write(b'{"id": 31415}', channel="x")
+    with pytest.raises(NotImplementedError, match="pari"):
+        load_stream("pari", tmp_path)
 
 
 def test_a_hive_style_path_is_a_path_not_a_name(tmp_path):

@@ -55,6 +55,7 @@ from itertools import combinations
 from pathlib import Path
 from typing import Callable, Iterable, Sequence
 
+from tennis.market.join import align_books
 from tennis.market.streams import (
     SOURCES,
     ClockMismatch,
@@ -507,6 +508,11 @@ def main(argv: list[str] | None = None) -> int:
         # a provider with no decoder yet -- are answers, not crashes.
         print(f"refused: {exc}", file=sys.stderr)
         return 2
+    # Two books number matches and sides their own way: the others are
+    # re-keyed onto the first one's by the players' names.
+    streams, notes = align_books(streams)
+    for note in notes:
+        print(note)
     reports = [(compare(a, b, window_s=args.window, tie_s=args.tie),
                 compare(a, b, window_s=2 * args.window, tie_s=args.tie))
                for a, b in combinations(streams, 2)]

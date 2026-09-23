@@ -10,7 +10,8 @@ Results from this module are in
 | `fit.py` | The single point probability behind an eight-outcome game book |
 | `measure.py` | CLI: margins and fit quality from a captured raw log |
 | `diff.py` | Which prices moved between two consecutive snapshots of a match |
-| `streams.py` | Raw log → quotes → price events (margin-free probability of an outcome, emitted when it changes); refuses logs not written on one machine |
+| `streams.py` | Raw log → quotes → price events (margin-free probability of an outcome, emitted when it changes), for BetBoom and 1win; refuses logs not written on one machine |
+| `join.py` | Which match of one book is which of another, by the players' names; re-keys the second book onto the first |
 | `lead_lag.py` | CLI: which of two books moves a price first, by how much, and whether the leader is stable |
 | `push_vs_snapshot.py` | CLI: BetBoom's per-stake pushes against its full snapshots -- does a late snapshot put a pushed price back, and how far ahead the push is |
 
@@ -73,6 +74,36 @@ Two rules come from measurement, not taste:
 A lag longer than the window is not seen: the pairing takes the neighbouring
 move instead and reports a small lag. Every pair is therefore rerun under a
 doubled window, with a warning when the answer moves.
+
+### Two books: BetBoom and 1win
+
+1win's quotes (`onewin_quotes`) get BetBoom's market addresses for the
+markets both quote as two players' odds: the match, a set, a game ("Победитель
+гейма", with the set and game as numbers). The match ids and the sides are
+each book's own, so `join.py` pairs the matches by the players' names and
+re-keys 1win onto BetBoom: 1win's "1" becomes "П1" or "П2" by where that
+player is at BetBoom -- home and away need not agree between books.
+
+The names are Russian in both books ("Тимофеева М." against "Мария
+Тимофеева"), and `tennis.ingest.names.match_key` folds names to ASCII, which
+drops Cyrillic whole ("Медведев Д." gives ""). So the pairing goes by the
+Russian words: one word in common, or a spelling apart for words of six
+letters and more ("Риналдо"/"Ринальдо"); both players, one to one, and
+quoted at overlapping times. A match that pairs with none, or with two, is
+left out, and the report says how many.
+
+First reading, 23.09 from 22:41 MSK, fifteen minutes, both recorders on the
+owner's laptop:
+
+    python -m tennis.market.lead_lag betboom=data/lab/trial/bb 1win=data/lab/trial/1w
+
+14 of 1win's 20 matches paired; one clock (offsets agree to 0.0 ms); 279
+moves paired, 71% of the fewer, and a doubled window did not move the answer.
+BetBoom first 223 (79.9%), level 33 (11.8%), 1win first 23 (8.2%); 1win
+after BetBoom by a median of +2.09 s, p90 +4.06 s; BetBoom first in 91% of
+246 decided moves (95% interval 86-94%) and in 11 of 12 matches: stable.
+Fifteen minutes of one evening is a first reading, not the answer -- that
+takes both recorders on the capture host for days.
 
 ## Pushes against snapshots: `push_vs_snapshot`
 

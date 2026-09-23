@@ -4,8 +4,9 @@ The half of the lead-lag meter that reads disk; `lead_lag` pairs what it
 produces. Three steps, one of them provider-specific:
 
 * A **quote** is one outcome as one frame showed it: odds, and whether it could
-  be bet. Decoding frames into quotes is the provider-specific step, and
-  `betboom_quotes` is the one decoder so far.
+  be bet. Decoding frames into quotes is the provider-specific step:
+  `betboom_quotes` and `onewin_quotes`, which gives 1win's markets BetBoom's
+  addresses.
 * A **price event** says "the probability of this outcome became X", X being
   its book's probability with the margin removed (Shin by default, as in
   `measure`). One is emitted only when X changes, and a book is priced only
@@ -33,10 +34,12 @@ monotonic clock is right.
 from __future__ import annotations
 
 import bisect
+import json
 import math
+import re
 import statistics
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import combinations
 from pathlib import Path
 from typing import Callable, Iterable, Iterator, Sequence
@@ -48,7 +51,8 @@ from tennis.market.overround import normalize_proportional, shin
 
 __all__ = [
     "Quote", "PriceEvent", "RunClock", "Stream", "ClockMismatch", "SOURCES",
-    "fold", "betboom_quotes", "load_stream", "clock_offset", "check_same_clock",
+    "fold", "betboom_quotes", "onewin_quotes", "load_stream", "clock_offset",
+    "check_same_clock",
 ]
 
 # Updates to one book within this of the first are one repricing. A two-way
@@ -232,8 +236,22 @@ def _is_line(stake) -> bool:
     return getattr(stake, "argument", None) is not None
 
 
-def betboom_quotes(rows: Iterable[dict | None], pb,
-                   sources: Sequence[str] = SOURCES) -> Iterator[Quote | None]:
+def _betboom_players(msg, which: str, players: dict) -> None:
+    """Home and away of every match a frame describes."""
+    if which == "matches_subscribe_full":
+        matches = [item.match for item in msg.matches_subscribe_full.full_matches]
+    elif which in ("newsletters_full_match", "newsletters_match"):
+        matches = [getattr(msg, which).match]
+    else:
+        return
+    for match in matches:
+        teams = match.info.teams
+        if match.info.id and teams.home_team.name and teams.away_team.name:
+            players[match.info.id] = (teams.home_team.name, teams.away_team.name)
+
+
+def betboom_quotes(rows: Iterable[dict | None], pb, sources: Sequence[str] = SOURCES,
+                   players: dict | None = None) -> Iterator[Quote | None]:
     """Frames of one BetBoom capture to quotes; None wherever the capture broke.
 
     Each source reports only what changed in its own stream: a full snapshot is
@@ -253,6 +271,9 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
     recorder takes the ids from that snapshot, so one always came first. Within
     the match, because a capture runs through many matches and nothing says
     the feed never reuses an id in another.
+
+    `players`, when given, collects who plays each match -- home, then away,
+    which is what "П1" and "П2" mean -- from any frame that names them.
     """
     full_last: dict[int, list] = {}
     tour_last: dict[int, dict] = {}
@@ -273,6 +294,8 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
             continue
         which = msg.WhichOneof("type")
         stamp = (row["ts_received_ns"], row["ts_mono_ns"])
+        if players is not None:
+            _betboom_players(msg, which, players)
 
         if which in ("matches_subscribe_full", "newsletters_full_match") and "full" in sources:
             if which == "matches_subscribe_full":
@@ -323,15 +346,110 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
             seen.update(frame)
 
 
-def _decoder(provider: str, sources: Sequence[str]):
+# --------------------------------------------------------------- 1win frames
+
+_ONEWIN_SET = re.compile(r"^(\d+)-й [сc]ет\. Победитель$")     # a Latin "c" seen live
+
+
+def _onewin_market(name: str | None, where: dict | None) -> tuple | None:
+    """The address BetBoom's `parse_market` gives the same market, for the
+    markets both books quote as two players' odds; None for the rest."""
+    if name == "Победитель":
+        return ("match", None, None, "Исход")
+    if name == "Победитель гейма" and where and {"v1", "v2"} <= set(where):
+        return ("game", int(where["v1"]), int(where["v2"]), "Исход")
+    found = _ONEWIN_SET.match(name or "")
+    if found:
+        return ("set", int(found.group(1)), None, "Исход")
+    return None
+
+
+def _onewin_players(payload, players: dict) -> None:
+    """Who plays, by position, from an answer of the live list."""
+    try:
+        items = json.loads(payload)["result"]["items"]
+    except (ValueError, KeyError, TypeError):
+        return
+    for m in items:
+        by_position = sorted(m.get("competitors") or [], key=lambda c: c.get("position", 0))
+        if len(by_position) == 2:
+            players[m["id"]] = tuple(c.get("name") or "" for c in by_position)
+
+
+def onewin_quotes(rows: Iterable[dict | None],
+                  players: dict | None = None) -> Iterator[Quote | None]:
+    """Frames of one 1win capture to quotes; None wherever the capture broke.
+
+    A `match-odds-snapshot` is the whole board of a match; an item missing
+    from it is gone. A `match-odds` update names only what is new -- live on
+    23.09, 548 of 645 updated groups came without a name and most items with
+    only id, odds, status and time -- so each odds item is remembered by its
+    id from the frame that named it. Status 1 is open; anything else cannot be
+    bet, and an update that suspends carries no odds, so the last ones stay.
+
+    Only the markets BetBoom quotes as two players' odds are kept, under
+    BetBoom's addresses; the outcome is the player's position, "1" or "2",
+    which `tennis.market.join` turns into BetBoom's side by the players'
+    names. `players`, when given, collects those names from the live list.
+    """
+    groups: dict[tuple, str] = {}            # (match, group id) -> name
+    known: dict[tuple, tuple] = {}           # (match, odds id) -> (market, outcome, odds, status)
+    for row in rows:
+        if row is None:
+            groups.clear()
+            known.clear()
+            yield None
+            continue
+        if row.get("dir") != "rx":
+            continue
+        if row.get("channel") == "matches/get-many":
+            if players is not None:
+                _onewin_players(row.get("payload"), players)
+            continue
+        text = row.get("payload")
+        if row.get("channel") != "push" or not isinstance(text, str) or not text.startswith("42"):
+            continue
+        try:
+            body = json.loads(text[2:])[1]
+            kind, data = body["messageType"], body["data"]
+        except (ValueError, IndexError, KeyError, TypeError):
+            continue
+        if kind not in ("match-odds-snapshot", "match-odds"):
+            continue
+        mid = data.get("matchId")
+        stamp = (row["ts_received_ns"], row["ts_mono_ns"])
+        present = set()
+        for g in data.get("oddsGroups") or []:
+            gkey = (mid, g.get("id"))
+            if g.get("name"):
+                groups[gkey] = g["name"]
+            for o in g.get("oddsList") or []:
+                okey = (mid, o.get("id"))
+                present.add(okey)
+                market, outcome, odds, status = known.get(okey, (None, None, None, None))
+                if "vars" in o or "name" in g or market is None:
+                    market = _onewin_market(groups.get(gkey), o.get("vars")) or market
+                outcome = o.get("outcome", outcome)
+                odds = o.get("cf", odds)
+                status = o.get("status", status)
+                known[okey] = (market, outcome, odds, status)
+                if market is not None and outcome in ("1", "2"):
+                    yield Quote(*stamp, mid, market, outcome, odds, status == 1, "push")
+        if kind == "match-odds-snapshot":
+            for okey in [k for k in known if k[0] == mid and k not in present]:
+                market, outcome, _, _ = known.pop(okey)
+                if market is not None and outcome in ("1", "2"):
+                    yield Quote(*stamp, mid, market, outcome, None, False, "push")
+
+
+def _decoder(provider: str, sources: Sequence[str], players: dict | None = None):
     if provider == "betboom":
         from tennis.ingest.betboom.client import load_pb
         pb = load_pb()
-        return lambda rows: betboom_quotes(rows, pb, sources)
-    raise NotImplementedError(
-        f"no quote decoder for provider {provider!r}. 1win's odds channel is not "
-        "known yet (tennis/ingest/onewin/README.md); its decoder belongs here, "
-        "next to betboom_quotes, once a captured response shows the shape.")
+        return lambda rows: betboom_quotes(rows, pb, sources, players)
+    if provider == "1win":
+        return lambda rows: onewin_quotes(rows, players)
+    raise NotImplementedError(f"no quote decoder for provider {provider!r}")
 
 
 # --------------------------------------------------------------- logs and clocks
@@ -362,13 +480,16 @@ class RunClock:
 
 @dataclass
 class Stream:
-    """One side of a comparison: every capture under one path, folded."""
+    """One side of a comparison: every capture under one path, folded.
+    `players` is who plays each match, by the provider's own match id and in
+    the order its outcomes name them, when the decoder could tell."""
 
     label: str
     provider: str
     path: str
     events: list[PriceEvent]
     runs: list[RunClock]
+    players: dict = field(default_factory=dict)
 
 
 def clock_offset(a: RunClock, b: RunClock, near_s: float = 5.0) -> float | None:
@@ -468,7 +589,8 @@ def load_stream(label: str, path: str | Path, *, sources: Sequence[str] = SOURCE
     provider = next((row.get("provider") for row in read_raw(files[0])), None)
     if provider is None:
         raise ValueError(f"{files[0]} holds no readable frame")
-    decode = decoder or _decoder(provider, sources)
+    players: dict = {}
+    decode = decoder or _decoder(provider, sources, players)
 
     by_run: dict[str, list[Path]] = defaultdict(list)
     for f in files:
@@ -487,4 +609,4 @@ def load_stream(label: str, path: str | Path, *, sources: Sequence[str] = SOURCE
             raise ValueError(f"{path}: {before.run_id} and {after.run_id} were recording "
                              "at the same time; pass each as a stream of its own")
     events.sort(key=lambda e: e.ts_received_ns)
-    return Stream(label, provider, str(path), events, runs)
+    return Stream(label, provider, str(path), events, runs, players)
