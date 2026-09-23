@@ -60,6 +60,10 @@ class CaptureStatus:
     stakes_seen: int | None = None
     last_stake_age_s: float | None = None
     reconnects: int | None = None
+    # Why the socket last closed, as the recorder saw it. On 23.09 the report
+    # said "not subscribed, 304 reconnects" and the cause -- the feed refusing
+    # every session with 3010 "Access rejected" -- took a second machine to see.
+    last_disconnect: str | None = None
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), ensure_ascii=False, indent=2, sort_keys=True)
@@ -101,6 +105,7 @@ def capture_status(root: str | Path, *, clock: Clock | None = None,
             last_stake_age_s=(round(now - last_stake, 1)
                               if isinstance(last_stake, (int, float)) else None),
             reconnects=side.get("reconnects") if side else None,
+            last_disconnect=side.get("last_disconnect") if side else None,
         )
 
     if not root.exists():

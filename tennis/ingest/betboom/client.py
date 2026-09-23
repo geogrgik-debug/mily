@@ -50,8 +50,10 @@ handshake the server demands, whether game markets (`победитель сле
 concurrency ceiling. Those need one live session, which is what `--discover`
 is for: it records everything and prints the market inventory it saw.
 
-This cannot run from a sandbox behind an HTTP CONNECT proxy: the proxy has to
-pass WebSocket upgrades. Run it on a host with direct network access.
+Behind an HTTP CONNECT proxy it runs only if the proxy passes WebSocket
+upgrades. The Claude Code cloud sandbox's does: on 23.09 a run from there
+subscribed and recorded prices, and it was the second address that showed a
+refusal to be the feed's, not the capture host's.
 """
 
 from __future__ import annotations
@@ -76,6 +78,15 @@ DEFAULT_URL = "wss://ru-ws2.sporthub.bet:443/api/tree_ws/v1"
 # cycle through a slot doing nothing.
 STALE_MATCH_S = 20 * 60
 STALE_COOLDOWN_S = 30 * 60
+
+# A session the server ends sooner than this was refused, not dropped, and the
+# wait before the next attempt keeps doubling up to MAX_BACKOFF_S. On 23.09 from
+# about 11:37 to 11:51 MSK the feed accepted every connection and closed it at
+# once with 3010 "Access rejected" -- the capture host and a second address
+# alike, so on its side. The wait was reset on every handshake, and that quarter
+# of an hour cost 561 reconnects, one every 1.6 s.
+HEALTHY_SESSION_S = 60.0
+MAX_BACKOFF_S = 60.0
 
 # Tournaments inside the tennis tree that are not what a serve model wants.
 # Measured on a live tree: 12 of 32 tournaments -- 11 doubles and one
@@ -129,6 +140,8 @@ class BetBoomRecorder:
         self.sports_seen = Counter()
         self.last_stake_at: float | None = None
         self.reconnects = 0
+        self.last_disconnect: str | None = None
+        self._sleep = asyncio.sleep          # the wait between sessions; tests replace it
         self.errors: list[str] = []
         self.bad_codes: list[str] = []
         # The live tree is lazy, so each layer is asked for exactly once.
@@ -170,34 +183,59 @@ class BetBoomRecorder:
         self.log.write(raw, direction="tx", channel="tree_ws", meta={"tag": tag})
         await ws.send(raw)
 
-    async def run(self) -> None:
-        try:
-            import websockets
-        except ImportError:  # pragma: no cover
-            raise SystemExit("pip install websockets")
-
-        backoff = 1.0
-        while True:
+    async def run(self, connect=None) -> None:
+        if connect is None:
             try:
-                async with websockets.connect(
+                import websockets
+            except ImportError:  # pragma: no cover
+                raise SystemExit("pip install websockets")
+
+            def connect():
+                return websockets.connect(
                     self.url, origin=ORIGIN, max_size=32 * 1024 * 1024,
                     additional_headers={"User-Agent": USER_AGENT},
-                    ping_interval=20, ping_timeout=20,
-                ) as ws:
-                    backoff = 1.0
-                    await self._session(ws)
-            except Exception as exc:
-                # A dropped socket is normal operation, not an error worth
-                # stopping for: the log keeps what was already written and the
-                # next connection appends to it.
+                    ping_interval=20, ping_timeout=20)
+
+        # Always, not only under --discover. The long-running capture is the
+        # mode that most needs to say it is alive: a silent process is
+        # indistinguishable from a hung one, and that is the mode left running
+        # for days. --discover only makes it chattier. One per process, not
+        # per socket: it has to keep reporting while there is no socket at
+        # all, and started per session it never stopped -- every reconnect
+        # left one more printing every minute.
+        heartbeat = asyncio.create_task(
+            self._heartbeat_loop(15.0 if self.discover else 60.0))
+        backoff = 1.0
+        try:
+            while True:
+                opened = None
+                why = "closed by the server"
+                try:
+                    async with connect() as ws:
+                        opened = self.clock.now()
+                        await self._session(ws)
+                except Exception as exc:
+                    # A dropped socket is normal operation, not an error worth
+                    # stopping for: the log keeps what was already written and
+                    # the next connection appends to it.
+                    why = f"{type(exc).__name__}: {exc}"
+                # Every way out of a session is a reconnect. A clean close --
+                # 1000 or 1001, which is what a server restart sends -- ends
+                # `async for` without raising, and used to loop straight back in
+                # with the old subscriptions remembered: nothing asked again, no
+                # wait, not counted.
                 self.reconnects += 1
-                self.log.write(f"reconnect after {type(exc).__name__}: {exc}",
+                self.last_disconnect = why[:300]
+                if opened is not None and self.clock.now() - opened >= HEALTHY_SESSION_S:
+                    backoff = 1.0
+                self.log.write(f"reconnect after {why}",
                                direction="meta", channel="_conn")
-                print(f"[conn] {type(exc).__name__}: {exc}; retry in {backoff:.0f}s",
-                      file=sys.stderr)
-                await asyncio.sleep(backoff)
-                backoff = min(backoff * 2, 60.0)
+                print(f"[conn] {why}; retry in {backoff:.0f}s", file=sys.stderr)
                 self._forget_subscriptions()
+                await self._sleep(backoff)
+                backoff = min(backoff * 2, MAX_BACKOFF_S)
+        finally:
+            heartbeat.cancel()
 
     def _forget_subscriptions(self) -> None:
         """Drop every memory of what we asked for, before reconnecting.
@@ -243,24 +281,26 @@ class BetBoomRecorder:
         req.state_subscribe_by_sports.types.append(pb.TREE_TYPES_LIVE)
         await self._send(ws, req, tag="state_subscribe_by_sports")
 
-        asyncio.create_task(self._ping_loop(ws))
-        # Always, not only under --discover. The long-running capture is the
-        # mode that most needs to say it is alive: a silent process is
-        # indistinguishable from a hung one, and that is the mode left running
-        # for days. --discover only makes it chattier.
-        asyncio.create_task(self._heartbeat_loop(15.0 if self.discover else 60.0))
-        asyncio.create_task(self._release_loop(ws))
-
-        async for frame in ws:
-            if isinstance(frame, str):
-                frame = frame.encode()
-            self.log.write(frame, direction="rx", channel="tree_ws")
-            try:
-                msg = pb.MainResponse()
-                msg.ParseFromString(frame)
-            except Exception:
-                continue                     # raw is already safe on disk
-            await self._handle(ws, msg)
+        # Bound to this socket, so they end with it. Left running they piled up
+        # a pair per reconnect, and a release loop still holding a dead socket
+        # could act on the next session's matches: drop one from `subscribed`,
+        # fail to send the unsubscribe, and leave the server feeding it.
+        loops = [asyncio.create_task(self._ping_loop(ws)),
+                 asyncio.create_task(self._release_loop(ws))]
+        try:
+            async for frame in ws:
+                if isinstance(frame, str):
+                    frame = frame.encode()
+                self.log.write(frame, direction="rx", channel="tree_ws")
+                try:
+                    msg = pb.MainResponse()
+                    msg.ParseFromString(frame)
+                except Exception:
+                    continue                     # raw is already safe on disk
+                await self._handle(ws, msg)
+        finally:
+            for task in loops:
+                task.cancel()
 
     async def _heartbeat_loop(self, every: float = 15.0) -> None:
         """Say what has arrived, so a session with no stakes is not silent.
@@ -320,6 +360,7 @@ class BetBoomRecorder:
                 "stake_pushes": self.stake_pushes,
                 "last_stake_at_s": self.last_stake_at,
                 "reconnects": self.reconnects,
+                "last_disconnect": self.last_disconnect,
                 "errors": len(self.errors),
                 "bad_codes": len(self.bad_codes),
                 "released": dict(self.released),

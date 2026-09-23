@@ -88,7 +88,8 @@ def test_report_is_json_and_carries_every_field(tmp_path):
     st = capture_status(_capture(tmp_path))
     data = json.loads(st.to_json())
     for key in ("ok", "reason", "checked_at_s", "newest_file", "newest_bytes",
-                "age_s", "files", "total_bytes", "disk_free_bytes", "disk_free_days"):
+                "age_s", "files", "total_bytes", "disk_free_bytes", "disk_free_days",
+                "last_disconnect"):
         assert key in data, key
 
 
@@ -124,6 +125,17 @@ def test_growing_file_with_no_subscriptions_is_not_ok(tmp_path):
     assert not st.ok
     assert "НЕ ПОДПИСАН" in st.reason
     assert st.subscribed == 0 and st.reconnects == 1
+
+
+def test_the_report_carries_why_the_socket_last_closed(tmp_path):
+    """23.09: "not subscribed, 304 reconnects" was all the report said, and the
+    cause -- the feed refusing every session -- took a second machine to find."""
+    root = _capture(tmp_path)
+    why = ("ConnectionClosedError: received 3010 (registered) Access rejected; "
+           "then sent 3010 (registered) Access rejected")
+    _sidecar(root, subscribed=0, reconnects=304, last_disconnect=why)
+    st = capture_status(root)
+    assert not st.ok and st.last_disconnect == why
 
 
 def test_growing_file_with_stale_prices_is_not_ok(tmp_path):
