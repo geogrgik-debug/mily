@@ -699,6 +699,14 @@ def test_sources_pick_the_frame_kinds(pb):
     assert [q.ts_received_ns for q in betboom_quotes(rows, pb, ("stake",))] == [stamp(2)[0]]
 
 
+def test_each_quote_names_the_kind_of_frame_that_carried_it(pb):
+    rows = [full(pb, 0, [(GAME_7, "П1", 2.30), (GAME_7, "П2", 1.47)]),
+            tour(pb, 1, [("Исход", "П1", 1.80), ("Исход", "П2", 2.05)]),
+            push(pb, 2, "П1", 2.35)]
+    assert [q.source for q in betboom_quotes(rows, pb)] == [
+        "full", "full", "tour", "tour", "stake"]
+
+
 def test_betboom_zero_test_through_the_command_line(pb, tmp_path, capsys):
     """Two recorders, one machine, one feed, real protobuf frames, the CLI."""
     feed = repricings(n_matches=4, per_match=20)

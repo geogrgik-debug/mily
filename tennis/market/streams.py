@@ -76,6 +76,7 @@ class Quote:
     `match` and `market` only have to be comparable across the streams being
     compared; the outcomes that share a (match, market) form one book, whose
     margin is removed together. `odds` is None when the outcome left the board.
+    `source` is the kind of frame that carried it, one of `SOURCES` for BetBoom.
     """
 
     ts_received_ns: int
@@ -85,6 +86,7 @@ class Quote:
     outcome: str
     odds: float | None
     active: bool = True
+    source: str = ""
 
 
 @dataclass(frozen=True)
@@ -285,7 +287,8 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
                 for s in stakes:
                     names_by_id[(mid, s.stake_id)] = (parse_market(s.market_name).key(), s.name)
                 for ch in diff_snapshots(full_last.get(mid, []), stakes):
-                    yield Quote(*stamp, mid, ch.ref.key(), ch.outcome, ch.new, ch.is_active)
+                    yield Quote(*stamp, mid, ch.ref.key(), ch.outcome, ch.new, ch.is_active,
+                                "full")
                 full_last[mid] = stakes
 
         elif which == "newsletters_stake" and "stake" in sources:
@@ -301,7 +304,7 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
                 continue
             gone = body.action == delete
             yield Quote(*stamp, s.match_id, market, outcome,
-                        None if gone else s.factor, not gone and s.is_active)
+                        None if gone else s.factor, not gone and s.is_active, "stake")
 
         elif which == "newsletters_match" and "tour" in sources:
             match = msg.newsletters_match.match
@@ -315,7 +318,8 @@ def betboom_quotes(rows: Iterable[dict | None], pb,
             seen = tour_last.setdefault(mid, {})
             for ch in diff_snapshots(list(seen.values()), list(frame.values())):
                 if ch.new is not None:
-                    yield Quote(*stamp, mid, ch.ref.key(), ch.outcome, ch.new, ch.is_active)
+                    yield Quote(*stamp, mid, ch.ref.key(), ch.outcome, ch.new, ch.is_active,
+                                "tour")
             seen.update(frame)
 
 

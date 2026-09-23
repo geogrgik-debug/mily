@@ -12,6 +12,7 @@ Results from this module are in
 | `diff.py` | Which prices moved between two consecutive snapshots of a match |
 | `streams.py` | Raw log → quotes → price events (margin-free probability of an outcome, emitted when it changes); refuses logs not written on one machine |
 | `lead_lag.py` | CLI: which of two books moves a price first, by how much, and whether the leader is stable |
+| `push_vs_snapshot.py` | CLI: BetBoom's per-stake pushes against its full snapshots -- does a late snapshot put a pushed price back, and how far ahead the push is |
 
 ## The one thing to know before using this
 
@@ -72,3 +73,25 @@ Two rules come from measurement, not taste:
 A lag longer than the window is not seen: the pairing takes the neighbouring
 move instead and reports a small lag. Every pair is therefore rerun under a
 doubled window, with a warning when the answer moves.
+
+## Pushes against snapshots: `push_vs_snapshot`
+
+    python -m tennis.market.push_vs_snapshot data/vps
+
+BetBoom prices a game market twice: one outcome at a time by push, and in the
+full snapshot of the match. `betboom_quotes` differences a snapshot against the
+previous snapshot, not against the pushes, so a snapshot still carrying a price
+the pushes had left would put it back, and the next change would move it on --
+two moves the book never made. Measured on the capture host's logs of 22-23.09
+(19.7 h, 12,385 pushed outcomes), that does not happen:
+
+* Of 76,063 snapshot quotes of an outcome already pushed, 63,811 carry its
+  latest pushed price and none a price the pushes had left. The other 12,252
+  take the outcome off the board before a push says so, which prices nothing.
+* The push was first in all 57,638 paired changes: snapshot minus push median
+  +0.52 s, p90 +0.61 s, max +10.63 s. The first look, 16 outcomes over 7
+  minutes, had a p90 of 78 s; it does not hold.
+
+So the meter's stream needs no guard against snapshots, and a game market's
+move is timed by its push. Only the capture host has pushes: the laptop's
+recorder predates 3f695d8, and the command refuses a capture without them.

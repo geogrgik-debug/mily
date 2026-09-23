@@ -53,7 +53,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from itertools import combinations
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Callable, Iterable, Sequence
 
 from tennis.market.streams import (
     SOURCES,
@@ -134,13 +134,19 @@ def _clusters(a: list[PriceEvent], b: list[PriceEvent], window_ns: int):
         yield ca, cb
 
 
-def _align(a: list[PriceEvent], b: list[PriceEvent], window_ns: int):
+def _same_direction(ea: PriceEvent, eb: PriceEvent) -> bool:
+    return ea.direction == eb.direction
+
+
+def _align(a: list, b: list, window_ns: int,
+           same: Callable[[object, object], bool] = _same_direction):
     """Most pairs, then least total gap, without two pairs crossing in time.
 
     Order matters here. Pairing each move with its nearest neighbour instead
     would, once one book lags by more than half the time between two moves,
     pair a move with the other book's *next* one -- reporting a small lead in
     the wrong direction, and so inventing simultaneity where there is a lag.
+    Two items can pair only if `same` says so.
     """
     n, m = len(a), len(b)
     score = [[(0, 0)] * (m + 1) for _ in range(n + 1)]
@@ -153,7 +159,7 @@ def _align(a: list[PriceEvent], b: list[PriceEvent], window_ns: int):
                 best, how = score[i][j - 1], 2
             eb = b[j - 1]
             gap = abs(eb.ts_received_ns - ea.ts_received_ns)
-            if gap <= window_ns and ea.direction == eb.direction:
+            if gap <= window_ns and same(ea, eb):
                 done, cost = score[i - 1][j - 1]
                 if (done + 1, cost - gap) > best:
                     best, how = (done + 1, cost - gap), 3
