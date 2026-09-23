@@ -25,8 +25,10 @@ starts at the probability core.
 | `ingest/onewin/` | The 1win recorder: config with no baked-in host, the three endpoints known to answer, a probe. The odds channel waits for one devtools request; see its README. | skeleton |
 | `ratings/` | Elo and as-of serve priors (Elo inversion blended with Barnett–Clarke), configured from the B1c sweep, with a snapshot the live process loads in 0.12 s instead of replaying 270k matches. Elo bit-identical to `research/elo_prior.py`; B1 numbers reproduced to four decimals. See its README. | done |
 | `market/` | Market-name parsing, overround, Shin, and the single-p fit behind a game book. Measured: the bookmaker prices the *next* game 74% of the time. `lead_lag.py`: which of two books moves a price first, by how much, and whether it is always the same one -- from logs of one machine only. See its README. | done |
-| `model/` | Track B step 3: one row per service game from only what was known before it (`game_rows.py`). Leak safety is by construction -- a game enters the accumulators only after its own row is out -- and a test poisons the future to guard it. | step 3 done |
-| `state/` `features/` `replay/` `eval/` | Live match state, snapshot features, residual model, replay backtest, metrics. | not started |
+| `model/` | Track B step 3: one row per service game from only what was known before it (`game_rows.py`). Leak safety is by construction -- a game enters the accumulators only after its own row is out -- and a test poisons the future to guard it. The serve features shrink with the live state's n0. | step 3 done |
+| `state/` | Track B step 4, v1: for each player a Beta on the chance of winning a point on his own serve, centred on the prior with n0 phantom points fitted on history (Slams 140, tour 100, Challenger 90); `p_hold_next` and `p_hold_now` through `markov`. See its README. | v1 done |
+| `eval/` | The history measurement: Grand Slam point by point and `tennis_pointbypoint`, priced with `RatingsSnapshot.prior`; n0 fitted on training years, the gain over the prior measured on later ones (+0.0036 Slams, +0.0043 tour, +0.0068 Challenger). `python -m tennis.eval download` then `live-state`. See its README. | done |
+| `features/` `replay/` | Snapshot features, residual model, replay backtest. | not started |
 
 ```bash
 pip install pytest numpy
