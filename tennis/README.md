@@ -22,8 +22,9 @@ starts at the probability core.
 | `ingest/names.py` | Cross-provider match identity: `initial.surname` normalisation and match keys. | done |
 | `ingest/rawlog.py` | Append-only, crash-safe raw frame log. Gzipped by default -- 4.8x measured on live capture -- with the per-line crash guarantee preserved through a Z_SYNC_FLUSH before every fsync. | done |
 | `ingest/betboom/` | The BetBoom line recorder. See its README. | done |
+| `ingest/onewin/` | The 1win recorder: config with no baked-in host, the three endpoints known to answer, a probe. The odds channel waits for one devtools request; see its README. | skeleton |
 | `ratings/` | Elo and as-of serve priors (Elo inversion blended with Barnett–Clarke), configured from the B1c sweep, with a snapshot the live process loads in 0.12 s instead of replaying 270k matches. Elo bit-identical to `research/elo_prior.py`; B1 numbers reproduced to four decimals. See its README. | done |
-| `market/` | Market-name parsing, overround, Shin, and the single-p fit behind a game book. Measured: the bookmaker prices the *next* game 74% of the time. See its README. | done |
+| `market/` | Market-name parsing, overround, Shin, and the single-p fit behind a game book. Measured: the bookmaker prices the *next* game 74% of the time. `lead_lag.py`: which of two books moves a price first, by how much, and whether it is always the same one -- from logs of one machine only. See its README. | done |
 | `state/` `features/` `models/` `replay/` `eval/` | Live match state, snapshot features, residual model, replay backtest, metrics. | not started |
 
 ```bash
