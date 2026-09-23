@@ -62,10 +62,10 @@ import argparse
 import asyncio
 import json
 import sys
-from collections import Counter
+from collections import Counter, deque
 from pathlib import Path
 
-from tennis.ingest.clock import Clock
+from tennis.ingest.clock import Clock, Instant
 from tennis.ingest.rawlog import RawLog
 from tennis.market.names import parse_market
 
@@ -87,6 +87,22 @@ STALE_COOLDOWN_S = 30 * 60
 # of an hour cost 561 reconnects, one every 1.6 s.
 HEALTHY_SESSION_S = 60.0
 MAX_BACKOFF_S = 60.0
+
+# 23.09 from 15:20 MSK the feed dropped live sessions without a close frame
+# and refused some handshakes, several times an hour; a second address saw the
+# same at the same minutes. A drop after a session that lived is retried at
+# once: the wait was a full second of a ~3 s gap per drop, for nothing.
+FIRST_RETRY_S = 0.0
+
+
+def describe(exc: BaseException) -> str:
+    """The error and its cause: websockets puts the peer's reset or EOF there."""
+    why = f"{type(exc).__name__}: {exc}"
+    cause = exc.__cause__
+    if cause is not None:
+        text = str(cause)
+        why += f" <- {type(cause).__name__}" + (f": {text}" if text else "")
+    return why
 
 # Tournaments inside the tennis tree that are not what a serve model wants.
 # Measured on a live tree: 12 of 32 tournaments -- 11 doubles and one
@@ -141,6 +157,13 @@ class BetBoomRecorder:
         self.last_stake_at: float | None = None
         self.reconnects = 0
         self.last_disconnect: str | None = None
+        self.disconnects: deque[dict] = deque(maxlen=10)
+        # What the reconnects cost: seconds from the last frame on a socket
+        # that carried subscriptions to the first price after it.
+        self.blind_s = 0.0
+        self.blind_since: Instant | None = None
+        self.last_blind_s: float | None = None
+        self.last_rx: Instant | None = None
         self._sleep = asyncio.sleep          # the wait between sessions; tests replace it
         self.errors: list[str] = []
         self.bad_codes: list[str] = []
@@ -218,22 +241,28 @@ class BetBoomRecorder:
                     # A dropped socket is normal operation, not an error worth
                     # stopping for: the log keeps what was already written and
                     # the next connection appends to it.
-                    why = f"{type(exc).__name__}: {exc}"
+                    why = describe(exc)
                 # Every way out of a session is a reconnect. A clean close --
                 # 1000 or 1001, which is what a server restart sends -- ends
                 # `async for` without raising, and used to loop straight back in
                 # with the old subscriptions remembered: nothing asked again, no
                 # wait, not counted.
+                lived = self.clock.now() - opened if opened is not None else None
                 self.reconnects += 1
                 self.last_disconnect = why[:300]
-                if opened is not None and self.clock.now() - opened >= HEALTHY_SESSION_S:
-                    backoff = 1.0
+                self.disconnects.append({
+                    "at_s": round(self._now(), 1), "why": why[:300],
+                    "lived_s": round(lived, 1) if lived is not None else None})
+                if self.subscribed and self.blind_since is None:
+                    self.blind_since = self.last_rx or self.clock.now()
+                if lived is not None and lived >= HEALTHY_SESSION_S:
+                    backoff = FIRST_RETRY_S
                 self.log.write(f"reconnect after {why}",
                                direction="meta", channel="_conn")
                 print(f"[conn] {why}; retry in {backoff:.0f}s", file=sys.stderr)
                 self._forget_subscriptions()
                 await self._sleep(backoff)
-                backoff = min(backoff * 2, MAX_BACKOFF_S)
+                backoff = min(max(backoff * 2, 1.0), MAX_BACKOFF_S)
         finally:
             heartbeat.cancel()
 
@@ -291,6 +320,7 @@ class BetBoomRecorder:
             async for frame in ws:
                 if isinstance(frame, str):
                     frame = frame.encode()
+                self.last_rx = self.clock.now()
                 self.log.write(frame, direction="rx", channel="tree_ws")
                 try:
                     msg = pb.MainResponse()
@@ -361,6 +391,10 @@ class BetBoomRecorder:
                 "last_stake_at_s": self.last_stake_at,
                 "reconnects": self.reconnects,
                 "last_disconnect": self.last_disconnect,
+                "disconnects": list(self.disconnects),
+                "blind_s": round(self.blind_s + (self.clock.now() - self.blind_since
+                                                 if self.blind_since is not None else 0.0), 1),
+                "last_blind_s": self.last_blind_s,
                 "errors": len(self.errors),
                 "bad_codes": len(self.bad_codes),
                 "released": dict(self.released),
@@ -767,7 +801,13 @@ class BetBoomRecorder:
 
     def _note_stake(self, stake) -> None:
         self.stakes_seen += 1
-        self.last_stake_at = self.clock.now().wall_ns / 1e9
+        now = self.clock.now()
+        self.last_stake_at = now.wall_ns / 1e9
+        if self.blind_since is not None:
+            gap = now - self.blind_since
+            self.blind_s += gap
+            self.last_blind_s = round(gap, 1)
+            self.blind_since = None
         self.markets[(stake.market_name, stake.period_name)] += 1
         if self.discover and self.stakes_seen % 200 == 0:
             self.report()

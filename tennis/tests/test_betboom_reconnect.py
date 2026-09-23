@@ -84,6 +84,8 @@ class Server:
                 if not server.sockets:
                     raise Stop
                 ws = server.sockets.pop(0)
+                if isinstance(ws, Exception):       # the handshake itself failed
+                    raise ws
                 server.served.append(ws)
                 return ws
 
@@ -162,13 +164,82 @@ def test_a_server_that_refuses_every_session_is_backed_off_not_hammered(rig):
     assert sum(waits) >= 15 * 60
 
 
-def test_a_session_that_lived_resets_the_wait(rig):
+def test_a_session_that_lived_is_retried_at_once_then_backed_off(rig):
     rec, clock, waits, _ = rig
     run(rec, [refused(), refused(),
               FakeWS(error=Rejected("keepalive ping timeout"),
                      lasts=HEALTHY_SESSION_S, clock=clock),
-              refused()])
-    assert waits == [1, 2, 1, 2]
+              refused(), refused()])
+    assert waits == [1, 2, 0, 1, 2]
+
+
+def board(mid, stake_id="s11"):
+    msg = pb.MainResponse()
+    n = msg.newsletters_full_match
+    n.action = pb.NEWSLETTER_ACTIONS_UPDATE
+    n.match.info.id = mid
+    s = n.match.stakes.add()
+    s.stake_id = stake_id
+    s.market_name = "1-й сет 3-й гейм: Исход"
+    s.is_active = True
+    return msg.SerializeToString()
+
+
+def dropped():
+    """23.09 from 15:20 MSK, on the capture host and a second address alike."""
+    err = Rejected("no close frame received or sent")
+    err.__cause__ = ConnectionResetError(104, "Connection reset by peer")
+    return err
+
+
+def test_a_drop_names_what_caused_it(rig):
+    rec, *_ = rig
+    run(rec, [FakeWS(error=dropped())])
+    assert rec.last_disconnect == ("Rejected: no close frame received or sent "
+                                   "<- ConnectionResetError: [Errno 104] Connection reset by peer")
+
+
+def test_blind_time_runs_from_the_last_frame_to_the_first_price_after(rig):
+    rec, *_ = rig
+    run(rec, [FakeWS([tree([1]), board(1)], error=dropped()),   # prices, then gone
+              dropped(),                                        # handshake fails: +1 s
+              FakeWS([tree([1]), board(1)])])                   # +2 s: prices again
+    assert rec.last_blind_s == 3.0 and rec.blind_s == 3.0
+    # The last socket closed too, and its gap is still open: 4 s so far.
+    rec._write_sidecar()
+    data = json.loads(rec.sidecar_path().read_text(encoding="utf-8"))
+    assert data["blind_s"] == 7.0 and data["last_blind_s"] == 3.0
+
+
+def test_a_wall_clock_step_inside_a_gap_does_not_bend_it(rig):
+    rec, clock, *_ = rig
+    plain = rec._sleep
+
+    async def ntp_step(seconds):
+        clock.advance(0, wall_step=-3600)
+        await plain(seconds)
+
+    rec._sleep = ntp_step
+    run(rec, [FakeWS([tree([1]), board(1)], error=dropped()),
+              FakeWS([tree([1]), board(1)])])
+    assert rec.last_blind_s == 1.0
+
+
+def test_a_drop_with_nothing_subscribed_costs_nothing(rig):
+    rec, *_ = rig
+    run(rec, [refused(), FakeWS([tree([1]), board(1)], error=dropped())])
+    assert rec.last_blind_s is None and rec.blind_s == 0.0
+
+
+def test_the_sidecar_lists_the_last_ten_drops(rig):
+    rec, *_ = rig
+    run(rec, [dropped()] + [refused() for _ in range(11)])
+    rec._write_sidecar()
+    drops = json.loads(rec.sidecar_path().read_text(encoding="utf-8"))["disconnects"]
+    assert len(drops) == 10 and rec.reconnects == 12
+    assert all("3010" in d["why"] and d["lived_s"] == 0.0 for d in drops)
+    run(rec, [dropped()])
+    assert rec.disconnects[-1]["lived_s"] is None         # never got past the handshake
 
 
 def test_a_clean_close_forgets_the_subscriptions_and_asks_again(rig):

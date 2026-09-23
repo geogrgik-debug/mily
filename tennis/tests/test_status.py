@@ -89,7 +89,7 @@ def test_report_is_json_and_carries_every_field(tmp_path):
     data = json.loads(st.to_json())
     for key in ("ok", "reason", "checked_at_s", "newest_file", "newest_bytes",
                 "age_s", "files", "total_bytes", "disk_free_bytes", "disk_free_days",
-                "last_disconnect"):
+                "last_disconnect", "disconnects", "blind_s", "last_blind_s"):
         assert key in data, key
 
 
@@ -136,6 +136,16 @@ def test_the_report_carries_why_the_socket_last_closed(tmp_path):
     _sidecar(root, subscribed=0, reconnects=304, last_disconnect=why)
     st = capture_status(root)
     assert not st.ok and st.last_disconnect == why
+
+
+def test_the_report_carries_what_the_drops_cost(tmp_path):
+    root = _capture(tmp_path)
+    drops = [{"at_s": 1790166300.0, "why": "ConnectionClosedError: no close frame "
+              "received or sent", "lived_s": 812.4}]
+    _sidecar(root, reconnects=8, disconnects=drops, blind_s=31.5, last_blind_s=2.8)
+    st = capture_status(root)
+    assert st.ok
+    assert st.disconnects == drops and st.blind_s == 31.5 and st.last_blind_s == 2.8
 
 
 def test_growing_file_with_stale_prices_is_not_ok(tmp_path):

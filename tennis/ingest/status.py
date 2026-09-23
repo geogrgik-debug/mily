@@ -64,6 +64,12 @@ class CaptureStatus:
     # said "not subscribed, 304 reconnects" and the cause -- the feed refusing
     # every session with 3010 "Access rejected" -- took a second machine to see.
     last_disconnect: str | None = None
+    # The last ten drops (at_s, why, lived_s), and what all of them cost in
+    # seconds without prices since the run started: the count alone does not
+    # say whether eight reconnects lost eight seconds or eight minutes.
+    disconnects: list | None = None
+    blind_s: float | None = None
+    last_blind_s: float | None = None
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), ensure_ascii=False, indent=2, sort_keys=True)
@@ -106,6 +112,9 @@ def capture_status(root: str | Path, *, clock: Clock | None = None,
                               if isinstance(last_stake, (int, float)) else None),
             reconnects=side.get("reconnects") if side else None,
             last_disconnect=side.get("last_disconnect") if side else None,
+            disconnects=side.get("disconnects") if side else None,
+            blind_s=side.get("blind_s") if side else None,
+            last_blind_s=side.get("last_blind_s") if side else None,
         )
 
     if not root.exists():
