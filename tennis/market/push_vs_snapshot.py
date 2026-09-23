@@ -223,7 +223,7 @@ def late_first_pushes(quotes: Iterable[Quote | None]) -> tuple[float, ...]:
             continue
         key = (q.match, q.market, q.outcome)
         prev = last.get(key)
-        if q.source == "full" and key not in pushed and prev is not None and prev != q.odds:
+        if q.source == "full" and prev is not None and prev != q.odds:
             moved[key] = (q.odds, q.ts_mono_ns)
         elif q.source == "stake" and key not in pushed:
             pushed.add(key)

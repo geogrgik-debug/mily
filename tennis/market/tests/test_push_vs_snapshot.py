@@ -149,6 +149,22 @@ def test_a_first_push_ahead_of_the_snapshot_is_the_push_first():
     assert lead(changes(quotes, "stake"), changes(quotes, "full")).leads == (3.0,)
 
 
+def test_only_the_first_push_of_an_outcome_is_held_against_the_snapshot():
+    """Found in review: without the first-push rule the capture host's count
+    went from 38 to 57 and its longest from 14.89 s to 236.51 s. Here the
+    later push, at the price the later snapshot moved to, is a change of the
+    pushes' own and pairs."""
+    quotes = [q(0, "П1", 1.80, "full"), q(5, "П1", 1.85, "stake"),
+              q(8, "П1", 1.90, "full"), q(13, "П1", 1.90, "stake")]
+    assert late_first_pushes(quotes) == ()
+
+
+def test_a_first_push_repeated_is_counted_once():
+    quotes = [q(0, "П1", 1.80, "full"), q(10, "П1", 1.85, "full"),
+              q(13, "П1", 1.85, "stake"), q(20, "П1", 1.85, "stake")]
+    assert late_first_pushes(quotes) == (3.0,)
+
+
 def test_a_first_push_repeating_the_board_is_not_late():
     """A first push at the price the snapshot started from moved nothing."""
     assert late_first_pushes([q(0, "П1", 1.80, "full"), q(1, "П1", 1.80, "stake")]) == ()
