@@ -39,7 +39,10 @@
    `git -c user.name=Claude -c user.email=noreply@anthropic.com commit ...`.
 6. Перед пушем `git pull --rebase --autostash`. Пуш только в
    `claude/tennis-prediction-audit-kskn26`, в `main` — никогда. Конфликт в
-   чужом файле — стоп, сказать владельцу.
+   чужом файле — стоп, сказать владельцу. Фоновое скачивание в цикле (слежение
+   за отчётом и т. п.) — только `git fetch --no-write-fetch-head`: обычный
+   `fetch` переписывает общий `.git/FETCH_HEAD`, и у соседей `git pull --rebase`
+   падает с «Cannot rebase onto multiple branches» (так было 23.09).
 7. Готово — это `python -m pytest tennis/ -q` → `0 failed`. Числа сверять с
    выводом команд, не с документами.
 8. В конце работы — **блок для ревьюера**. Владелец отнесёт его ревьюеру, а
