@@ -1,16 +1,16 @@
 {
-  "age_s": 0.8,
-  "checked_at_s": 1790153401.9770336,
-  "disk_free_bytes": 25029775360,
+  "age_s": 0.3,
+  "checked_at_s": 1790153701.047943,
+  "disk_free_bytes": 25028784128,
   "disk_free_days": 27.8,
   "files": 2,
-  "last_stake_age_s": 4957.3,
-  "newest_bytes": 13565403,
+  "last_stake_age_s": 3.3,
+  "newest_bytes": 14188547,
   "newest_file": "data/raw/provider=betboom/date=2026-09-23/run-1790102024-356580-2b06c7.jsonl.gz",
-  "ok": false,
-  "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
-  "reconnects": 521,
-  "stakes_seen": 487095,
-  "subscribed": 0,
-  "total_bytes": 51316971
+  "ok": true,
+  "reason": "пишет, 10 подписок, 492222 котировок",
+  "reconnects": 562,
+  "stakes_seen": 492222,
+  "subscribed": 10,
+  "total_bytes": 51940115
 }
