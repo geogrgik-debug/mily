@@ -167,6 +167,53 @@ rsync -avz --progress USER@VPS:/home/USER/capture/data/raw/ ./data/raw/
 
 Закрытые дневные файлы можно после копирования удалять с VPS.
 
+## 7. Вторая контора: 1win
+
+Меритель очерёдности (`tennis.market.lead_lag`) сравнивает конторы только по
+записям одной машины. Поэтому 1win пишется здесь же, рядом с BetBoom, своей
+службой `onewin-capture`. Код рекордера — `tennis/ingest/onewin/`, он уже входит
+в разреженный набор шага 2.
+
+Сначала номер партнёра. Адрес API публичный и записан в юните, а номер хранится
+только на машине: одна строка `ONEWIN_PARTNER_ID=<значение>` в
+`/etc/mily/onewin.env`, читать которую может только root. В репозиторий и в чат
+номер не класть. У владельца он лежит на ноутбуке, в
+`data\onewin\partner_id.txt`. На сервер его можно положить одной командой из Git
+Bash на ноутбуке, из корня репозитория. Команда выводит только размер файла, а не
+сам номер:
+
+```bash
+{ printf 'ONEWIN_PARTNER_ID='; head -n 1 data/onewin/partner_id.txt | tr -d '\r\n'; echo; } | ssh root@<IP сервера> 'install -d -m 700 /etc/mily && umask 077 && cat > /etc/mily/onewin.env && wc -c /etc/mily/onewin.env'
+```
+
+Потом на сервере:
+
+```bash
+bash deploy/install-onewin.sh
+```
+
+Скрипт ставит юнит с подставленными путями, запускает службу и через 90 с
+показывает журнал. Службу BetBoom и строку отчёта в crontab не трогает. Если файла
+с номером нет, он сразу останавливается и пишет, чего не хватает. Без этого файла
+служба не стартует вовсе, а не перезапускается каждые 10 с на ошибке настройки.
+Проверить: `journalctl -u onewin-capture -n 20 --no-pager`. Сразу после запуска
+должна быть строка `[1win] recording...`, через минуту — `[sub] N match(es)`,
+через две — `[hb] ... match-odds=...`.
+
+В отчёте машины (`capture-status`) 1win виден в поле `other_providers`: самый
+свежий файл, его размер и сколько секунд назад в него писали. Это факты, а не
+вердикт. Своих счётчиков у рекордера 1win нет, а тихий файл ночью, когда в лайве
+мало матчей, ещё не поломка. Вердикт `ok` по-прежнему выносится только о BetBoom и
+только по его файлам: до 24.09 отчёт брал самый свежий файл во всём `data/raw`,
+и живой 1win выдал бы мёртвый BetBoom за здоровый.
+
+Объём, по замеру роли «Рынок»: 90 с на 20 матчах дали 115 КБ сжатого, то есть
+грубо до ~110 МБ в сутки. Забирать вместе с BetBoom по шагу 6: `provider=1win`
+лежит рядом с `provider=betboom`.
+
+Пока 1win пишется с этой машины, в 1win через VPN на ней не заходить. Причина та
+же, что и с BetBoom: иначе аккаунт свяжется со сбором котировок по IP.
+
 ## Что может пойти не так
 
 | Симптом | Причина | Что делать |
@@ -186,4 +233,5 @@ rsync -avz --progress USER@VPS:/home/USER/capture/data/raw/ ./data/raw/
 | `heartbeat-push.sh` не пушит | у deploy key нет write access | перевыпустить ключ с галочкой |
 | `heartbeat-push.sh`: `outside of your sparse-checkout definition` или `could not push after 3 attempts` при живом ключе | старая версия скрипта: worktree унаследовал разреженность, мелкий клон не видел `origin/capture-status` | `git pull` — исправлено 22.09 |
 | Много `[sub]` на турниры «Пары» | старая версия кода | `git pull` — парные и симулятор не подписываются с `36cfe9c` |
+| `onewin-capture` не стартует, в `journalctl` — `Failed to load environment files` | нет `/etc/mily/onewin.env` | положить номер партнёра, шаг 7, и повторить `bash deploy/install-onewin.sh` |
 | `APP_BUILD` конторы сменился | схема protobuf устарела, поля молча разъехались | пересобрать схему: `tennis/ingest/betboom/extract_schema.py`, рецепт в `docs/TRACK_A_betboom_capture.md` |

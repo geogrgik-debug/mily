@@ -18,10 +18,12 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 RUNBOOK = ROOT / "deploy" / "README.md"
 
-# What the capture host runs: the service, the heartbeat's status report, and
-# the log inspector the runbook points to when something looks wrong.
+# What the capture host runs: both services (BetBoom and, from 24.09, 1win
+# beside it), the heartbeat's status report, and the log inspector the runbook
+# points to when something looks wrong.
 ENTRY_POINTS = (
     "tennis.ingest.betboom.client",
+    "tennis.ingest.onewin.client",
     "tennis.ingest.status",
     "tennis.ingest.betboom.inspect_log",
 )
@@ -82,7 +84,8 @@ def test_the_sparse_set_holds_everything_the_capture_host_imports():
     patterns = sparse_patterns(RUNBOOK.read_text(encoding="utf-8"))
     loaded = files_loaded_by(ENTRY_POINTS)
     assert "tennis/ingest/betboom/client.py" in loaded
-    missing = [f for f in loaded if not covered(f, patterns)]
+    assert "tennis/ingest/onewin/client.py" in loaded
+    missing =[f for f in loaded if not covered(f, patterns)]
     assert not missing, (
         "the capture host's sparse checkout (deploy/README.md, step 2) lacks "
         f"files the recorder imports: {missing}. Add their directories to the "

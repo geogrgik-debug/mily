@@ -1,0 +1,45 @@
+# systemd unit for the 1win capture, beside betboom-capture on the same host.
+#
+# The lead-lag meter compares two books only from one machine's logs, so 1win
+# records where BetBoom does. This is a copy of betboom-capture.service: what
+# differs is the recorder, its match cap and where its settings come from.
+# Everything else is kept for the reasons written there.
+#
+# Paths are placeholders: deploy/install-onewin.sh fills __ROOT__ and __USER__
+# and starts the unit.
+
+[Unit]
+Description=1win live odds capture
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__ROOT__
+Environment=PYTHONUNBUFFERED=1
+# Hosts rotate, so the recorder has no default for either setting. The API base
+# is public. The partner id lives only on the host, as the one line
+# ONEWIN_PARTNER_ID=<value> in /etc/mily/onewin.env, never in the repository.
+# No leading "-" on EnvironmentFile: without the file the unit must fail to
+# start, not restart every ten seconds on a config error.
+Environment=ONEWIN_API_BASE=https://api-gateway.top-parser.com
+EnvironmentFile=/etc/mily/onewin.env
+ExecStart=__ROOT__/.venv/bin/python -m tennis.ingest.onewin.client --out data/raw --max-matches 25
+
+Restart=always
+RestartSec=10
+
+# Heartbeats go to the journal: journalctl -u onewin-capture
+StandardOutput=journal
+StandardError=journal
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=__ROOT__/data
+
+[Install]
+WantedBy=multi-user.target
