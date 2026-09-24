@@ -9,6 +9,7 @@ covers the data, how to rerun it, and how the rows are built.
 python -m tennis.eval download data/sackmann       # ATP 54 files, Slams 90, pointbypoint 8 (~320 MB)
 python -m tennis.eval live-state --json data/eval/live_state.json    # about 6 minutes
 python -m tennis.eval calibrate --json data/eval/calibrate.json      # about 14 minutes; writes tennis/model/hold_v1.json
+python -m tennis.eval check-sets                                     # about 30 seconds
 ```
 
 Everything under `data/` is git-ignored: the files are CC BY-NC-SA 4.0,
@@ -122,7 +123,8 @@ games so far, prior.
 
 `to_plays` rebuilds the set score from the games. A set ends on a tie-break,
 or at six games or more with a lead of two, which covers the advantage final
-sets. It was checked once against the sources' own set marks:
+sets. `python -m tennis.eval check-sets` checks it against the sources' own
+set marks (`set_marks.py`), through the same code the rows are built with:
 - tennis_pointbypoint: 46 944 of 46 944 matches agree;
 - Slams: 4 698 of 4 699 agree.
 
@@ -152,8 +154,14 @@ structure:
 - a scoreboard counted by hand;
 - a fit untouched by poisoned test years;
 - a planted context effect found again;
+- folds that never split a match;
+- ECE that adds gaps of either sign, and a floor drawn from the forecasts,
+  not from the outcomes;
+- the set marks read from both sources;
 - `tennis.model.p_hold`, played point by point, equal to the evaluated
-  forecast.
+  forecast;
+- the report's test numbers on test rows, with its full model the
+  calibrated one.
 
 `tests/test_live_state.py` runs the machinery on simulated matches where the
 truth is known. Each player's form is his prior plus a draw of known spread.

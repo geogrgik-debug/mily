@@ -6,8 +6,10 @@ import pytest
 
 from tennis.eval.calibrate import (
     FEATURES, GROUPS, Rows, beta_apply, build_rows, calibration_stats, ece, equal_count_edges, evaluate,
-    fit_params, isotonic_apply, isotonic_fit, role_of, to_plays,
+    fit_params, isotonic_apply, isotonic_fit, match_folds, role_of, set_numbers, to_plays,
 )
+from tennis.eval.live_state import log_loss
+from tennis.eval.set_marks import compare, pbp_marks, slam_marks
 from tennis.eval.join import PricedMatch
 from tennis.eval.points import Game, MatchPoints, valid_game
 from tennis.features import GameContext, vector
@@ -223,6 +225,23 @@ def test_ece_of_a_known_gap():
     assert ece(p, y, np.array([0.0, 1.0])) == pytest.approx(0.1)
 
 
+def test_ece_adds_gaps_of_either_sign():
+    # 0.6 forecast where 0.7 happens, 0.9 where 0.8 happens: the gaps cancel in
+    # a sum and in one bin, not in ECE
+    p = np.repeat([0.6, 0.9], 1000)
+    y = np.concatenate([np.arange(1000) < 700, np.arange(1000) < 800]).astype(float)
+    assert ece(p, y, np.array([0.0, 0.75, 1.0])) == pytest.approx(0.1)
+
+
+def test_the_floor_is_what_a_calibrated_forecast_would_show_not_what_this_one_does():
+    rng = np.random.default_rng(1)
+    p = rng.uniform(0.75, 0.85, 60_000)
+    y = (rng.random(p.size) < p - 0.1).astype(float)      # 0.1 too sure of the hold
+    s = calibration_stats(p, y, np.arange(p.size) // 15, n_boot=20)
+    assert s["ece"] == pytest.approx(0.1, abs=0.01)
+    assert s["ece_floor"] < 0.02
+
+
 def test_ece_of_calibrated_forecasts_sits_at_its_floor():
     rng = np.random.default_rng(0)
     p = rng.uniform(0.6, 0.95, 60_000)
@@ -232,6 +251,14 @@ def test_ece_of_calibrated_forecasts_sits_at_its_floor():
     assert s["cox_slope"] == pytest.approx(1.0, abs=0.1)
     assert s["cox_slope_ci"][0] < 1.0 < s["cox_slope_ci"][1]
     assert len(equal_count_edges(p)) == 16
+
+
+def test_folds_never_split_a_match():
+    match = np.repeat(np.arange(200), np.random.default_rng(0).integers(5, 30, 200))
+    fold = match_folds(match, 5, seed=3)
+    for m in np.unique(match):
+        assert len(set(fold[match == m])) == 1
+    assert set(fold) == set(range(5))
 
 
 def test_isotonic_is_monotone_and_pools_violators():
@@ -251,6 +278,13 @@ def test_the_live_function_reproduces_the_evaluated_forecast():
     params, report = evaluate(rows, n_boot=20, n_boot_coef=0, l2_grid=(100.0,))
     assert set(report["test"]) == {"tour", "chall", "all"}
     final = predict(rows.h, rows.Z, params)
+    # the report scores the test years, and its full model is the calibrated one
+    test = rows.role == "test"
+    for lv in ("tour", "chall", "all"):
+        i = test & ((rows.level == lv) if lv != "all" else True)
+        assert report["test"][lv]["games"] == int(i.sum())
+        assert report["test"][lv]["logloss"]["final"] == pytest.approx(
+            log_loss(final[i], rows.hold[i]).mean(), abs=1e-12)
     for pm in [pm for pm in priced if role_of(pm.match) == "test"][:2]:
         idx = np.flatnonzero(rows.match == priced.index(pm))
         plays = to_plays(pm.match)
@@ -264,3 +298,32 @@ def test_the_live_function_reproduces_the_evaluated_forecast():
             for srv, won in g.points:
                 s = s.after_point(srv, won)
         assert at == len(idx)
+
+
+# ---- the set marks check ------------------------------------------------------
+
+def test_set_numbers_follow_the_games_and_compare_counts_disagreements():
+    games = [_hold(1 + i % 2) for i in range(12)]
+    servers = [1 if (n + 1) // 2 % 2 == 0 else 2 for n in range(7)]
+    games.append(Game(1, tuple((srv, int(srv == 1)) for srv in servers), tiebreak=True))
+    games.append(_hold(2))
+    m = MatchPoints("k", "pbp", "tour", 2013, "", "", "a", "b", tuple(games))
+    assert set_numbers(m) == [1] * 13 + [2]
+    counts, differ = compare([m], {"k": [1] * 13 + [2]})
+    assert counts["same"] == 1 and not differ
+    counts, differ = compare([m], {"k": [1] * 12 + [2, 2]})
+    assert counts["differ"] == 1 and differ == ["k"]
+    assert compare([m], {})[0]["no_marks"] == 1
+
+
+def test_the_marks_are_read_from_both_sources(tmp_path):
+    # a repeated id keeps its first row, as load_pbp does
+    (tmp_path / "pbp_matches_x.csv").write_text(
+        "pbp_id,pbp\n7,SSSS;RRRR.SSSS\n7,SSSS\n", encoding="utf-8")
+    assert pbp_marks(tmp_path) == {"7": [1, 1, 2]}
+    # markers (server 0) and the women's draw (match number 2xxx) are not games
+    rows = ["match_id,SetNo,GameNo,PointServer,PointWinner",
+            "2013-x-1101,1,1,1,1", "2013-x-1101,1,1,1,1", "2013-x-1101,1,2,2,1",
+            "2013-x-1101,2,3,1,2", "2013-x-1101,0,0,0,0", "2013-x-2101,1,1,1,1"]
+    (tmp_path / "2013-x-points.csv").write_text("\n".join(rows) + "\n", encoding="utf-8")
+    assert slam_marks(tmp_path) == {"2013-x-1101": [1, 1, 2]}

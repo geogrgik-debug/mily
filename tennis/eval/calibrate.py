@@ -59,26 +59,39 @@ def role_of(m: MatchPoints) -> str:
     return ""
 
 
-def to_plays(m: MatchPoints) -> List[GamePlay]:
-    """The regular service games of a match, each with the set score before it.
+def _walk(m: MatchPoints):
+    """Every game of a match with the score before it: (game, set number,
+    games in the set, sets won), the last two as {player: count}.
 
     A set ends on a tie-break, or when a player has six games or more and a
     lead of two -- which also covers the advantage final sets the Slams played
-    until 2019-2022.
+    until 2019-2022. `python -m tennis.eval check-sets` checks this against the
+    sources' own set marks.
     """
-    plays: List[GamePlay] = []
     games, sets, set_no = {1: 0, 2: 0}, {1: 0, 2: 0}, 1
     for g in m.games:
-        if not g.tiebreak:
-            s, r = g.server, 3 - g.server
-            plays.append(GamePlay(server=s, returner=r, points=tuple(w for _, w in g.points),
-                                  set_no=set_no, server_games=games[s], returner_games=games[r],
-                                  server_sets=sets[s], returner_sets=sets[r]))
+        yield g, set_no, dict(games), dict(sets)
         won = g.winner()
         games[won] += 1
         if g.tiebreak or (max(games.values()) >= 6 and abs(games[1] - games[2]) >= 2):
             sets[won] += 1
             games, set_no = {1: 0, 2: 0}, set_no + 1
+
+
+def set_numbers(m: MatchPoints) -> List[int]:
+    """The set each game of a match belongs to, tie-breaks included."""
+    return [set_no for _, set_no, _, _ in _walk(m)]
+
+
+def to_plays(m: MatchPoints) -> List[GamePlay]:
+    """The regular service games of a match, each with the set score before it."""
+    plays: List[GamePlay] = []
+    for g, set_no, games, sets in _walk(m):
+        if not g.tiebreak:
+            s, r = g.server, 3 - g.server
+            plays.append(GamePlay(server=s, returner=r, points=tuple(w for _, w in g.points),
+                                  set_no=set_no, server_games=games[s], returner_games=games[r],
+                                  server_sets=sets[s], returner_sets=sets[r]))
     return plays
 
 
@@ -135,10 +148,15 @@ def _design(Z: np.ndarray) -> np.ndarray:
     return np.column_stack([np.ones(len(Z)), Z])
 
 
+def match_folds(match: np.ndarray, folds: int, seed: int = 0) -> np.ndarray:
+    """A fold for every row, whole matches to one fold, matches dealt at random."""
+    _, inv = np.unique(match, return_inverse=True)
+    return np.random.default_rng(seed).permutation(inv.max() + 1)[inv] % folds
+
+
 def choose_l2(h, Z, y, match, grid=L2_GRID, folds: int = 5, seed: int = 0) -> Tuple[float, list]:
     """The L2 strength with the lowest held-out log loss, folds by whole match."""
-    _, inv = np.unique(match, return_inverse=True)
-    fold = np.random.default_rng(seed).permutation(inv.max() + 1)[inv] % folds
+    fold = match_folds(match, folds, seed)
     X, off = _design(Z), logit(h)
     curve = []
     for l2 in grid:

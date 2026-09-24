@@ -47,6 +47,20 @@ def test_the_scoreboard():
     assert _named(_ctx(level="slam", best_of=5, set_no=3, server_sets=1, returner_sets=1))["deciding_set"] == 0
 
 
+@pytest.mark.parametrize("server, returner, for_set, to_stay", [
+    (5, 4, 1, 0), (4, 5, 0, 1), (6, 5, 1, 0), (5, 6, 0, 1), (5, 5, 0, 0), (6, 6, 0, 0),
+    (4, 4, 0, 0), (5, 3, 1, 0), (3, 5, 0, 1),
+])
+def test_serving_for_the_set_and_to_stay_in_it(server, returner, for_set, to_stay):
+    z = _named(_ctx(server_games=server, returner_games=returner, served_before=4))
+    assert (z["serving_for_set"], z["serving_to_stay"]) == (for_set, to_stay)
+
+
+def test_the_first_service_game_is_only_the_first():
+    assert _named(_ctx(served_before=0))["first_service_game"] == 1
+    assert _named(_ctx(served_before=1))["first_service_game"] == 0
+
+
 def test_from_row_reads_what_game_rows_built():
     plays = [
         GamePlay(1, 2, (1, 1, 1, 1), set_no=2, server_games=0, returner_games=0,

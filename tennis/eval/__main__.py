@@ -3,6 +3,7 @@
   python -m tennis.eval download data/sackmann
   python -m tennis.eval live-state [--data data/sackmann] [--json out.json] [--n-boot 1000]
   python -m tennis.eval calibrate [--data data/sackmann] [--json out.json] [--params PATH]
+  python -m tennis.eval check-sets [--data data/sackmann]
 
 `download` fetches the ATP match files (for the prior), Grand Slam point by
 point 2012-2024 and tennis_pointbypoint (ATP, Challenger) under `--data`.
@@ -20,6 +21,9 @@ before 2017, scores it on 2017 and later, and writes the parameters the live
 process loads (`tennis/model/hold_v1.json`). Slam main-draw matches are taken
 from the Slam files only: tennis_pointbypoint carries them too, and one match
 in two sources could sit in the fit and the test at once.
+
+`check-sets` checks the set score `calibrate` rebuilds from the games against
+the sources' own set marks, match by match.
 """
 from __future__ import annotations
 
@@ -34,6 +38,7 @@ from tennis.eval.download import download_pbp, download_slam
 from tennis.eval.join import join_pbp, join_slam, price, stream_priors
 from tennis.eval.live_state import evaluate_segment
 from tennis.eval.pbp import load_pbp
+from tennis.eval.set_marks import compare, pbp_marks, slam_marks
 from tennis.eval.slam import load_slam
 from tennis.model.hold import PARAMS_PATH
 from tennis.ratings.sackmann import download as download_atp, load_matches
@@ -103,6 +108,8 @@ def main(argv=None) -> int:
     c.add_argument("--n-boot", type=int, default=1000)
     c.add_argument("--n-boot-coef", type=int, default=200,
                    help="refits of the residual for the coefficients' intervals")
+    k = sub.add_parser("check-sets", help="the rebuilt set score against the sources' set marks")
+    k.add_argument("--data", default="data/sackmann")
     args = ap.parse_args(argv)
     t0 = time.monotonic()
 
@@ -114,6 +121,9 @@ def main(argv=None) -> int:
         got, missing = download_pbp(os.path.join(args.data, "pointbypoint"))
         print(f"pointbypoint: fetched {len(got)}, missing {len(missing)}")
         return 0
+
+    if args.cmd == "check-sets":
+        return _check_sets(args.data)
 
     sack, js, jp, priors, out = _load(args.data, t0)
     if args.cmd == "calibrate":
@@ -162,6 +172,18 @@ def _calibrate(args, sack, js, jp, priors, out, t0: float) -> int:
     params.save(args.params)
     print(f"wrote {args.params}")
     _write_json(args.json, out)
+    return 0
+
+
+def _check_sets(data: str) -> int:
+    for name, (matches, _), marks in (
+            ("pointbypoint", load_pbp(os.path.join(data, "pointbypoint")),
+             pbp_marks(os.path.join(data, "pointbypoint"))),
+            ("slam", load_slam(os.path.join(data, "slam")), slam_marks(os.path.join(data, "slam")))):
+        counts, differ = compare(matches, marks)
+        print(f"{name}: {counts['same']} of {len(matches)} matches agree with the source's set marks"
+              + (f"; differ: {', '.join(differ)}" if differ else "")
+              + (f"; no marks: {counts['no_marks']}" if counts["no_marks"] else ""))
     return 0
 
 

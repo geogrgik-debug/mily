@@ -121,6 +121,21 @@ def test_the_live_call_is_the_offline_prediction_on_that_row():
     assert logit(r) - logit(0.8) == pytest.approx(0.12 + vector(ctx) @ np.array(params.coef))
 
 
+def test_the_calibration_map_is_applied_on_top_of_the_residual():
+    # a = b = 1 makes the beta map a pure shift of the logit by d: the calibrated
+    # forecast must sit exactly d above the residual, offline and live
+    params = _identity(intercept=0.1, coef=tuple(np.linspace(-0.2, 0.2, len(FEATURES))),
+                       calibration=(1.0, 1.0, 0.4))
+    h = np.array([0.35, 0.62, 0.8, 0.93])
+    Z = np.vstack([vector(_ctx()), vector(_ctx(level="slam", best_of=5)),
+                   vector(_ctx(just_broke=True)), vector(_ctx(surface="Grass"))])
+    assert logit(predict(h, Z, params)) - logit(residual(h, Z, params)) == pytest.approx(0.4)
+    s = MatchState.start(1, 2, 0.64, 0.61, n0=100.0)
+    shifted = p_hold(s, 1, _ctx(), params)
+    plain = residual(np.array([s.p_hold_next(1)]), vector(_ctx())[None, :], params)[0]
+    assert logit(shifted) - logit(plain) == pytest.approx(0.4)
+
+
 def test_start_state_uses_the_fitted_prior_strength():
     s = start_state(_identity(), "slam", 1, 2, 0.65, 0.60)
     b = s.belief(1)
