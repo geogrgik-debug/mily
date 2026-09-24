@@ -385,6 +385,169 @@ def test_the_partner_id_is_sent_but_never_logged(log, tmp_path):
     assert "<partner id>" in rec.last_disconnect
 
 
+# --------------------------------------------------------------- counters
+
+INFO = '42["u",{"data":{"matchId":1,"score":"1:0 (15:30)"},"messageType":"match-info"},"R"]'
+
+
+def odds(kind, *group_sizes):
+    """A price message whose groups hold that many odds items each."""
+    groups = [{"id": g, "oddsList": [{"id": 100 * g + i, "cf": 1.85, "status": 1,
+                                      "ts": 1790175514508} for i in range(n)]}
+              for g, n in enumerate(group_sizes)]
+    return "42" + json.dumps(["u", {"data": {"matchId": 1, "oddsGroups": groups},
+                                    "messageType": kind}, "Q"])
+
+
+class Timed(FakeSocket):
+    """Frames as (seconds the clock moves before it, frame)."""
+
+    def __init__(self, clock, steps):
+        super().__init__([frame for _, frame in steps])
+        self.clock = clock
+        self.waits = [wait for wait, _ in steps]
+
+    async def recv(self):
+        if self.frames:
+            self.clock.advance(self.waits.pop(0))
+        return await super().recv()
+
+
+def clocked(log, clock, *items):
+    return OneWinRecorder(OneWinClient(OneWinConfig(BASE, PARTNER), log, FakeTransport(
+        {"matches/get-many": (200, {}, live_body(*items))})), clock=clock)
+
+
+def test_a_quote_is_an_odds_item_and_pings_or_the_score_are_none(log):
+    """The server pings every 25 s and sends the score about as often as
+    prices; a socket bringing only those grows the file and prices nothing."""
+    rec, _ = recorder(log, live_item(1))
+    ws = FakeSocket([OPEN, CONNECTED, "2", INFO, odds("match-odds-snapshot", 2, 1),
+                     "2", INFO, odds("match-odds", 2)])
+    with pytest.raises(ConnectionError):
+        asyncio.run(rec._session(ws))
+
+    c = rec.counters()
+    assert c["quotes_total"] == c["quotes_last_hour"] == 5
+    assert c["frames"] >= 8                  # the pings and the score are logged all the same
+
+    idle, _ = recorder(log, live_item(1))
+    with pytest.raises(ConnectionError):
+        asyncio.run(idle._session(FakeSocket([OPEN, CONNECTED, "2", INFO, "2", INFO])))
+    assert idle.counters()["quotes_total"] == 0
+    assert idle.counters()["last_quote_at_s"] is None
+
+
+def test_the_last_quote_is_timed_by_prices_not_by_pings(log):
+    clock = FakeClock()
+    rec = clocked(log, clock, live_item(1))
+    start = clock.now().wall_s
+    ws = Timed(clock, [(0, OPEN), (0, CONNECTED), (5, odds("match-odds", 2)),
+                       (25, "2"), (25, "2"), (1, INFO)])
+    with pytest.raises(ConnectionError):
+        asyncio.run(rec._session(ws))
+
+    assert rec.counters()["last_quote_at_s"] == start + 5
+
+
+def test_quotes_older_than_an_hour_leave_the_hourly_count(log):
+    clock = FakeClock()
+    rec = clocked(log, clock)
+    rec._count_quotes(3)
+    clock.advance(59 * 60)
+    rec._count_quotes(2)
+    assert rec.quotes_last_hour() == 5       # 59 minutes on: still the same hour
+
+    clock.advance(2 * 60)
+    assert rec.quotes_last_hour() == 2       # the first three are 61 minutes old
+    assert rec.counters()["quotes_total"] == 5
+
+
+def test_the_counters_say_how_many_are_live_and_subscribed_before_and_after_a_drop(log):
+    rec, _ = recorder(log, live_item(1), live_item(2), live_item(3), max_matches=2)
+    with pytest.raises(ConnectionError):
+        asyncio.run(rec._session(FakeSocket([OPEN, CONNECTED])))
+    assert (rec.counters()["live"], rec.counters()["subscribed"]) == (3, 2)
+
+    class Stop(Exception):
+        pass
+
+    after_drop = []
+
+    async def sleep(seconds):
+        after_drop.append(rec.counters())
+        raise Stop
+
+    rec._sleep = sleep
+    with pytest.raises(Stop):
+        asyncio.run(rec.run(connect=lambda: FakeSocket([OPEN, CONNECTED])))
+    (c,) = after_drop
+    assert (c["live"], c["subscribed"], c["reconnects"]) == (3, 0, 1)
+    assert "script over" in c["last_disconnect"]
+
+
+def test_the_counters_sit_with_1win_and_are_not_taken_for_betboom_s(tmp_path):
+    """tennis.ingest.status reads the newest `_recorder*.json` in the log root
+    as BetBoom's; 1win's counters must stay out of that name and that place."""
+    from tennis.ingest.status import capture_status
+
+    with RawLog(tmp_path, provider="betboom", compress=False, fsync_every=0) as bb:
+        bb.write(b"frame", channel="odds")
+    with RawLog(tmp_path, provider="1win", compress=False, fsync_every=0) as raw:
+        rec, _ = recorder(raw, live_item(1), live_item(2))
+        with pytest.raises(ConnectionError):
+            asyncio.run(rec._session(FakeSocket([OPEN, CONNECTED, odds("match-odds", 3)])))
+        rec._write_counters()
+
+        path = rec.counters_path()
+        assert path.parent == tmp_path / "provider=1win"
+        assert path.name == f"_counters-{raw.run_id}.json"
+        written = json.loads(path.read_text(encoding="utf-8"))
+        assert written["provider"] == "1win" and written["subscribed"] == 2
+        assert written["quotes_total"] == 3
+        assert list(tmp_path.glob("_recorder*.json")) == []
+        assert path not in find_logs(tmp_path)
+
+        st = capture_status(tmp_path)
+    assert st.ok, st.reason
+    assert st.subscribed is None and st.stakes_seen is None
+    assert st.other_providers["1win"]["files"] == 1
+
+
+def test_a_counters_write_that_fails_does_not_stop_the_capture(log, tmp_path):
+    rec, _ = recorder(log)
+    blocker = tmp_path / "blocker"
+    blocker.write_text("a file where a folder should be", encoding="utf-8")
+    rec.counters_path = lambda: blocker / "counters.json"
+
+    with pytest.raises(asyncio.TimeoutError):
+        asyncio.run(asyncio.wait_for(rec._heartbeat_loop(every=0.01), 0.1))
+    assert blocker.is_file()
+
+
+def test_the_counters_are_written_at_once_and_taken_away_on_exit(log):
+    rec, _ = recorder(log, live_item(1))
+    seen = []
+
+    class Stop(Exception):
+        pass
+
+    async def sleep(seconds):
+        await asyncio.sleep(0)                # the heartbeat's first turn
+        seen.append(rec.counters_path().is_file())
+        raise Stop
+
+    def refused():
+        raise ConnectionError("refused")
+
+    rec._sleep = sleep
+    with pytest.raises(Stop):
+        asyncio.run(rec.run(connect=refused))
+
+    assert seen == [True]
+    assert not rec.counters_path().exists()
+
+
 # --------------------------------------------------------------- command line
 
 

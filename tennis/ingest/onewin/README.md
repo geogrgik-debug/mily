@@ -12,7 +12,7 @@ server; checked live from the owner's laptop on 23.09 (21 live singles found,
 
 | File | What |
 |---|---|
-| `client.py` | `OneWinConfig` (gateway and partner id, from flags or the environment, no defaults), `OneWinClient` (the REST gateway: the live list, and the objects `--probe` asks for; every answer logged before it is read), `OneWinRecorder` (the push socket: subscribe, log every frame, answer pings, reconnect) |
+| `client.py` | `OneWinConfig` (gateway and partner id, from flags or the environment, no defaults), `OneWinClient` (the REST gateway: the live list, and the objects `--probe` asks for; every answer logged before it is read), `OneWinRecorder` (the push socket: subscribe, log every frame, answer pings, reconnect, write its counters) |
 
 ## How its prices travel
 
@@ -64,3 +64,41 @@ python -m tennis.ingest.onewin.client --probe --match 40403794  # one REST look
 Every frame of the socket is on disk before it is read; a reconnect writes a
 `_conn` row, which the meter reads as a break. `[hb]` once a minute says what
 has arrived. Run it on the machine that records BetBoom.
+
+## Counters: recording, or idling
+
+A growing log does not prove that prices arrive. The server pings every 25 s,
+and the score (`match-info`) comes about as often as prices: 1469 messages
+to 1571 in the first 15 minutes, 23.09. A socket that has lost its
+subscriptions keeps writing both. BetBoom's capture stood idle a night that
+way (22-23.09). So the recorder writes its own counters beside the log, at
+start and then once a minute:
+
+    <out>/provider=1win/_counters-<run id>.json
+
+They sit in 1win's own folder, and the name is not `_recorder*.json`, because
+`tennis.ingest.status` reads the newest such file in the log root as
+BetBoom's. The file is written whole and then renamed, so a reader never gets
+half of it. A failed write is skipped, and the log goes on. A clean stop
+removes the file. Only a killed process leaves one behind, and its
+`written_at_s` shows how old it is.
+
+| Field | What |
+|---|---|
+| `provider`, `run_id` | `1win`, and the run: the same id as the run's log files |
+| `written_at_s` | when the file was written, wall clock, seconds |
+| `live` | live singles in the gateway's last answer; 0 at a quiet hour is no fault |
+| `subscribed` | matches subscribed on the current socket; 0 right after a drop, until the resubscription |
+| `quotes_last_hour` | quotes in the last 60 minutes, counted by minute of the monotonic clock |
+| `quotes_total` | quotes since the run started |
+| `last_quote_at_s` | when the last quote came, wall clock; null before the first |
+| `frames` | every row written, pings and the score included -- for comparison |
+| `reconnects`, `last_disconnect` | as in `[hb]`, the partner id replaced |
+
+A **quote** is one outcome's odds item, in `match-odds-snapshot` (a match's
+whole board) or `match-odds` (what changed). No other message carried any on
+23.09. Pings, the score and the answers to a subscription count as none.
+
+Reading them: `subscribed` 0 while `live` is not means nothing is subscribed;
+`last_quote_at_s` long past while `subscribed` is not means the socket brings
+no prices; a `written_at_s` minutes old means the process is gone.

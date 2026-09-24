@@ -48,6 +48,7 @@ import urllib.error
 import urllib.request
 from collections import Counter, deque
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable, Mapping
 from urllib.parse import urlencode, urlsplit
 
@@ -86,6 +87,12 @@ SILENCE_S = 60.0
 # simulator names itself. BetBoom's recorder skips the same, so neither side
 # would find the other's half of such a match.
 SKIP_WORDS = ("пары", "парный", "doubles", "кибер", "cyber", "esports", "simulated")
+# The recorder's counters sit beside its log, in its own provider=1win folder,
+# and not under the `_recorder*.json` name: tennis.ingest.status reads the
+# newest such file in the log root as BetBoom's.
+COUNTERS_PREFIX = "_counters-"
+# `quotes_last_hour` adds up this many minutes of the monotonic clock.
+HOUR_MINUTES = 60
 
 
 class ConfigError(ValueError):
@@ -238,6 +245,10 @@ class OneWinRecorder:
     Every frame of the push socket is written before it is read. Subscriptions
     live on the socket, so a reconnect asks for all of them again, and writes
     a `_conn` meta row -- the break `tennis.market.streams` reads it as.
+
+    Once a minute it writes its counters beside the log (`counters_path`): a
+    growing file proves only that something arrives, and the server's pings
+    alone make it grow -- the way BetBoom's capture stood idle on 22-23.09.
     """
 
     def __init__(self, client: OneWinClient, *, max_matches: int = 20,
@@ -253,6 +264,9 @@ class OneWinRecorder:
         self.last_disconnect: str | None = None
         self.disconnects: deque[dict] = deque(maxlen=10)
         self.discover_errors = 0
+        self.quotes_total = 0                # odds items of every price message
+        self.last_quote_at_s: float | None = None
+        self._quotes_by_minute: Counter = Counter()   # monotonic minute -> quotes
         self._sleep = asyncio.sleep          # the wait between sessions; tests replace it
 
     # -- REST ---------------------------------------------------------------
@@ -331,9 +345,67 @@ class OneWinRecorder:
                 elif frame.startswith(("41", "44")):      # disconnected, or refused
                     raise ConnectionError(f"the server ended the session: {frame[:200]}")
                 elif frame.startswith("42"):
-                    self.kinds[_message_type(frame)] += 1
+                    kind, quotes = _message(frame)
+                    self.kinds[kind] += 1
+                    if quotes:
+                        self._count_quotes(quotes)
         finally:
             follow.cancel()
+
+    # -- counters -------------------------------------------------------------
+
+    def _count_quotes(self, n: int) -> None:
+        now = self.clock.now()
+        self.quotes_total += n
+        self.last_quote_at_s = now.wall_s
+        self._quotes_by_minute[now.mono_ns // 60_000_000_000] += n
+
+    def quotes_last_hour(self) -> int:
+        """Quotes of the last HOUR_MINUTES minutes, the current one included."""
+        minute = self.clock.now().mono_ns // 60_000_000_000
+        for old in [m for m in self._quotes_by_minute if m <= minute - HOUR_MINUTES]:
+            del self._quotes_by_minute[old]
+        return sum(self._quotes_by_minute.values())
+
+    def counters(self) -> dict:
+        return {
+            "provider": PROVIDER,
+            "run_id": self.log.run_id,
+            "written_at_s": self.clock.now().wall_s,
+            "live": len(self.live),
+            "subscribed": len(self.subscribed),
+            "quotes_last_hour": self.quotes_last_hour(),
+            "quotes_total": self.quotes_total,
+            "last_quote_at_s": self.last_quote_at_s,
+            "frames": self.log.frames,
+            "reconnects": self.reconnects,
+            "last_disconnect": self.last_disconnect,
+        }
+
+    def counters_path(self) -> Path:
+        return (Path(self.log.root) / f"provider={PROVIDER}"
+                / f"{COUNTERS_PREFIX}{self.log.run_id}.json")
+
+    def _write_counters(self) -> None:
+        """Write-then-rename, so a reader never catches half a file. A failed
+        write is skipped: the log is the thing that must not stop."""
+        try:
+            path = self.counters_path()
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(".json.tmp")
+            tmp.write_text(json.dumps(self.counters(), ensure_ascii=False, indent=2,
+                                      sort_keys=True) + "\n", encoding="utf-8")
+            tmp.replace(path)
+        except OSError:
+            pass
+
+    def _remove_counters(self) -> None:
+        """A recorder that has stopped must not leave counters claiming it runs.
+        Only a kill leaves them, and their `written_at_s` ages them out."""
+        try:
+            self.counters_path().unlink(missing_ok=True)
+        except OSError:
+            pass
 
     async def run(self, connect=None) -> None:
         if connect is None:
@@ -375,24 +447,43 @@ class OneWinRecorder:
                 backoff = min(max(backoff * 2, 1.0), MAX_BACKOFF_S)
         finally:
             heartbeat.cancel()
+            self._remove_counters()
 
     async def _heartbeat_loop(self, every: float = 60.0) -> None:
-        """Say what has arrived, so a quiet capture is not mistaken for a dead one."""
+        """Say what has arrived, so a quiet capture is not mistaken for a dead
+        one; and write the counters, the first time at once, so a restarted
+        capture is not without them for a minute."""
+        self._write_counters()
         while True:
             await asyncio.sleep(every)
             kinds = ", ".join(f"{k}={n}" for k, n in self.kinds.most_common(5))
             print(f"[hb] {self.log.frames} frames, {len(self.subscribed)} subscribed of "
-                  f"{len(self.live)} live singles, {self.reconnects} reconnects "
+                  f"{len(self.live)} live singles, {self.reconnects} reconnects, "
+                  f"{self.quotes_last_hour()} quotes in the last hour "
                   f"| {kinds or 'no messages yet'}", file=sys.stderr)
+            self._write_counters()
 
 
-def _message_type(frame: str) -> str:
+def _message(frame: str) -> tuple[str, int]:
+    """A socket.io event's type, and how many quotes it carries.
+
+    A quote is one outcome's odds item. On 23.09 (15 minutes, 22 matches) only
+    `match-odds-snapshot` and `match-odds` carried any; the score came in
+    `match-info` nearly as often (1469 messages to 1571), and the server's
+    pings every 25 s. A socket that brings only those grows its file and
+    prices nothing.
+    """
     try:
         msg = json.loads(frame[2:])
         body = msg[1] if len(msg) > 1 and isinstance(msg[1], dict) else {}
-        return body.get("messageType") or str(msg[0])
+        kind = body.get("messageType") or str(msg[0])
     except (ValueError, IndexError, TypeError, KeyError):
-        return "unreadable"
+        return "unreadable", 0
+    data = body.get("data")
+    groups = data.get("oddsGroups") if isinstance(data, dict) else None
+    if not isinstance(groups, list):
+        return kind, 0
+    return kind, sum(len(g.get("oddsList") or []) for g in groups if isinstance(g, dict))
 
 
 def describe(resp: Response) -> str:
