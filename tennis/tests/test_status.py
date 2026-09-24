@@ -92,6 +92,24 @@ def test_other_books_get_a_line_of_their_own(tmp_path):
     assert one["newest_bytes"] > 0 and one["files"] == 1 and one["age_s"] < 60
 
 
+def test_the_other_books_line_is_its_newest_file_and_the_sum_of_all(tmp_path):
+    """Two 1win runs: the line names the one written last -- by time, not by
+    name -- how long ago that was, and the bytes of both."""
+    import os
+    root = _capture(tmp_path)
+    _book(root, "1win")
+    _book(root, "1win")
+    first, last = sorted((root / "provider=1win").rglob("*.jsonl.gz"))
+    now = time.time()
+    os.utime(last, (now - 600, now - 600))       # the name that sorts last is the old one
+    os.utime(first, (now - 5, now - 5))
+    one = capture_status(root).other_providers["1win"]
+    assert one["newest_file"] == str(first) and one["files"] == 2
+    assert 4 <= one["age_s"] < 60
+    assert one["newest_bytes"] == first.stat().st_size
+    assert one["total_bytes"] == first.stat().st_size + last.stat().st_size
+
+
 def test_a_stale_capture_is_not_ok(tmp_path):
     """The failure this whole module exists for: the process died quietly."""
     root = _capture(tmp_path)
