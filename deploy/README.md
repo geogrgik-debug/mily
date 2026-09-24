@@ -194,8 +194,11 @@ bash deploy/install-onewin.sh
 
 Скрипт ставит юнит с подставленными путями, запускает службу и через 90 с
 показывает журнал. Службу BetBoom и строку отчёта в crontab не трогает. Если файла
-с номером нет, он сразу останавливается и пишет, чего не хватает. Без этого файла
-служба не стартует вовсе, а не перезапускается каждые 10 с на ошибке настройки.
+с номером нет, он сразу останавливается и пишет, чего не хватает. Сама служба без
+этого файла тоже стоит: в юните есть условие `ConditionPathExists`, и systemd
+пропускает запуск, не считая его сбоем. Без условия отсутствующий
+`EnvironmentFile` был бы сбоем запуска, и `Restart=always` повторял бы его
+каждые 10 с.
 Проверить: `journalctl -u onewin-capture -n 20 --no-pager`. Сразу после запуска
 должна быть строка `[1win] recording...`, через минуту — `[sub] N match(es)`,
 через две — `[hb] ... match-odds=...`.
@@ -233,5 +236,5 @@ bash deploy/install-onewin.sh
 | `heartbeat-push.sh` не пушит | у deploy key нет write access | перевыпустить ключ с галочкой |
 | `heartbeat-push.sh`: `outside of your sparse-checkout definition` или `could not push after 3 attempts` при живом ключе | старая версия скрипта: worktree унаследовал разреженность, мелкий клон не видел `origin/capture-status` | `git pull` — исправлено 22.09 |
 | Много `[sub]` на турниры «Пары» | старая версия кода | `git pull` — парные и симулятор не подписываются с `36cfe9c` |
-| `onewin-capture` не стартует, в `journalctl` — `Failed to load environment files` | нет `/etc/mily/onewin.env` | положить номер партнёра, шаг 7, и повторить `bash deploy/install-onewin.sh` |
+| `systemctl status onewin-capture` — `inactive (dead)` и `ConditionPathExists=/etc/mily/onewin.env was not met` | нет файла с номером партнёра | положить номер, шаг 7, и повторить `bash deploy/install-onewin.sh` |
 | `APP_BUILD` конторы сменился | схема protobuf устарела, поля молча разъехались | пересобрать схему: `tennis/ingest/betboom/extract_schema.py`, рецепт в `docs/TRACK_A_betboom_capture.md` |

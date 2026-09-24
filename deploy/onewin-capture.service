@@ -13,6 +13,11 @@ Description=1win live odds capture
 After=network-online.target
 Wants=network-online.target
 StartLimitIntervalSec=0
+# Without the partner id file the unit stays down. A failed condition skips the
+# start without marking the unit failed, so Restart= below never fires. A
+# missing EnvironmentFile alone is a failed start, and Restart=always would
+# retry it every RestartSec, forever.
+ConditionPathExists=/etc/mily/onewin.env
 
 [Service]
 Type=simple
@@ -22,8 +27,6 @@ Environment=PYTHONUNBUFFERED=1
 # Hosts rotate, so the recorder has no default for either setting. The API base
 # is public. The partner id lives only on the host, as the one line
 # ONEWIN_PARTNER_ID=<value> in /etc/mily/onewin.env, never in the repository.
-# No leading "-" on EnvironmentFile: without the file the unit must fail to
-# start, not restart every ten seconds on a config error.
 Environment=ONEWIN_API_BASE=https://api-gateway.top-parser.com
 EnvironmentFile=/etc/mily/onewin.env
 ExecStart=__ROOT__/.venv/bin/python -m tennis.ingest.onewin.client --out data/raw --max-matches 25
