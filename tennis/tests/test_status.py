@@ -60,6 +60,38 @@ def test_an_empty_directory_is_not_ok(tmp_path):
     assert "не начиналась" in st.reason
 
 
+def _book(root, provider):
+    """Another bookmaker's recorder writing into the same data/raw."""
+    with RawLog(root, provider=provider, clock=FakeClock()) as log:
+        log.write(b"frame", channel="odds")
+
+
+def test_a_live_second_book_does_not_speak_for_a_dead_betboom(tmp_path):
+    """From 24.09 a 1win recorder writes into the same data/raw. The newest
+    file there used to decide, so a dead BetBoom capture beside a live 1win
+    one read as healthy and the watchman stayed silent."""
+    import os
+    root = _capture(tmp_path)
+    betboom = next(iter((root / "provider=betboom").rglob("*.jsonl.gz")))
+    old = time.time() - 3600
+    os.utime(betboom, (old, old))
+    _book(root, "1win")
+    st = capture_status(root)
+    assert not st.ok and "встала" in st.reason
+    assert st.newest_file == str(betboom) and st.files == 1
+
+
+def test_other_books_get_a_line_of_their_own(tmp_path):
+    root = _capture(tmp_path)
+    _book(root, "1win")
+    st = capture_status(root)
+    assert st.ok, st.reason
+    assert "provider=betboom" in st.newest_file
+    one = st.other_providers["1win"]
+    assert "provider=1win" in one["newest_file"]
+    assert one["newest_bytes"] > 0 and one["files"] == 1 and one["age_s"] < 60
+
+
 def test_a_stale_capture_is_not_ok(tmp_path):
     """The failure this whole module exists for: the process died quietly."""
     root = _capture(tmp_path)
@@ -89,7 +121,8 @@ def test_report_is_json_and_carries_every_field(tmp_path):
     data = json.loads(st.to_json())
     for key in ("ok", "reason", "checked_at_s", "newest_file", "newest_bytes",
                 "age_s", "files", "total_bytes", "disk_free_bytes", "disk_free_days",
-                "last_disconnect", "disconnects", "blind_s", "last_blind_s"):
+                "last_disconnect", "disconnects", "blind_s", "last_blind_s",
+                "other_providers"):
         assert key in data, key
 
 

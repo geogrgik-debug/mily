@@ -43,6 +43,13 @@ NO_STAKES_AFTER_S = 600.0
 
 SIDECAR_GLOB = "_recorder*.json"
 
+# The capture this report judges. From 24.09 a 1win recorder writes into the
+# same data/raw, and the newest file under it used to decide: a dead BetBoom
+# capture beside a live 1win one read as healthy. Other books get a line each
+# in `other_providers` -- facts, not a verdict: they publish no counters, and
+# a quiet file at night is not proof of a fault.
+PROVIDER = "betboom"
+
 
 @dataclass(frozen=True)
 class CaptureStatus:
@@ -70,6 +77,9 @@ class CaptureStatus:
     disconnects: list | None = None
     blind_s: float | None = None
     last_blind_s: float | None = None
+    # Every other book's newest log: {provider: {newest_file, newest_bytes,
+    # age_s, files, total_bytes}}.
+    other_providers: dict | None = None
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), ensure_ascii=False, indent=2, sort_keys=True)
@@ -96,6 +106,7 @@ def capture_status(root: str | Path, *, clock: Clock | None = None,
     free_days = (free / bytes_per_day) if bytes_per_day > 0 else None
 
     side = _read_sidecar(root, now, stale_after_s)
+    others = _other_providers(root, now)
 
     def result(ok, reason, newest=None, newest_bytes=0, age=None,
                files=0, total=0):
@@ -115,20 +126,17 @@ def capture_status(root: str | Path, *, clock: Clock | None = None,
             disconnects=side.get("disconnects") if side else None,
             blind_s=side.get("blind_s") if side else None,
             last_blind_s=side.get("last_blind_s") if side else None,
+            other_providers=others,
         )
 
     if not root.exists():
         return result(False, f"нет каталога {root}")
-    logs = find_logs(root)
+    mine = root / f"provider={PROVIDER}"
+    logs = find_logs(mine) if mine.is_dir() else []
     if not logs:
-        return result(False, f"в {root} нет ни одного лога — запись не начиналась")
+        return result(False, f"в {mine} нет ни одного лога — запись не начиналась")
 
-    stats = []
-    for p in logs:
-        try:
-            stats.append((p, p.stat()))
-        except OSError:
-            continue
+    stats = _stats(logs)
     if not stats:
         return result(False, "логи есть, но ни один не читается")
 
@@ -170,6 +178,36 @@ def capture_status(root: str | Path, *, clock: Clock | None = None,
 
     return result(True, f"пишет, последний кадр {age:.0f} с назад "
                         f"(счётчиков рекордера нет — только по файлу)", **common)
+
+
+def _stats(logs) -> list:
+    """(path, stat) for every log still readable; one vanishing is not fatal."""
+    out = []
+    for p in logs:
+        try:
+            out.append((p, p.stat()))
+        except OSError:
+            continue
+    return out
+
+
+def _other_providers(root: Path, now: float) -> dict | None:
+    """The newest log of every book other than PROVIDER under `root`."""
+    out = {}
+    try:
+        dirs = sorted(d for d in root.glob("provider=*") if d.is_dir())
+    except OSError:
+        return None
+    for d in dirs:
+        name = d.name.split("=", 1)[1]
+        stats = _stats(find_logs(d)) if name != PROVIDER else []
+        if not stats:
+            continue
+        newest, st = max(stats, key=lambda ps: ps[1].st_mtime)
+        out[name] = {"newest_file": str(newest), "newest_bytes": st.st_size,
+                     "age_s": round(now - st.st_mtime, 1), "files": len(stats),
+                     "total_bytes": sum(s.st_size for _, s in stats)}
+    return out or None
 
 
 def _read_sidecar(root: Path, now: float, max_age_s: float) -> dict:
