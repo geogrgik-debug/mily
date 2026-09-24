@@ -1,33 +1,8 @@
 {
-  "age_s": 33.9,
-  "blind_s": 2028.7,
-  "checked_at_s": 1790254801.970021,
+  "age_s": 32.1,
+  "blind_s": 2328.9,
+  "checked_at_s": 1790255101.8199618,
   "disconnects": [
-    {
-      "at_s": 1790254164.7,
-      "lived_s": 0.0,
-      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790254225.0,
-      "lived_s": 0.0,
-      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790254285.5,
-      "lived_s": 0.0,
-      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790254345.8,
-      "lived_s": 0.0,
-      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790254406.1,
-      "lived_s": 0.0,
-      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
-    },
     {
       "at_s": 1790254466.5,
       "lived_s": 0.0,
@@ -52,21 +27,46 @@
       "at_s": 1790254707.8,
       "lived_s": 0.0,
       "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790254768.1,
+      "lived_s": 0.0,
+      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790254828.4,
+      "lived_s": 0.0,
+      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790254888.7,
+      "lived_s": 0.0,
+      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790254949.0,
+      "lived_s": 0.0,
+      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790255009.4,
+      "lived_s": 0.0,
+      "why": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected"
     }
   ],
-  "disk_free_bytes": 24351260672,
+  "disk_free_bytes": 24351211520,
   "disk_free_days": 27.1,
   "files": 5,
   "last_blind_s": 45.1,
   "last_disconnect": "ConnectionClosedError: received 3010 (registered) Access rejected; then sent 3010 (registered) Access rejected",
-  "last_stake_age_s": 1922.8,
-  "newest_bytes": 228324371,
+  "last_stake_age_s": 2222.7,
+  "newest_bytes": 228325166,
   "newest_file": "data/raw/provider=betboom/date=2026-09-24/run-1790175133-376994-180c57.jsonl.gz",
   "ok": false,
   "other_providers": null,
   "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
-  "reconnects": 47,
+  "reconnects": 52,
   "stakes_seen": 4735594,
   "subscribed": 0,
-  "total_bytes": 456378382
+  "total_bytes": 456379177
 }
