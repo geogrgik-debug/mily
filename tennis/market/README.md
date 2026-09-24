@@ -14,6 +14,7 @@ Results from this module are in
 | `join.py` | Which match of one book is which of another, by the players' names; re-keys the second book onto the first |
 | `lead_lag.py` | CLI: which of two books moves a price first, by how much, and whether the leader is stable |
 | `push_vs_snapshot.py` | CLI: BetBoom's per-stake pushes against its full snapshots -- does a late snapshot put a pushed price back, and how far ahead the push is |
+| `p_gap.py` | CLI: how far BetBoom and 1win disagree on p, the server's point probability, game by game, and 1win's margin on the same markets |
 
 ## The one thing to know before using this
 
@@ -130,3 +131,38 @@ two moves the book never made. Measured on the capture host's logs of 22-23.09
 So the meter's stream needs no guard against snapshots, and a game market's
 move is timed by its push. Only the capture host has pushes: the laptop's
 recorder predates 3f695d8, and the command refuses a capture without them.
+
+## How far two books disagree on p: `p_gap`
+
+    python -m tennis.market.p_gap betboom=PATH 1win=PATH [--games games.csv]
+
+START_HERE carried "two books differ on p by 1.6 points", and nothing in the
+repository computed it. This computes it from two books recorded on one
+machine, one number per game:
+
+* the game is one both books priced **before it began**, while the game
+  before it was played (BetBoom's scoreboard). The price of a game in
+  progress depends on its point score, and an inversion from 0-0 does not
+  know that;
+* the moment is the last one before either book shut the market at which
+  both were open and **neither had moved for 10 s** (`--settle`). 1win
+  follows BetBoom by about 2 s, so a moment right after a move would measure
+  the lag, not a disagreement;
+* each book's two-way "winner of the game", margin removed, read as P(the
+  server holds). The server is BetBoom's next one, by alternation; p comes
+  from inverting `markov.p_game`. Which side serves does not change the size
+  of the gap, because p_game(1 - p) = 1 - p_game(p);
+* the median of |p 1win - p BetBoom|, with a 95% interval that resamples
+  **matches**, not games: twenty games of one match are not twenty witnesses.
+  Beside it: the mean signed gap, the gap in P(hold), and both books' margin
+  at the same moments.
+
+Two units are easy to mix up here. The 1.09 points between BetBoom's own two
+markets (above) is in P(hold); the gap here is in p, and P(hold) is about
+1.9 times as sensitive near p = 0.62. The report gives both.
+
+Margin removal moves the answer. On the first two-book trial (laptop, 23.09,
+15 minutes, 13 games) Shin gave twice the gap that proportional removal gave.
+So `--method proportional` belongs in any report beside the default. The
+number itself waits for a day of the capture host's logs, where 1win records
+beside BetBoom (`data/raw/provider=1win`).
