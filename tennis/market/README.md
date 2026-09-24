@@ -157,6 +157,11 @@ machine, one number per game:
   Beside it: the mean signed gap, the gap in P(hold), and both books' margin
   at the same moments.
 
+Moments are ordered and timed on the **monotonic clock**, as the fold is.
+Review found that on the wall clock a step back of 20 s put a book's changes
+out of order. A reboot restarts the monotonic clock, so a capture that spans
+one is refused, not misordered: pass each side of it apart.
+
 Two units are easy to mix up here. The 1.09 points between BetBoom's own two
 markets (above) is in P(hold); the gap here is in p, and P(hold) is about
 1.9 times as sensitive near p = 0.62. The report gives both.

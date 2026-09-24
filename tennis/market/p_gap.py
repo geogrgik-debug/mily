@@ -26,6 +26,12 @@ Which side serves does not change the size of the gap: a game is won by the
 server with p exactly as often as it is lost by the server with 1 - p, so
 p_game(1 - p) = 1 - p_game(p), and both books' p flip together.
 
+Moments are ordered and timed on the monotonic clock, as `streams.fold`
+does: the wall clock can step, and one step back inside a run would put a
+book's changes out of order (found in review). Both books are on one
+machine -- checked -- so they share that clock; a reboot restarts it, and a
+capture that spans one is refused rather than misordered.
+
 Research and paper only: nothing here places, sizes or times a bet.
 """
 from __future__ import annotations
@@ -44,7 +50,7 @@ from typing import Callable, Iterable, Sequence
 
 from tennis.ingest.rawlog import find_logs, read_raw
 from tennis.market.join import pair_matches
-from tennis.market.lead_lag import _stream_arg, quantile
+from tennis.market.lead_lag import _stream_arg, _utc, quantile
 from tennis.market.measure import HOME, game_context
 from tennis.market.names import GAME_WINNER
 from tennis.market.overround import overround
@@ -64,7 +70,7 @@ from tennis.market.streams import (
 from tennis.markov import p_game
 
 __all__ = ["SETTLE_S", "GameGap", "p_from_hold", "timelines", "last_settled",
-           "game_gaps", "median_ci", "mean_ci", "main"]
+           "game_gaps", "median_ci", "mean_ci", "games_needed", "main"]
 
 # Neither book may have moved for this long before the moment compared: five
 # times the median lag of 1win behind BetBoom, and the pairing window of
@@ -115,7 +121,7 @@ def _state(book: dict) -> State:
 def timelines(quotes: Iterable[Quote | None],
               rename: Callable[[Quote], tuple | None] | None = None
               ) -> dict[tuple, list[tuple[int, State]]]:
-    """Each book's states in time, as (ts_received_ns, state) at every change.
+    """Each book's states in time, as (ts_mono_ns, state) at every change.
 
     `rename` gives a quote its (match, outcome) in the other book's names, or
     None to drop it. A None in the input is a break in the capture: every book
@@ -134,7 +140,7 @@ def timelines(quotes: Iterable[Quote | None],
         match, outcome = (q.match, q.outcome) if rename is None else (rename(q) or (None, None))
         if match is None:
             continue
-        last_ts = q.ts_received_ns
+        last_ts = q.ts_mono_ns
         key = (match, q.market)
         book = books[key]
         if q.odds is None:
@@ -144,7 +150,7 @@ def timelines(quotes: Iterable[Quote | None],
         state = _state(book)
         line = out[key]
         if not line or line[-1][1] != state:
-            line.append((q.ts_received_ns, state))
+            line.append((q.ts_mono_ns, state))
     return dict(out)
 
 
@@ -186,7 +192,7 @@ class GameGap:
     tier: str
     set_no: int
     game_no: int
-    ts_received_ns: int
+    ts_mono_ns: int
     hold_a: float
     hold_b: float
     p_a: float
@@ -212,7 +218,7 @@ def game_gaps(a_books: dict, b_books: dict, boards: dict, tiers: dict, *,
 
     `a_books` and `b_books` are `timelines` keyed by BetBoom's match ids and
     outcome names; `boards` holds each match's scoreboard in time, as
-    (ts_received_ns, GameContext).
+    (ts_mono_ns, GameContext).
     """
     strip = _stripper(method)
     settle_ns = int(settle_s * 1e9)
@@ -279,6 +285,12 @@ def mean_ci(games: Sequence[GameGap], value: Callable[[GameGap], float], *,
     return _bootstrap(games, value, statistics.fmean, rounds, seed)
 
 
+def games_needed(n_games: int, half: float, target: float = TARGET_HALF_WIDTH) -> int:
+    """Games for an interval `target` wide each way, from one `half` wide on
+    `n_games`: the width shrinks as one over the square root of the count."""
+    return math.ceil(n_games * (half / target) ** 2)
+
+
 # --------------------------------------------------------------- reading logs
 
 
@@ -303,8 +315,14 @@ def _scoreboards(rows, pb, boards: dict, tiers: dict):
             for match in matches:
                 ctx = game_context(match.info, pb) if match.info.id else None
                 if ctx is not None:
-                    boards[match.info.id].append((row["ts_received_ns"], ctx))
+                    boards[match.info.id].append((row["ts_mono_ns"], ctx))
         yield row
+
+
+def _mono_span(run: RunClock) -> tuple[int, int]:
+    """First and last monotonic reading of a run's clock samples."""
+    monos = [wall - anchor for wall, anchor in zip(run.walls, run.anchors)]
+    return min(monos), max(monos)
 
 
 def _is_game_winner(q: Quote | None) -> bool:
@@ -344,6 +362,12 @@ def _read(label: str, path: Path):
         quotes.append(None)                    # a new run knows nothing of the last
         if clock.walls:
             runs.append(clock)
+    for before, after in zip(runs, runs[1:]):
+        if _mono_span(after)[0] < _mono_span(before)[1]:
+            raise ValueError(
+                f"{path}: {after.run_id} begins before {before.run_id} ends on the "
+                "monotonic clock -- two recorders at once, or a reboot between them. "
+                "Moments are ordered on that clock: measure each side apart")
     for line in boards.values():
         line.sort(key=lambda row: row[0])
     stream = Stream(label, provider, str(path), fold(quotes), runs, players)
@@ -397,20 +421,22 @@ def print_report(games: Sequence[GameGap], note: str, offset: float | None,
         print(f"  too few matches for an interval ({len(matches)} < {MIN_MATCHES}): "
               "a first look, not a number")
     if half > TARGET_HALF_WIDTH:
-        need = math.ceil(len(games) * (half / TARGET_HALF_WIDTH) ** 2)
         print(f"  the interval is +-{_pp(half)} pp; +-{_pp(TARGET_HALF_WIDTH)} would take about "
-              f"{need} games at this spread")
+              f"{games_needed(len(games), half)} games at this spread")
 
 
-def write_games(path: str | Path, games: Sequence[GameGap]) -> None:
+def write_games(path: str | Path, games: Sequence[GameGap], anchor_ns: int) -> None:
+    """Every game compared. `utc` is its moment on the wall clock, from the
+    capture's median wall - monotonic offset: for finding it by eye, not for
+    ordering."""
     with open(path, "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
-        w.writerow(["match", "tier", "set", "game", "ts_received_ns", "hold_betboom",
+        w.writerow(["match", "tier", "set", "game", "utc", "ts_mono_ns", "hold_betboom",
                     "hold_1win", "p_betboom", "p_1win", "dp", "margin_betboom", "margin_1win"])
         for g in games:
-            w.writerow([g.match, g.tier, g.set_no, g.game_no, g.ts_received_ns,
-                        f"{g.hold_a:.6f}", f"{g.hold_b:.6f}", f"{g.p_a:.6f}", f"{g.p_b:.6f}",
-                        f"{g.dp:+.6f}", f"{g.margin_a:.6f}", f"{g.margin_b:.6f}"])
+            w.writerow([g.match, g.tier, g.set_no, g.game_no, _utc(g.ts_mono_ns + anchor_ns),
+                        g.ts_mono_ns, f"{g.hold_a:.6f}", f"{g.hold_b:.6f}", f"{g.p_a:.6f}",
+                        f"{g.p_b:.6f}", f"{g.dp:+.6f}", f"{g.margin_a:.6f}", f"{g.margin_b:.6f}"])
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -454,7 +480,8 @@ def main(argv: list[str] | None = None) -> int:
             f"matches with game markets paired with BetBoom's; margin removed by {args.method}")
     print_report(games, note, offset, args.settle)
     if args.games:
-        write_games(args.games, games)
+        anchor = int(statistics.median(x for run in a.runs for x in run.anchors))
+        write_games(args.games, games, anchor)
         print(f"{len(games)} games -> {args.games}")
     return 0
 
