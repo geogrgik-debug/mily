@@ -1,0 +1,27 @@
+# Python 3.11 or newer.
+#
+#   python -m venv .venv
+#   source .venv/bin/activate        # Windows: .venv\Scripts\activate
+#   pip install -r requirements.txt
+#
+# Nothing here is needed to read the docs. The groups are independent: the
+# engine tests run on numpy and pytest alone.
+
+# --- engine + tests (tennis/markov, tennis/ingest) -------------------------
+numpy>=1.26
+pytest>=8.0
+
+# --- collector (tennis/ingest/betboom) -------------------------------------
+# websockets is imported lazily, so the rest of the package works without it.
+# grpcio-tools compiles tennis/ingest/betboom/proto/*.proto into
+# tennis/ingest/betboom/generated/, which is gitignored and built locally.
+websockets>=12.0
+grpcio-tools>=1.60
+protobuf>=4.25
+
+# --- research scripts (research/) ------------------------------------------
+# Only needed to re-run the experiments, which also needs the datasets --
+# see research/README.md. They are not in the repository.
+pandas>=2.0
+scipy>=1.11
+scikit-learn>=1.3

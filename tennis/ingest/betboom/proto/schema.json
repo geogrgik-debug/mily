@@ -1,0 +1,9781 @@
+{
+ "messages": {
+  "google.protobuf.Any": [
+   {
+    "no": 1,
+    "name": "type_url",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "value",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 12
+   }
+  ],
+  "bb.sport_ws.v1.common.Error": [
+   {
+    "no": 1,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "details",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "cn"
+   }
+  ],
+  "bb.sport_ws.v1.common.BadRequestErrorDetails": [
+   {
+    "no": 1,
+    "name": "violations",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Mc"
+   }
+  ],
+  "bb.sport_ws.v1.common.BadRequestErrorDetails.Violation": [
+   {
+    "no": 1,
+    "name": "reason",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsCategoryInfo": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "order",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "icon",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Jp"
+   },
+   {
+    "no": 6,
+    "name": "matches_count",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 7,
+    "name": "min_prematch_match_start_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 8,
+    "name": "tournaments_count",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 9,
+    "name": "url_slug",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 10,
+    "name": "main_markets",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "em"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsCategoryInfo.Icon": [
+   {
+    "no": 1,
+    "name": "svg",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "pdf",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsCategoryInfo.MainMarkets": [
+   {
+    "no": 1,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "main_markets_ids",
+    "kind": "scalar",
+    "repeated": true,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsStake": [
+   {
+    "no": 1,
+    "name": "stake_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "is_active",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "is_live",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 5,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 6,
+    "name": "short_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 7,
+    "name": "outcome_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 8,
+    "name": "order",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 9,
+    "name": "argument",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 1
+   },
+   {
+    "no": 10,
+    "name": "factor",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 11,
+    "name": "is_for_live_tv",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 12,
+    "name": "is_show_sign",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 13,
+    "name": "market_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 14,
+    "name": "market_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 15,
+    "name": "market_order",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 16,
+    "name": "market_view",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 17,
+    "name": "group_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 18,
+    "name": "group_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 19,
+    "name": "group_order",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 20,
+    "name": "period_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 21,
+    "name": "is_allow_cashout",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 22,
+    "name": "period_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 23,
+    "name": "period_order",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 24,
+    "name": "view_agg_key",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 25,
+    "name": "title",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch": [
+   {
+    "no": 1,
+    "name": "info",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "tm"
+   },
+   {
+    "no": 2,
+    "name": "stakes",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "qr"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch.MatchInfo": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "order",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.MatchTypes",
+    "enum_ident": "OR",
+    "enum_prefix": "MATCH_TYPES_"
+   },
+   {
+    "no": 4,
+    "name": "provider",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.Providers",
+    "enum_ident": "pD",
+    "enum_prefix": "PROVIDERS_"
+   },
+   {
+    "no": 5,
+    "name": "provider_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 6,
+    "name": "is_active",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 7,
+    "name": "is_bet_stop",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 8,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 9,
+    "name": "category_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 10,
+    "name": "tournament_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 11,
+    "name": "match_time",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 12,
+    "name": "match_status",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "nm"
+   },
+   {
+    "no": 13,
+    "name": "start_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 14,
+    "name": "has_live_tv",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 8
+   },
+   {
+    "no": 15,
+    "name": "has_live_info",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 8
+   },
+   {
+    "no": 16,
+    "name": "teams",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "rm"
+   },
+   {
+    "no": 17,
+    "name": "comment",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 18,
+    "name": "players_counts",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 19,
+    "name": "is_scoreboard_available",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 20,
+    "name": "scoreboard",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "im"
+   },
+   {
+    "no": 22,
+    "name": "period_scores",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "am"
+   },
+   {
+    "no": 23,
+    "name": "is_has_live_odds",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 24,
+    "name": "stakes_count",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 25,
+    "name": "tournament_comment",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 26,
+    "name": "period_scores_by",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.PeriodScoresBy",
+    "enum_ident": "wD",
+    "enum_prefix": "PERIOD_SCORES_BY_"
+   },
+   {
+    "no": 27,
+    "name": "is_super_top",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 28,
+    "name": "surface",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.MatchSurfaces",
+    "enum_ident": "SD",
+    "enum_prefix": "MATCH_SURFACES_"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Status": [
+   {
+    "no": 1,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.MatchStatuses",
+    "enum_ident": "vD",
+    "enum_prefix": "MATCH_STATUSES_"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Teams": [
+   {
+    "no": 1,
+    "name": "home_team",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Kn"
+   },
+   {
+    "no": 2,
+    "name": "second_home_team",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Kn"
+   },
+   {
+    "no": 3,
+    "name": "away_team",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Kn"
+   },
+   {
+    "no": 4,
+    "name": "second_away_team",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Kn"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Teams.Team": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "provider_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "short_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "description",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 6,
+    "name": "is_human",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 7,
+    "name": "image",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 8,
+    "name": "color",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 9,
+    "name": "dark_opacity",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 2
+   },
+   {
+    "no": 10,
+    "name": "light_opacity",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 2
+   },
+   {
+    "no": 11,
+    "name": "image_big",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Scoreboard": [
+   {
+    "no": 1,
+    "name": "is_visible",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 2,
+    "name": "score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "alternative_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "serving_side",
+    "kind": "enum",
+    "repeated": false,
+    "optional": true,
+    "type_ref": "bb.sport_ws.v1.common.ScoreboardServingSides",
+    "enum_ident": "gD",
+    "enum_prefix": "SCOREBOARD_SERVING_SIDES_"
+   },
+   {
+    "no": 5,
+    "name": "current_game_part",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 6,
+    "name": "extra_time",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 7,
+    "name": "match_seconds",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 8,
+    "name": "scores",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "sm"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Scoreboard.ScoreboardScore": [
+   {
+    "no": 1,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ScoreboardScoreTypes",
+    "enum_ident": "mD",
+    "enum_prefix": "SCOREBOARD_SCORE_TYPES_"
+   },
+   {
+    "no": 2,
+    "name": "sequence",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "home_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "away_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "is_favorite",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.PeriodScore": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.PeriodScoreTypes",
+    "enum_ident": "yD",
+    "enum_prefix": "PERIOD_SCORE_TYPES_"
+   },
+   {
+    "no": 3,
+    "name": "number",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "scores",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "om"
+   },
+   {
+    "no": 6,
+    "name": "is_current",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.PeriodScore.PeriodScoreScore": [
+   {
+    "no": 1,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.PeriodScoreScoreTypes",
+    "enum_ident": "bD",
+    "enum_prefix": "PERIOD_SCORE_SCORE_TYPES_"
+   },
+   {
+    "no": 2,
+    "name": "home_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "away_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "is_favorite",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsTournament": [
+   {
+    "no": 1,
+    "name": "info",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "lm"
+   },
+   {
+    "no": 2,
+    "name": "category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "um"
+   },
+   {
+    "no": 3,
+    "name": "matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Mt"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsTournament.TournamentInfo": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "category_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 4,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "comment",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 6,
+    "name": "order",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 7,
+    "name": "logo",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 8,
+    "name": "image",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 9,
+    "name": "matches_count",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 10,
+    "name": "site_logo_url",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 11,
+    "name": "show_category",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 12,
+    "name": "title",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 13,
+    "name": "has_stat",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsTournament.Category": [
+   {
+    "no": 1,
+    "name": "info",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ta"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsCategory": [
+   {
+    "no": 1,
+    "name": "info",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ta"
+   },
+   {
+    "no": 2,
+    "name": "tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Ge"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsSport": [
+   {
+    "no": 1,
+    "name": "info",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "cm"
+   },
+   {
+    "no": 2,
+    "name": "tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Ge"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsSport.SportInfo": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "order",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "icon",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "dm"
+   },
+   {
+    "no": 5,
+    "name": "matches_count",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 6,
+    "name": "min_prematch_match_start_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 7,
+    "name": "tournaments_count",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 8,
+    "name": "url_slug",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 9,
+    "name": "main_markets",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "fm"
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsSport.SportInfo.Icon": [
+   {
+    "no": 1,
+    "name": "svg",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "pdf",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "webp_selected",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "webp_unselected",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.models.ModelsSport.SportInfo.MainMarkets": [
+   {
+    "no": 1,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "main_markets_ids",
+    "kind": "scalar",
+    "repeated": true,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesSubscribeFullRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "full_matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "hm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesSubscribeFullRequest.SubscribeFullMatch": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesSubscribeFullResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "full_matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "mm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesSubscribeFullResponse.SubscribeFullMatch": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "sport",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ut"
+   },
+   {
+    "no": 6,
+    "name": "category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "lt"
+   },
+   {
+    "no": 7,
+    "name": "tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ge"
+   },
+   {
+    "no": 8,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Mt"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesSubscribeRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "gm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesSubscribeRequest.SubscribeMatch": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesSubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "bm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesSubscribeResponse.SubscribeMatch": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "sport",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ut"
+   },
+   {
+    "no": 6,
+    "name": "category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "lt"
+   },
+   {
+    "no": 7,
+    "name": "tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ge"
+   },
+   {
+    "no": 8,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Mt"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeFullRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "full_matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "vm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeFullRequest.UnsubscribeFullMatch": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeFullResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "full_matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "km"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeFullResponse.UnsubscribeFullMatch": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Sm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeRequest.UnsubscribeMatch": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "matches",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Tm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeResponse.UnsubscribeMatch": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersCategoryResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 5,
+    "name": "action",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.NewsletterActions",
+    "enum_ident": "Fs",
+    "enum_prefix": "NEWSLETTER_ACTIONS_"
+   },
+   {
+    "no": 6,
+    "name": "category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "lt"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersFullMatchResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "action",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.NewsletterActions",
+    "enum_ident": "Fs",
+    "enum_prefix": "NEWSLETTER_ACTIONS_"
+   },
+   {
+    "no": 5,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Mt"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersFullTournamentResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "action",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.NewsletterActions",
+    "enum_ident": "Fs",
+    "enum_prefix": "NEWSLETTER_ACTIONS_"
+   },
+   {
+    "no": 5,
+    "name": "tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ge"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersMatchResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 5,
+    "name": "action",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.NewsletterActions",
+    "enum_ident": "Fs",
+    "enum_prefix": "NEWSLETTER_ACTIONS_"
+   },
+   {
+    "no": 6,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Mt"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersSportResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 5,
+    "name": "action",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.NewsletterActions",
+    "enum_ident": "Fs",
+    "enum_prefix": "NEWSLETTER_ACTIONS_"
+   },
+   {
+    "no": 6,
+    "name": "sport",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ut"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersStakeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "action",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.NewsletterActions",
+    "enum_ident": "Fs",
+    "enum_prefix": "NEWSLETTER_ACTIONS_"
+   },
+   {
+    "no": 5,
+    "name": "stake",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "qr"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersStateAwaitResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersStateReadyResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.newsletters.NewslettersTournamentResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 5,
+    "name": "action",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.NewsletterActions",
+    "enum_ident": "Fs",
+    "enum_prefix": "NEWSLETTER_ACTIONS_"
+   },
+   {
+    "no": 6,
+    "name": "tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ge"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.PingRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.PingResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.settings.SettingsSetRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "time_filter",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "language",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.Languages",
+    "enum_ident": "hD",
+    "enum_prefix": "LANGUAGES_"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.settings.SettingsSetResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.stakes.StakesSubscribeRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "stakes",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Um"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.stakes.StakesSubscribeRequest.SubscribeStake": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "stake_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.stakes.StakesSubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "stakes",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Am"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.stakes.StakesSubscribeResponse.SubscribeStake": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Mt"
+   },
+   {
+    "no": 6,
+    "name": "stake",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "qr"
+   },
+   {
+    "no": 7,
+    "name": "sport",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ut"
+   },
+   {
+    "no": 8,
+    "name": "category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "lt"
+   },
+   {
+    "no": 9,
+    "name": "tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ge"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.stakes.StakesUnsubscribeRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "stakes",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Mm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.stakes.StakesUnsubscribeRequest.UnsubscribeStake": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "stake_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.stakes.StakesUnsubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "stakes",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "jm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.stakes.StakesUnsubscribeResponse.UnsubscribeStake": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeByCategoriesRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "types",
+    "kind": "enum",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeByCategoriesResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "states",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "zm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeByCategoriesResponse.State": [
+   {
+    "no": 1,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 2,
+    "name": "categories",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "lt"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeBySportsRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "types",
+    "kind": "enum",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeBySportsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "states",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Km"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeBySportsResponse.State": [
+   {
+    "no": 1,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 2,
+    "name": "sports",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "ut"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeCategoriesRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "categories",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Hm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeCategoriesRequest.SubscribeCategory": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 3,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 4,
+    "name": "category_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeCategoriesResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "categories",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Gm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeCategoriesResponse.SubscribeCategory": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 6,
+    "name": "category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "lt"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeSportsRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "sports",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Zm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeSportsRequest.SubscribeSport": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 3,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeSportsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "sports",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Qm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeSportsResponse.SubscribeSport": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 6,
+    "name": "sport",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ut"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeTournamentsRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Xm"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeTournamentsRequest.SubscribeTournament": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 3,
+    "name": "tournament_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeTournamentsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "eg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateSubscribeTournamentsResponse.SubscribeTournament": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 6,
+    "name": "sport",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ut"
+   },
+   {
+    "no": 7,
+    "name": "category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "lt"
+   },
+   {
+    "no": 8,
+    "name": "tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ge"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeByCategoriesRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "types",
+    "kind": "enum",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeByCategoriesResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeBySportsRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "types",
+    "kind": "enum",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeBySportsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeCategoriesRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "categories",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "rg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeCategoriesRequest.UnsubscribeCategory": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 3,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 4,
+    "name": "category_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeCategoriesResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "categories",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "sg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeCategoriesResponse.UnsubscribeCategory": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeSportsRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "sports",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "ag"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeSportsRequest.UnsubscribeSport": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 3,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeSportsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "sports",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "lg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeSportsResponse.UnsubscribeSport": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeTournamentsRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "ug"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeTournamentsRequest.UnsubscribeTournament": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TreeTypes",
+    "enum_ident": "Tt",
+    "enum_prefix": "TREE_TYPES_"
+   },
+   {
+    "no": 3,
+    "name": "tournament_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeTournamentsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "dg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.state.StateUnsubscribeTournamentsResponse.UnsubscribeTournament": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "full_tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "fg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullRequest.SubscribeFullTournament": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "tournament_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "full_tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "pg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullResponse.SubscribeFullTournament": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ge"
+   },
+   {
+    "no": 6,
+    "name": "category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "lt"
+   },
+   {
+    "no": 7,
+    "name": "sport",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ut"
+   },
+   {
+    "no": 8,
+    "name": "sub_tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "mg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullResponse.SubscribeFullTournament.SubTournament": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "order_index",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsUnsubscribeFullRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "full_tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "gg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsUnsubscribeFullRequest.UnsubscribeFullTournament": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "tournament_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsUnsubscribeFullResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "full_tournaments",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "bg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.tournaments.TournamentsUnsubscribeFullResponse.UnsubscribeFullTournament": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.UnsubscribeRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.UnsubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sport_ws.v1.rpc.HealthResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "transforms",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "wg"
+   }
+  ],
+  "bb.sport_ws.v1.rpc.HealthResponse.Transform": [
+   {
+    "no": 1,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.TransformStatuses",
+    "enum_ident": "kD",
+    "enum_prefix": "TRANSFORM_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "origin_status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "is_betting_allowed",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 5,
+    "name": "is_cashout_allowed",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 6,
+    "name": "is_heartbeat_ok",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.sport_ws.v1.DefaultResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sport_ws.v1.common.ResponseStatuses",
+    "enum_ident": "$e",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "ne"
+   }
+  ],
+  "bb.sport_ws.v1.MainRequest": [
+   {
+    "no": 1,
+    "name": "ping",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Vc"
+   },
+   {
+    "no": 2,
+    "name": "unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ad"
+   },
+   {
+    "no": 3,
+    "name": "settings_set",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Kc"
+   },
+   {
+    "no": 4,
+    "name": "state_subscribe_by_sports",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Zc"
+   },
+   {
+    "no": 5,
+    "name": "state_subscribe_by_categories",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Gc"
+   },
+   {
+    "no": 6,
+    "name": "state_subscribe_sports",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Qc"
+   },
+   {
+    "no": 7,
+    "name": "state_subscribe_categories",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Yc"
+   },
+   {
+    "no": 8,
+    "name": "state_subscribe_tournaments",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Xc"
+   },
+   {
+    "no": 9,
+    "name": "state_unsubscribe_by_categories",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Jc"
+   },
+   {
+    "no": 10,
+    "name": "state_unsubscribe_by_sports",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ed"
+   },
+   {
+    "no": 11,
+    "name": "state_unsubscribe_categories",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "td"
+   },
+   {
+    "no": 12,
+    "name": "state_unsubscribe_sports",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "nd"
+   },
+   {
+    "no": 13,
+    "name": "state_unsubscribe_tournaments",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "rd"
+   },
+   {
+    "no": 14,
+    "name": "tournaments_subscribe_full",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "id"
+   },
+   {
+    "no": 15,
+    "name": "tournaments_unsubscribe_full",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "sd"
+   },
+   {
+    "no": 16,
+    "name": "matches_subscribe_full",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Fc"
+   },
+   {
+    "no": 17,
+    "name": "matches_subscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "jc"
+   },
+   {
+    "no": 18,
+    "name": "matches_unsubscribe_full",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Wc"
+   },
+   {
+    "no": 19,
+    "name": "matches_unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "zc"
+   },
+   {
+    "no": 20,
+    "name": "stakes_subscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Hc"
+   },
+   {
+    "no": 21,
+    "name": "stakes_unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "qc"
+   },
+   {
+    "no": 22,
+    "name": "health",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Ea"
+   }
+  ],
+  "bb.sport_ws.v1.MainResponse": [
+   {
+    "no": 1,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "kg"
+   },
+   {
+    "no": 2,
+    "name": "ping",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "$m"
+   },
+   {
+    "no": 3,
+    "name": "unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "vg"
+   },
+   {
+    "no": 4,
+    "name": "settings_set",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Cm"
+   },
+   {
+    "no": 5,
+    "name": "state_subscribe_by_sports",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Vm"
+   },
+   {
+    "no": 6,
+    "name": "state_subscribe_by_categories",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Wm"
+   },
+   {
+    "no": 7,
+    "name": "state_subscribe_sports",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Ym"
+   },
+   {
+    "no": 8,
+    "name": "state_subscribe_categories",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "qm"
+   },
+   {
+    "no": 9,
+    "name": "state_subscribe_tournaments",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Jm"
+   },
+   {
+    "no": 10,
+    "name": "state_unsubscribe_by_sports",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ng"
+   },
+   {
+    "no": 11,
+    "name": "state_unsubscribe_by_categories",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "tg"
+   },
+   {
+    "no": 12,
+    "name": "state_unsubscribe_sports",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "og"
+   },
+   {
+    "no": 13,
+    "name": "state_unsubscribe_categories",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ig"
+   },
+   {
+    "no": 14,
+    "name": "state_unsubscribe_tournaments",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "cg"
+   },
+   {
+    "no": 15,
+    "name": "tournaments_subscribe_full",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "hg"
+   },
+   {
+    "no": 16,
+    "name": "tournaments_unsubscribe_full",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "yg"
+   },
+   {
+    "no": 17,
+    "name": "matches_subscribe_full",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "pm"
+   },
+   {
+    "no": 18,
+    "name": "matches_subscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ym"
+   },
+   {
+    "no": 19,
+    "name": "matches_unsubscribe_full",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "wm"
+   },
+   {
+    "no": 20,
+    "name": "matches_unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "_m"
+   },
+   {
+    "no": 21,
+    "name": "stakes_subscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "xm"
+   },
+   {
+    "no": 22,
+    "name": "stakes_unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Fm"
+   },
+   {
+    "no": 23,
+    "name": "newsletters_state_await",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Pm"
+   },
+   {
+    "no": 24,
+    "name": "newsletters_state_ready",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Bm"
+   },
+   {
+    "no": 25,
+    "name": "newsletters_sport",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Lm"
+   },
+   {
+    "no": 26,
+    "name": "newsletters_category",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Em"
+   },
+   {
+    "no": 27,
+    "name": "newsletters_tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Dm"
+   },
+   {
+    "no": 28,
+    "name": "newsletters_full_tournament",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Nm"
+   },
+   {
+    "no": 29,
+    "name": "newsletters_match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Om"
+   },
+   {
+    "no": 30,
+    "name": "newsletters_full_match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Rm"
+   },
+   {
+    "no": 31,
+    "name": "newsletters_stake",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Im"
+   },
+   {
+    "no": 32,
+    "name": "health",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Ea"
+   }
+  ],
+  "bb.bets_history_ws.v1.common.Error": [
+   {
+    "no": 1,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "details",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "cn"
+   }
+  ],
+  "bb.bets_history_ws.v1.common.BadRequestErrorDetails.Violation": [
+   {
+    "no": 1,
+    "name": "reason",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.ScoreModel": [
+   {
+    "no": 1,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.bets_history_ws.v1.common.ScoreTypes",
+    "enum_ident": "N9",
+    "enum_prefix": "SCORE_TYPES_"
+   },
+   {
+    "no": 2,
+    "name": "sequence",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "home_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "away_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "is_favorite",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.bets_history_ws.v1.models.PeriodScoreModel": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.bets_history_ws.v1.common.PeriodScoreTypes",
+    "enum_ident": "E9",
+    "enum_prefix": "PERIOD_SCORE_TYPES_"
+   },
+   {
+    "no": 3,
+    "name": "number",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "scores",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Cy"
+   }
+  ],
+  "bb.bets_history_ws.v1.models.PeriodScoreModel.PeriodScoreScore": [
+   {
+    "no": 1,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.bets_history_ws.v1.common.PeriodScoreScoreTypes",
+    "enum_ident": "R9",
+    "enum_prefix": "PERIOD_SCORE_SCORE_TYPES_"
+   },
+   {
+    "no": 2,
+    "name": "home_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "away_score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "is_favorite",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.bets_history_ws.v1.models.LabelModel": [
+   {
+    "no": 1,
+    "name": "text",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "color",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.ClientMetadataModel": [
+   {
+    "no": 1,
+    "name": "ip_address",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "device_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "platform",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "user_agent",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "browser_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 6,
+    "name": "operating_system",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 7,
+    "name": "browser_codename",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel": [
+   {
+    "no": 1,
+    "name": "key",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "bet_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "bet_uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "game_kind",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "bet_status",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "My"
+   },
+   {
+    "no": 6,
+    "name": "create_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 7,
+    "name": "result_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 8,
+    "name": "bet_sum",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 9,
+    "name": "possible_win",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 10,
+    "name": "bet_win",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 11,
+    "name": "currency_code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 12,
+    "name": "currency_code_win",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 13,
+    "name": "allow_share",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 14,
+    "name": "other",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Fy"
+   },
+   {
+    "no": 15,
+    "name": "is_autobet",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 16,
+    "name": "client_metadata",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "xy"
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.BetStatus": [
+   {
+    "no": 1,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.bets_history_ws.v1.common.BetStatusTypes",
+    "enum_ident": "S9",
+    "enum_prefix": "BET_STATUS_TYPES_"
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other": [
+   {
+    "no": 1,
+    "name": "bet_type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.bets_history_ws.v1.common.BetTypes",
+    "enum_ident": "k9",
+    "enum_prefix": "BET_TYPES_"
+   },
+   {
+    "no": 2,
+    "name": "coeff",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 3,
+    "name": "events_to_guess",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "insurance_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 3
+   },
+   {
+    "no": 5,
+    "name": "insurance_sum",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 6,
+    "name": "multi_bets_of_day_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 5
+   },
+   {
+    "no": 7,
+    "name": "is_sporthub",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 8,
+    "name": "bet_stakes",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "jy"
+   },
+   {
+    "no": 9,
+    "name": "bets",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Hy"
+   },
+   {
+    "no": 10,
+    "name": "result",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Zy"
+   },
+   {
+    "no": 11,
+    "name": "game_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 12,
+    "name": "game_name_ru",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 13,
+    "name": "logo_url",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 14,
+    "name": "game_is_active",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 15,
+    "name": "stakes",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Yy"
+   },
+   {
+    "no": 16,
+    "name": "outcomes",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Qy"
+   },
+   {
+    "no": 17,
+    "name": "autobet",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Xy"
+   },
+   {
+    "no": 18,
+    "name": "insurance_label",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Uy"
+   },
+   {
+    "no": 19,
+    "name": "base_coeff",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 20,
+    "name": "express_bonus_coeff",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 1
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.BetStake": [
+   {
+    "no": 1,
+    "name": "stake_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "provider",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.bets_history_ws.v1.common.Providers",
+    "enum_ident": "T9",
+    "enum_prefix": "PROVIDERS_"
+   },
+   {
+    "no": 3,
+    "name": "is_live",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "stake_status",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Wy"
+   },
+   {
+    "no": 5,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 6,
+    "name": "sport_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 7,
+    "name": "sport_icon",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "zy"
+   },
+   {
+    "no": 8,
+    "name": "category_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 9,
+    "name": "category_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 10,
+    "name": "category_icon",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Vy"
+   },
+   {
+    "no": 11,
+    "name": "tournament_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 12,
+    "name": "tournament_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 13,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 14,
+    "name": "match_start_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 15,
+    "name": "period_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 16,
+    "name": "period_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 17,
+    "name": "home_team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 18,
+    "name": "home_team_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 19,
+    "name": "away_team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 4
+   },
+   {
+    "no": 20,
+    "name": "away_team_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 21,
+    "name": "second_home_team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 4
+   },
+   {
+    "no": 22,
+    "name": "second_home_team_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 23,
+    "name": "second_away_team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 4
+   },
+   {
+    "no": 24,
+    "name": "second_away_team_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 25,
+    "name": "market_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 26,
+    "name": "market_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 27,
+    "name": "outcome_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 28,
+    "name": "outcome_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 29,
+    "name": "is_active",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 30,
+    "name": "is_show_sign",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 31,
+    "name": "coeff",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 32,
+    "name": "score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 33,
+    "name": "argument",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 34,
+    "name": "result",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ky"
+   },
+   {
+    "no": 35,
+    "name": "included_in_express_bonus",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.BetStake.StakeStatus": [
+   {
+    "no": 1,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.bets_history_ws.v1.common.BetStakeStatusTypes",
+    "enum_ident": "_9",
+    "enum_prefix": "BET_STAKE_STATUS_TYPES_"
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.BetStake.SportIcon": [
+   {
+    "no": 1,
+    "name": "svg",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "pdf",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.BetStake.CategoryIcon": [
+   {
+    "no": 1,
+    "name": "svg",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "pdf",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.BetStake.Result": [
+   {
+    "no": 1,
+    "name": "period_scores",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "$y"
+   },
+   {
+    "no": 2,
+    "name": "scores",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Dy"
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.Bet": [
+   {
+    "no": 1,
+    "name": "balance_type",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "balance_type_win",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "bet_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 4,
+    "name": "bet_sum",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 5,
+    "name": "bet_win",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 6,
+    "name": "bet_win_real",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 7,
+    "name": "content",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "qy"
+   },
+   {
+    "no": 8,
+    "name": "create_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 9,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.Bet.Content": [
+   {
+    "no": 1,
+    "name": "keys",
+    "kind": "scalar",
+    "repeated": true,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "numbers",
+    "kind": "scalar",
+    "repeated": true,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "ships",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Gy"
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.Bet.Content.Ship": [
+   {
+    "no": 1,
+    "name": "pos",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "deck",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "orient",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.Result": [
+   {
+    "no": 1,
+    "name": "numbers",
+    "kind": "scalar",
+    "repeated": true,
+    "optional": false,
+    "scalar": 5
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.Stake": [
+   {
+    "no": 1,
+    "name": "argument",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "coeff",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 3,
+    "name": "event_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 4,
+    "name": "parent_event_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 5,
+    "name": "event_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 6,
+    "name": "event_start_date",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 7,
+    "name": "is_active",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 8,
+    "name": "is_live",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 9,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 10,
+    "name": "period_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 11,
+    "name": "score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 12,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 13,
+    "name": "sport_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 14,
+    "name": "stake_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 15,
+    "name": "team_side_1_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 16,
+    "name": "team_side_2_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 17,
+    "name": "tournament_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 18,
+    "name": "type_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.Outcome": [
+   {
+    "no": 1,
+    "name": "coeff",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 2,
+    "name": "event_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "event_start_date",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "is_active",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 5,
+    "name": "is_live",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 6,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 7,
+    "name": "event_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 8,
+    "name": "period_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 9,
+    "name": "sport_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 10,
+    "name": "sport_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 11,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 12,
+    "name": "team_side_1_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 13,
+    "name": "team_side_2_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 14,
+    "name": "tournament_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 15,
+    "name": "type_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 16,
+    "name": "stake_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.models.BetModel.Other.Autobet": [
+   {
+    "no": 1,
+    "name": "min_coeff",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 2,
+    "name": "max_coeff",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   },
+   {
+    "no": 3,
+    "name": "cancel_reason",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainRequest": [
+   {
+    "no": 1,
+    "name": "ping",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "hd"
+   },
+   {
+    "no": 2,
+    "name": "unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Jy"
+   },
+   {
+    "no": 3,
+    "name": "subscribe_summary",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "pd"
+   },
+   {
+    "no": 4,
+    "name": "unsubscribe_summary",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "md"
+   },
+   {
+    "no": 5,
+    "name": "subscribe_match_bets",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "eb"
+   },
+   {
+    "no": 6,
+    "name": "unsubscribe_match_bets",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "tb"
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainRequest.PingRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainRequest.UnsubscribeRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainRequest.SubscribeSummaryRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "token",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainRequest.SubscribeMatchBetsRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "token",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainRequest.UnsubscribeSummaryRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainRequest.UnsubscribeMatchBetsRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse": [
+   {
+    "no": 1,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "nb"
+   },
+   {
+    "no": 2,
+    "name": "ping",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "rb"
+   },
+   {
+    "no": 3,
+    "name": "unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ib"
+   },
+   {
+    "no": 4,
+    "name": "subscribe_summary",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "sb"
+   },
+   {
+    "no": 5,
+    "name": "unsubscribe_summary",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ob"
+   },
+   {
+    "no": 6,
+    "name": "summary",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ub"
+   },
+   {
+    "no": 7,
+    "name": "subscribe_match_bets",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "ab"
+   },
+   {
+    "no": 8,
+    "name": "unsubscribe_match_bets",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "lb"
+   },
+   {
+    "no": 9,
+    "name": "update_match_bets",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "cb"
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.DefaultResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.PingResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.UnsubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.SubscribeSummaryResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "count",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 6,
+    "name": "sum",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.SubscribeMatchBetsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.UnsubscribeSummaryResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.UnsubscribeMatchBetsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.SummaryResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   },
+   {
+    "no": 4,
+    "name": "count",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "sum",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 1
+   }
+  ],
+  "bb.bets_history_ws.v1.rpc.MainResponse.UpdateMatchBetsResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ze"
+   },
+   {
+    "no": 4,
+    "name": "bet",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ay"
+   }
+  ],
+  "bb.market_betstats_ws.v1.common.Error": [
+   {
+    "no": 1,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "details",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "cn"
+   }
+  ],
+  "bb.market_betstats_ws.v1.models.OutcomeStat": [
+   {
+    "no": 1,
+    "name": "outcome_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "percentage",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainRequest": [
+   {
+    "no": 1,
+    "name": "subscribe_match_market",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "kd"
+   },
+   {
+    "no": 2,
+    "name": "unsubscribe_match_market",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Sd"
+   },
+   {
+    "no": 3,
+    "name": "ping",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "wd"
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainRequest.PingRequest": [
+   {
+    "no": 1,
+    "name": "uuid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainRequest.SubscribeRequest": [
+   {
+    "no": 1,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainRequest.UnsubscribeRequest": [
+   {
+    "no": 1,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainResponse": [
+   {
+    "no": 1,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Tb"
+   },
+   {
+    "no": 2,
+    "name": "subscribe_match_market",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Nb"
+   },
+   {
+    "no": 3,
+    "name": "unsubscribe_match_market",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Lb"
+   },
+   {
+    "no": 5,
+    "name": "ping",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Eb"
+   },
+   {
+    "no": 6,
+    "name": "betstats_outcome_changed",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Rb"
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainResponse.DefaultResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "hn"
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainResponse.PingResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "hn"
+   },
+   {
+    "no": 4,
+    "name": "uuid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainResponse.BetstatsOutcomeChangedResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "hn"
+   },
+   {
+    "no": 4,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 5,
+    "name": "market_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 6,
+    "name": "outcome_stats",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Da"
+   },
+   {
+    "no": 7,
+    "name": "period_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainResponse.SubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "hn"
+   },
+   {
+    "no": 5,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 6,
+    "name": "outcome_stats",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Ob"
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainResponse.SubscribeResponse.MatchMarketOutcomeStat": [
+   {
+    "no": 1,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 2,
+    "name": "market_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 4
+   },
+   {
+    "no": 3,
+    "name": "outcome_stats",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Da"
+   },
+   {
+    "no": 4,
+    "name": "period_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.market_betstats_ws.v1.rpc.MainResponse.UnsubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "hn"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.common.Error": [
+   {
+    "no": 1,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "details",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "cn"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.common.BadRequestErrorDetails.Violation": [
+   {
+    "no": 1,
+    "name": "reason",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.models.Penalty": [
+   {
+    "no": 1,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sportradar_stream_events_ws.v1.common.PenaltyStatus",
+    "enum_ident": "H8",
+    "enum_prefix": "PENALTY_STATUS_"
+   },
+   {
+    "no": 2,
+    "name": "team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.models.MatchStatus": [
+   {
+    "no": 1,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "type",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sportradar_stream_events_ws.v1.common.MatchStatusType",
+    "enum_ident": "q8",
+    "enum_prefix": ""
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.models.Soccer": [
+   {
+    "no": 1,
+    "name": "penalties",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "$a"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.models.IceHockey": [
+   {
+    "no": 1,
+    "name": "penalties",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "$a"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.models.Match": [
+   {
+    "no": 1,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 2,
+    "name": "match_status",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Pb"
+   },
+   {
+    "no": 3,
+    "name": "home_team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 4,
+    "name": "away_team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 3
+   },
+   {
+    "no": 5,
+    "name": "second_home_team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 3
+   },
+   {
+    "no": 6,
+    "name": "second_away_team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 3
+   },
+   {
+    "no": 7,
+    "name": "widget",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "$b"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.models.Widget": [
+   {
+    "no": 1,
+    "name": "soccer",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Bb"
+   },
+   {
+    "no": 2,
+    "name": "ice_hockey",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Db"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.rpc.match.MatchLiveDataSubscribeRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.rpc.match.MatchLiveDataSubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 13
+   },
+   {
+    "no": 2,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Gn"
+   },
+   {
+    "no": 3,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sportradar_stream_events_ws.v1.common.ResponseStatuses",
+    "enum_ident": "uh",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 4,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ca"
+   },
+   {
+    "no": 5,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.rpc.match.MatchLiveDataUnsubscribeRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.rpc.match.MatchLiveDataUnsubscribeResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 13
+   },
+   {
+    "no": 2,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Gn"
+   },
+   {
+    "no": 3,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sportradar_stream_events_ws.v1.common.ResponseStatuses",
+    "enum_ident": "uh",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.rpc.newsletters.NewslettersMatchResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 13
+   },
+   {
+    "no": 2,
+    "name": "action",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sportradar_stream_events_ws.v1.common.UpdateAction",
+    "enum_ident": "K8",
+    "enum_prefix": "UPDATE_ACTION_"
+   },
+   {
+    "no": 3,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sportradar_stream_events_ws.v1.common.ResponseStatuses",
+    "enum_ident": "uh",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   },
+   {
+    "no": 4,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Gn"
+   },
+   {
+    "no": 5,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ca"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.DefaultResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 13
+   },
+   {
+    "no": 2,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Gn"
+   },
+   {
+    "no": 3,
+    "name": "status",
+    "kind": "enum",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "bb.sportradar_stream_events_ws.v1.common.ResponseStatuses",
+    "enum_ident": "uh",
+    "enum_prefix": "RESPONSE_STATUSES_"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.MainRequest": [
+   {
+    "no": 1,
+    "name": "match_live_data_subscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "_d"
+   },
+   {
+    "no": 2,
+    "name": "match_live_data_unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Td"
+   }
+  ],
+  "bb.sportradar_stream_events_ws.v1.MainResponse": [
+   {
+    "no": 1,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Ab"
+   },
+   {
+    "no": 2,
+    "name": "match_live_data_subscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Cb"
+   },
+   {
+    "no": 3,
+    "name": "match_live_data_unsubscribe",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Ub"
+   },
+   {
+    "no": 4,
+    "name": "newsletters_match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "xb"
+   }
+  ],
+  "bb.grid_widget.Error": [
+   {
+    "no": 1,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "details",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "cn"
+   }
+  ],
+  "bb.grid_widget.BadRequestErrorDetails.Violation": [
+   {
+    "no": 1,
+    "name": "reason",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "message",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "grid_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 3,
+    "name": "ready",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "widget",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Fb"
+   },
+   {
+    "no": 5,
+    "name": "game_mode",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget": [
+   {
+    "no": 1,
+    "name": "csgo",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "jb"
+   },
+   {
+    "no": 2,
+    "name": "dota",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Yb"
+   },
+   {
+    "no": 3,
+    "name": "lol",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "iv"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo": [
+   {
+    "no": 1,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "timer",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Wb"
+   },
+   {
+    "no": 3,
+    "name": "teams",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "zb"
+   },
+   {
+    "no": 4,
+    "name": "games",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Kb"
+   },
+   {
+    "no": 5,
+    "name": "last_kill",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Gb"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoItem": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoTimer": [
+   {
+    "no": 1,
+    "name": "start_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "ticking",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 3,
+    "name": "ticks_backwards",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "current_seconds",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoTeam": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "home",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "players",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Vb"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoTeam.CsgoPlayer": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoGame": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "sequence",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "map_name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "map_image",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "current",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 6,
+    "name": "teams",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Hb"
+   },
+   {
+    "no": 7,
+    "name": "map_image_v2",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": true,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoGame.CsgoGameTeam": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "side",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 4,
+    "name": "money",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 5,
+    "name": "players",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "qb"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoGame.CsgoGameTeam.CsgoGameTeamPlayer": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "alive",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 3,
+    "name": "weapon",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "xa"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoLastKill": [
+   {
+    "no": 1,
+    "name": "killer",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Mr"
+   },
+   {
+    "no": 2,
+    "name": "assists",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Mr"
+   },
+   {
+    "no": 3,
+    "name": "weapon",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "xa"
+   },
+   {
+    "no": 4,
+    "name": "kill",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Zb"
+   },
+   {
+    "no": 5,
+    "name": "target",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Mr"
+   },
+   {
+    "no": 6,
+    "name": "dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoLastKill.CsgoKillPlayer": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Csgo.CsgoLastKill.CsgoKillInfo": [
+   {
+    "no": 1,
+    "name": "headshot",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 2,
+    "name": "selfkill",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota": [
+   {
+    "no": 1,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "timer",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Qb"
+   },
+   {
+    "no": 3,
+    "name": "teams",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Xb"
+   },
+   {
+    "no": 4,
+    "name": "games",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "ev"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota.DotaCharacter": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "image",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "face_image",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 4,
+    "name": "gif_image",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota.DotaTimer": [
+   {
+    "no": 1,
+    "name": "start_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "ticking",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 3,
+    "name": "ticks_backwards",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "current_seconds",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota.DotaTeam": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "home",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "players",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "Jb"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota.DotaTeam.DotaPlayer": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota.DotaGame": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "sequence",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "current",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "teams",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "tv"
+   },
+   {
+    "no": 5,
+    "name": "pick_ban_road",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "rv"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota.DotaGame.DotaGameTeam": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "side",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "money",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 4,
+    "name": "kills",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "roshan_kills",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 6,
+    "name": "towers_destroyed",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 7,
+    "name": "has_first_blood",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 8,
+    "name": "has_first_ten_kills",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 9,
+    "name": "is_winner",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 10,
+    "name": "players",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "nv"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota.DotaGame.DotaGameTeam.DotaGameTeamPlayer": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "alive",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 3,
+    "name": "character",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Aa"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Dota.DotaGame.DotaGamePickStep": [
+   {
+    "no": 1,
+    "name": "type",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "current",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "character",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Aa"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol": [
+   {
+    "no": 1,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "timer",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "sv"
+   },
+   {
+    "no": 3,
+    "name": "teams",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "av"
+   },
+   {
+    "no": 4,
+    "name": "games",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "lv"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol.LolCharacter": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "image",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "face_image",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol.LolTimer": [
+   {
+    "no": 1,
+    "name": "start_dttm",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "ticking",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 3,
+    "name": "ticks_backwards",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "current_seconds",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol.LolTeam": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "home",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "score",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "players",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "ov"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol.LolTeam.LolPlayer": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "name",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol.LolGame": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "sequence",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 3,
+    "name": "current",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "teams",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "uv"
+   },
+   {
+    "no": 5,
+    "name": "pick_ban_road",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "dv"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol.LolGame.LolGameTeam": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "side",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "money",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 3
+   },
+   {
+    "no": 4,
+    "name": "kills",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 5,
+    "name": "baron_kills",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 6,
+    "name": "dragon_kills",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 7,
+    "name": "towers_destroyed",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 8,
+    "name": "inhibitors_destroyed",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 9,
+    "name": "has_first_blood",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 10,
+    "name": "is_winner",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 11,
+    "name": "players",
+    "kind": "message",
+    "repeated": true,
+    "optional": false,
+    "type_ref": "cv"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol.LolGame.LolGameTeam.LolGameTeamPlayer": [
+   {
+    "no": 1,
+    "name": "id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "alive",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 3,
+    "name": "character",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ma"
+   }
+  ],
+  "bb.grid_widget.Match.Widget.Lol.LolGame.LolGamePickStep": [
+   {
+    "no": 1,
+    "name": "type",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "team_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "current",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 8
+   },
+   {
+    "no": 4,
+    "name": "character",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ma"
+   }
+  ],
+  "bb.grid_widget.MatchResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "pn"
+   },
+   {
+    "no": 4,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ua"
+   }
+  ],
+  "bb.grid_widget.UnsubscribeMatchRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.UnsubscribeMatchResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "pn"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.SubscribeMatchRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 2,
+    "name": "match_id",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.SubscribeMatchResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "pn"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 5,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "Ua"
+   }
+  ],
+  "bb.grid_widget.PingRequest": [
+   {
+    "no": 1,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.PingResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "pn"
+   },
+   {
+    "no": 4,
+    "name": "uid",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   }
+  ],
+  "bb.grid_widget.DefaultResponse": [
+   {
+    "no": 1,
+    "name": "code",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 5
+   },
+   {
+    "no": 2,
+    "name": "status",
+    "kind": "scalar",
+    "repeated": false,
+    "optional": false,
+    "scalar": 9
+   },
+   {
+    "no": 3,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "type_ref": "pn"
+   }
+  ],
+  "bb.grid_widget.MainRequest": [
+   {
+    "no": 1,
+    "name": "ping",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Nd"
+   },
+   {
+    "no": 2,
+    "name": "subscribe_match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Rd"
+   },
+   {
+    "no": 3,
+    "name": "unsubscribe_match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "Ed"
+   }
+  ],
+  "bb.grid_widget.MainResponse": [
+   {
+    "no": 1,
+    "name": "error",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "gv"
+   },
+   {
+    "no": 2,
+    "name": "ping",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "mv"
+   },
+   {
+    "no": 3,
+    "name": "subscribe_match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "pv"
+   },
+   {
+    "no": 4,
+    "name": "unsubscribe_match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "hv"
+   },
+   {
+    "no": 5,
+    "name": "match",
+    "kind": "message",
+    "repeated": false,
+    "optional": false,
+    "oneof": "type",
+    "type_ref": "fv"
+   }
+  ]
+ },
+ "idents": {
+  "cn": "google.protobuf.Any",
+  "ne": "bb.sport_ws.v1.common.Error",
+  "_D": "bb.sport_ws.v1.common.BadRequestErrorDetails",
+  "Mc": "bb.sport_ws.v1.common.BadRequestErrorDetails.Violation",
+  "Ta": "bb.sport_ws.v1.models.ModelsCategoryInfo",
+  "Jp": "bb.sport_ws.v1.models.ModelsCategoryInfo.Icon",
+  "em": "bb.sport_ws.v1.models.ModelsCategoryInfo.MainMarkets",
+  "qr": "bb.sport_ws.v1.models.ModelsStake",
+  "Mt": "bb.sport_ws.v1.models.ModelsMatch",
+  "tm": "bb.sport_ws.v1.models.ModelsMatch.MatchInfo",
+  "nm": "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Status",
+  "rm": "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Teams",
+  "Kn": "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Teams.Team",
+  "im": "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Scoreboard",
+  "sm": "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.Scoreboard.ScoreboardScore",
+  "am": "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.PeriodScore",
+  "om": "bb.sport_ws.v1.models.ModelsMatch.MatchInfo.PeriodScore.PeriodScoreScore",
+  "Ge": "bb.sport_ws.v1.models.ModelsTournament",
+  "lm": "bb.sport_ws.v1.models.ModelsTournament.TournamentInfo",
+  "um": "bb.sport_ws.v1.models.ModelsTournament.Category",
+  "lt": "bb.sport_ws.v1.models.ModelsCategory",
+  "ut": "bb.sport_ws.v1.models.ModelsSport",
+  "cm": "bb.sport_ws.v1.models.ModelsSport.SportInfo",
+  "dm": "bb.sport_ws.v1.models.ModelsSport.SportInfo.Icon",
+  "fm": "bb.sport_ws.v1.models.ModelsSport.SportInfo.MainMarkets",
+  "Fc": "bb.sport_ws.v1.rpc.matches.MatchesSubscribeFullRequest",
+  "hm": "bb.sport_ws.v1.rpc.matches.MatchesSubscribeFullRequest.SubscribeFullMatch",
+  "pm": "bb.sport_ws.v1.rpc.matches.MatchesSubscribeFullResponse",
+  "mm": "bb.sport_ws.v1.rpc.matches.MatchesSubscribeFullResponse.SubscribeFullMatch",
+  "jc": "bb.sport_ws.v1.rpc.matches.MatchesSubscribeRequest",
+  "gm": "bb.sport_ws.v1.rpc.matches.MatchesSubscribeRequest.SubscribeMatch",
+  "ym": "bb.sport_ws.v1.rpc.matches.MatchesSubscribeResponse",
+  "bm": "bb.sport_ws.v1.rpc.matches.MatchesSubscribeResponse.SubscribeMatch",
+  "Wc": "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeFullRequest",
+  "vm": "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeFullRequest.UnsubscribeFullMatch",
+  "wm": "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeFullResponse",
+  "km": "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeFullResponse.UnsubscribeFullMatch",
+  "zc": "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeRequest",
+  "Sm": "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeRequest.UnsubscribeMatch",
+  "_m": "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeResponse",
+  "Tm": "bb.sport_ws.v1.rpc.matches.MatchesUnsubscribeResponse.UnsubscribeMatch",
+  "Em": "bb.sport_ws.v1.rpc.newsletters.NewslettersCategoryResponse",
+  "Rm": "bb.sport_ws.v1.rpc.newsletters.NewslettersFullMatchResponse",
+  "Nm": "bb.sport_ws.v1.rpc.newsletters.NewslettersFullTournamentResponse",
+  "Om": "bb.sport_ws.v1.rpc.newsletters.NewslettersMatchResponse",
+  "Lm": "bb.sport_ws.v1.rpc.newsletters.NewslettersSportResponse",
+  "Im": "bb.sport_ws.v1.rpc.newsletters.NewslettersStakeResponse",
+  "Pm": "bb.sport_ws.v1.rpc.newsletters.NewslettersStateAwaitResponse",
+  "Bm": "bb.sport_ws.v1.rpc.newsletters.NewslettersStateReadyResponse",
+  "Dm": "bb.sport_ws.v1.rpc.newsletters.NewslettersTournamentResponse",
+  "Vc": "bb.sport_ws.v1.rpc.PingRequest",
+  "$m": "bb.sport_ws.v1.rpc.PingResponse",
+  "Kc": "bb.sport_ws.v1.rpc.settings.SettingsSetRequest",
+  "Cm": "bb.sport_ws.v1.rpc.settings.SettingsSetResponse",
+  "Hc": "bb.sport_ws.v1.rpc.stakes.StakesSubscribeRequest",
+  "Um": "bb.sport_ws.v1.rpc.stakes.StakesSubscribeRequest.SubscribeStake",
+  "xm": "bb.sport_ws.v1.rpc.stakes.StakesSubscribeResponse",
+  "Am": "bb.sport_ws.v1.rpc.stakes.StakesSubscribeResponse.SubscribeStake",
+  "qc": "bb.sport_ws.v1.rpc.stakes.StakesUnsubscribeRequest",
+  "Mm": "bb.sport_ws.v1.rpc.stakes.StakesUnsubscribeRequest.UnsubscribeStake",
+  "Fm": "bb.sport_ws.v1.rpc.stakes.StakesUnsubscribeResponse",
+  "jm": "bb.sport_ws.v1.rpc.stakes.StakesUnsubscribeResponse.UnsubscribeStake",
+  "Gc": "bb.sport_ws.v1.rpc.state.StateSubscribeByCategoriesRequest",
+  "Wm": "bb.sport_ws.v1.rpc.state.StateSubscribeByCategoriesResponse",
+  "zm": "bb.sport_ws.v1.rpc.state.StateSubscribeByCategoriesResponse.State",
+  "Zc": "bb.sport_ws.v1.rpc.state.StateSubscribeBySportsRequest",
+  "Vm": "bb.sport_ws.v1.rpc.state.StateSubscribeBySportsResponse",
+  "Km": "bb.sport_ws.v1.rpc.state.StateSubscribeBySportsResponse.State",
+  "Yc": "bb.sport_ws.v1.rpc.state.StateSubscribeCategoriesRequest",
+  "Hm": "bb.sport_ws.v1.rpc.state.StateSubscribeCategoriesRequest.SubscribeCategory",
+  "qm": "bb.sport_ws.v1.rpc.state.StateSubscribeCategoriesResponse",
+  "Gm": "bb.sport_ws.v1.rpc.state.StateSubscribeCategoriesResponse.SubscribeCategory",
+  "Qc": "bb.sport_ws.v1.rpc.state.StateSubscribeSportsRequest",
+  "Zm": "bb.sport_ws.v1.rpc.state.StateSubscribeSportsRequest.SubscribeSport",
+  "Ym": "bb.sport_ws.v1.rpc.state.StateSubscribeSportsResponse",
+  "Qm": "bb.sport_ws.v1.rpc.state.StateSubscribeSportsResponse.SubscribeSport",
+  "Xc": "bb.sport_ws.v1.rpc.state.StateSubscribeTournamentsRequest",
+  "Xm": "bb.sport_ws.v1.rpc.state.StateSubscribeTournamentsRequest.SubscribeTournament",
+  "Jm": "bb.sport_ws.v1.rpc.state.StateSubscribeTournamentsResponse",
+  "eg": "bb.sport_ws.v1.rpc.state.StateSubscribeTournamentsResponse.SubscribeTournament",
+  "Jc": "bb.sport_ws.v1.rpc.state.StateUnsubscribeByCategoriesRequest",
+  "tg": "bb.sport_ws.v1.rpc.state.StateUnsubscribeByCategoriesResponse",
+  "ed": "bb.sport_ws.v1.rpc.state.StateUnsubscribeBySportsRequest",
+  "ng": "bb.sport_ws.v1.rpc.state.StateUnsubscribeBySportsResponse",
+  "td": "bb.sport_ws.v1.rpc.state.StateUnsubscribeCategoriesRequest",
+  "rg": "bb.sport_ws.v1.rpc.state.StateUnsubscribeCategoriesRequest.UnsubscribeCategory",
+  "ig": "bb.sport_ws.v1.rpc.state.StateUnsubscribeCategoriesResponse",
+  "sg": "bb.sport_ws.v1.rpc.state.StateUnsubscribeCategoriesResponse.UnsubscribeCategory",
+  "nd": "bb.sport_ws.v1.rpc.state.StateUnsubscribeSportsRequest",
+  "ag": "bb.sport_ws.v1.rpc.state.StateUnsubscribeSportsRequest.UnsubscribeSport",
+  "og": "bb.sport_ws.v1.rpc.state.StateUnsubscribeSportsResponse",
+  "lg": "bb.sport_ws.v1.rpc.state.StateUnsubscribeSportsResponse.UnsubscribeSport",
+  "rd": "bb.sport_ws.v1.rpc.state.StateUnsubscribeTournamentsRequest",
+  "ug": "bb.sport_ws.v1.rpc.state.StateUnsubscribeTournamentsRequest.UnsubscribeTournament",
+  "cg": "bb.sport_ws.v1.rpc.state.StateUnsubscribeTournamentsResponse",
+  "dg": "bb.sport_ws.v1.rpc.state.StateUnsubscribeTournamentsResponse.UnsubscribeTournament",
+  "id": "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullRequest",
+  "fg": "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullRequest.SubscribeFullTournament",
+  "hg": "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullResponse",
+  "pg": "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullResponse.SubscribeFullTournament",
+  "mg": "bb.sport_ws.v1.rpc.tournaments.TournamentsSubscribeFullResponse.SubscribeFullTournament.SubTournament",
+  "sd": "bb.sport_ws.v1.rpc.tournaments.TournamentsUnsubscribeFullRequest",
+  "gg": "bb.sport_ws.v1.rpc.tournaments.TournamentsUnsubscribeFullRequest.UnsubscribeFullTournament",
+  "yg": "bb.sport_ws.v1.rpc.tournaments.TournamentsUnsubscribeFullResponse",
+  "bg": "bb.sport_ws.v1.rpc.tournaments.TournamentsUnsubscribeFullResponse.UnsubscribeFullTournament",
+  "ad": "bb.sport_ws.v1.rpc.UnsubscribeRequest",
+  "vg": "bb.sport_ws.v1.rpc.UnsubscribeResponse",
+  "Ea": "bb.sport_ws.v1.rpc.HealthResponse",
+  "wg": "bb.sport_ws.v1.rpc.HealthResponse.Transform",
+  "kg": "bb.sport_ws.v1.DefaultResponse",
+  "ct": "bb.sport_ws.v1.MainRequest",
+  "Ev": "bb.sport_ws.v1.MainResponse",
+  "Ze": "bb.bets_history_ws.v1.common.Error",
+  "By": "bb.bets_history_ws.v1.common.BadRequestErrorDetails.Violation",
+  "Dy": "bb.bets_history_ws.v1.models.ScoreModel",
+  "$y": "bb.bets_history_ws.v1.models.PeriodScoreModel",
+  "Cy": "bb.bets_history_ws.v1.models.PeriodScoreModel.PeriodScoreScore",
+  "Uy": "bb.bets_history_ws.v1.models.LabelModel",
+  "xy": "bb.bets_history_ws.v1.models.ClientMetadataModel",
+  "Ay": "bb.bets_history_ws.v1.models.BetModel",
+  "My": "bb.bets_history_ws.v1.models.BetModel.BetStatus",
+  "Fy": "bb.bets_history_ws.v1.models.BetModel.Other",
+  "jy": "bb.bets_history_ws.v1.models.BetModel.Other.BetStake",
+  "Wy": "bb.bets_history_ws.v1.models.BetModel.Other.BetStake.StakeStatus",
+  "zy": "bb.bets_history_ws.v1.models.BetModel.Other.BetStake.SportIcon",
+  "Vy": "bb.bets_history_ws.v1.models.BetModel.Other.BetStake.CategoryIcon",
+  "Ky": "bb.bets_history_ws.v1.models.BetModel.Other.BetStake.Result",
+  "Hy": "bb.bets_history_ws.v1.models.BetModel.Other.Bet",
+  "qy": "bb.bets_history_ws.v1.models.BetModel.Other.Bet.Content",
+  "Gy": "bb.bets_history_ws.v1.models.BetModel.Other.Bet.Content.Ship",
+  "Zy": "bb.bets_history_ws.v1.models.BetModel.Other.Result",
+  "Yy": "bb.bets_history_ws.v1.models.BetModel.Other.Stake",
+  "Qy": "bb.bets_history_ws.v1.models.BetModel.Other.Outcome",
+  "Xy": "bb.bets_history_ws.v1.models.BetModel.Other.Autobet",
+  "Yf": "bb.bets_history_ws.v1.rpc.MainRequest",
+  "hd": "bb.bets_history_ws.v1.rpc.MainRequest.PingRequest",
+  "Jy": "bb.bets_history_ws.v1.rpc.MainRequest.UnsubscribeRequest",
+  "pd": "bb.bets_history_ws.v1.rpc.MainRequest.SubscribeSummaryRequest",
+  "eb": "bb.bets_history_ws.v1.rpc.MainRequest.SubscribeMatchBetsRequest",
+  "md": "bb.bets_history_ws.v1.rpc.MainRequest.UnsubscribeSummaryRequest",
+  "tb": "bb.bets_history_ws.v1.rpc.MainRequest.UnsubscribeMatchBetsRequest",
+  "O9": "bb.bets_history_ws.v1.rpc.MainResponse",
+  "nb": "bb.bets_history_ws.v1.rpc.MainResponse.DefaultResponse",
+  "rb": "bb.bets_history_ws.v1.rpc.MainResponse.PingResponse",
+  "ib": "bb.bets_history_ws.v1.rpc.MainResponse.UnsubscribeResponse",
+  "sb": "bb.bets_history_ws.v1.rpc.MainResponse.SubscribeSummaryResponse",
+  "ab": "bb.bets_history_ws.v1.rpc.MainResponse.SubscribeMatchBetsResponse",
+  "ob": "bb.bets_history_ws.v1.rpc.MainResponse.UnsubscribeSummaryResponse",
+  "lb": "bb.bets_history_ws.v1.rpc.MainResponse.UnsubscribeMatchBetsResponse",
+  "ub": "bb.bets_history_ws.v1.rpc.MainResponse.SummaryResponse",
+  "cb": "bb.bets_history_ws.v1.rpc.MainResponse.UpdateMatchBetsResponse",
+  "hn": "bb.market_betstats_ws.v1.common.Error",
+  "Da": "bb.market_betstats_ws.v1.models.OutcomeStat",
+  "lh": "bb.market_betstats_ws.v1.rpc.MainRequest",
+  "wd": "bb.market_betstats_ws.v1.rpc.MainRequest.PingRequest",
+  "kd": "bb.market_betstats_ws.v1.rpc.MainRequest.SubscribeRequest",
+  "Sd": "bb.market_betstats_ws.v1.rpc.MainRequest.UnsubscribeRequest",
+  "V8": "bb.market_betstats_ws.v1.rpc.MainResponse",
+  "Tb": "bb.market_betstats_ws.v1.rpc.MainResponse.DefaultResponse",
+  "Eb": "bb.market_betstats_ws.v1.rpc.MainResponse.PingResponse",
+  "Rb": "bb.market_betstats_ws.v1.rpc.MainResponse.BetstatsOutcomeChangedResponse",
+  "Nb": "bb.market_betstats_ws.v1.rpc.MainResponse.SubscribeResponse",
+  "Ob": "bb.market_betstats_ws.v1.rpc.MainResponse.SubscribeResponse.MatchMarketOutcomeStat",
+  "Lb": "bb.market_betstats_ws.v1.rpc.MainResponse.UnsubscribeResponse",
+  "Gn": "bb.sportradar_stream_events_ws.v1.common.Error",
+  "Ib": "bb.sportradar_stream_events_ws.v1.common.BadRequestErrorDetails.Violation",
+  "$a": "bb.sportradar_stream_events_ws.v1.models.Penalty",
+  "Pb": "bb.sportradar_stream_events_ws.v1.models.MatchStatus",
+  "Bb": "bb.sportradar_stream_events_ws.v1.models.Soccer",
+  "Db": "bb.sportradar_stream_events_ws.v1.models.IceHockey",
+  "Ca": "bb.sportradar_stream_events_ws.v1.models.Match",
+  "$b": "bb.sportradar_stream_events_ws.v1.models.Widget",
+  "_d": "bb.sportradar_stream_events_ws.v1.rpc.match.MatchLiveDataSubscribeRequest",
+  "Cb": "bb.sportradar_stream_events_ws.v1.rpc.match.MatchLiveDataSubscribeResponse",
+  "Td": "bb.sportradar_stream_events_ws.v1.rpc.match.MatchLiveDataUnsubscribeRequest",
+  "Ub": "bb.sportradar_stream_events_ws.v1.rpc.match.MatchLiveDataUnsubscribeResponse",
+  "xb": "bb.sportradar_stream_events_ws.v1.rpc.newsletters.NewslettersMatchResponse",
+  "Ab": "bb.sportradar_stream_events_ws.v1.DefaultResponse",
+  "CO": "bb.sportradar_stream_events_ws.v1.MainRequest",
+  "p7": "bb.sportradar_stream_events_ws.v1.MainResponse",
+  "pn": "bb.grid_widget.Error",
+  "Mb": "bb.grid_widget.BadRequestErrorDetails.Violation",
+  "Ua": "bb.grid_widget.Match",
+  "Fb": "bb.grid_widget.Match.Widget",
+  "jb": "bb.grid_widget.Match.Widget.Csgo",
+  "xa": "bb.grid_widget.Match.Widget.Csgo.CsgoItem",
+  "Wb": "bb.grid_widget.Match.Widget.Csgo.CsgoTimer",
+  "zb": "bb.grid_widget.Match.Widget.Csgo.CsgoTeam",
+  "Vb": "bb.grid_widget.Match.Widget.Csgo.CsgoTeam.CsgoPlayer",
+  "Kb": "bb.grid_widget.Match.Widget.Csgo.CsgoGame",
+  "Hb": "bb.grid_widget.Match.Widget.Csgo.CsgoGame.CsgoGameTeam",
+  "qb": "bb.grid_widget.Match.Widget.Csgo.CsgoGame.CsgoGameTeam.CsgoGameTeamPlayer",
+  "Gb": "bb.grid_widget.Match.Widget.Csgo.CsgoLastKill",
+  "Mr": "bb.grid_widget.Match.Widget.Csgo.CsgoLastKill.CsgoKillPlayer",
+  "Zb": "bb.grid_widget.Match.Widget.Csgo.CsgoLastKill.CsgoKillInfo",
+  "Yb": "bb.grid_widget.Match.Widget.Dota",
+  "Aa": "bb.grid_widget.Match.Widget.Dota.DotaCharacter",
+  "Qb": "bb.grid_widget.Match.Widget.Dota.DotaTimer",
+  "Xb": "bb.grid_widget.Match.Widget.Dota.DotaTeam",
+  "Jb": "bb.grid_widget.Match.Widget.Dota.DotaTeam.DotaPlayer",
+  "ev": "bb.grid_widget.Match.Widget.Dota.DotaGame",
+  "tv": "bb.grid_widget.Match.Widget.Dota.DotaGame.DotaGameTeam",
+  "nv": "bb.grid_widget.Match.Widget.Dota.DotaGame.DotaGameTeam.DotaGameTeamPlayer",
+  "rv": "bb.grid_widget.Match.Widget.Dota.DotaGame.DotaGamePickStep",
+  "iv": "bb.grid_widget.Match.Widget.Lol",
+  "Ma": "bb.grid_widget.Match.Widget.Lol.LolCharacter",
+  "sv": "bb.grid_widget.Match.Widget.Lol.LolTimer",
+  "av": "bb.grid_widget.Match.Widget.Lol.LolTeam",
+  "ov": "bb.grid_widget.Match.Widget.Lol.LolTeam.LolPlayer",
+  "lv": "bb.grid_widget.Match.Widget.Lol.LolGame",
+  "uv": "bb.grid_widget.Match.Widget.Lol.LolGame.LolGameTeam",
+  "cv": "bb.grid_widget.Match.Widget.Lol.LolGame.LolGameTeam.LolGameTeamPlayer",
+  "dv": "bb.grid_widget.Match.Widget.Lol.LolGame.LolGamePickStep",
+  "fv": "bb.grid_widget.MatchResponse",
+  "Ed": "bb.grid_widget.UnsubscribeMatchRequest",
+  "hv": "bb.grid_widget.UnsubscribeMatchResponse",
+  "Rd": "bb.grid_widget.SubscribeMatchRequest",
+  "pv": "bb.grid_widget.SubscribeMatchResponse",
+  "Nd": "bb.grid_widget.PingRequest",
+  "mv": "bb.grid_widget.PingResponse",
+  "gv": "bb.grid_widget.DefaultResponse",
+  "Tk": "bb.grid_widget.MainRequest",
+  "y7": "bb.grid_widget.MainResponse"
+ },
+ "enums": {
+  "bb.sport_ws.v1.common.MatchTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "LIVE",
+    1
+   ],
+   [
+    "PREMATCH",
+    2
+   ]
+  ],
+  "bb.sport_ws.v1.common.Providers": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "DIGITAIN",
+    1
+   ],
+   [
+    "ODDIN",
+    2
+   ],
+   [
+    "SPORTRADAR",
+    3
+   ],
+   [
+    "LSPORTS",
+    4
+   ]
+  ],
+  "bb.sport_ws.v1.common.PeriodScoresBy": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "MAPS",
+    1
+   ],
+   [
+    "PARTS",
+    2
+   ]
+  ],
+  "bb.sport_ws.v1.common.MatchSurfaces": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "HARD_COURT",
+    1
+   ],
+   [
+    "GRASS",
+    2
+   ],
+   [
+    "SAND",
+    3
+   ],
+   [
+    "RED_CLAY",
+    4
+   ],
+   [
+    "GREEN_CLAY",
+    5
+   ],
+   [
+    "HARDCOURT_OUTDOOR",
+    6
+   ],
+   [
+    "CARPET_INDOOR",
+    7
+   ],
+   [
+    "SYNTHETIC_INDOOR",
+    8
+   ]
+  ],
+  "bb.sport_ws.v1.common.MatchStatuses": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "NOT_STARTED",
+    1
+   ],
+   [
+    "PAUSE",
+    2
+   ],
+   [
+    "FINISHED",
+    3
+   ]
+  ],
+  "bb.sport_ws.v1.common.ScoreboardServingSides": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "HOME",
+    1
+   ],
+   [
+    "AWAY",
+    2
+   ]
+  ],
+  "bb.sport_ws.v1.common.ScoreboardScoreTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "TOTAL",
+    1
+   ],
+   [
+    "DESTROYED_TOWERS",
+    2
+   ],
+   [
+    "DESTROYED_TURRETS",
+    3
+   ],
+   [
+    "GOLD",
+    4
+   ],
+   [
+    "KILLS",
+    5
+   ],
+   [
+    "WON_ROUNDS",
+    6
+   ],
+   [
+    "GOALS",
+    7
+   ],
+   [
+    "RED_CARDS",
+    8
+   ],
+   [
+    "YELLOW_CARDS",
+    9
+   ],
+   [
+    "CORNER_KICKS",
+    10
+   ],
+   [
+    "PART",
+    11
+   ],
+   [
+    "GAME",
+    12
+   ],
+   [
+    "SHOTS_ON_GOAL",
+    13
+   ],
+   [
+    "PENALTIES",
+    14
+   ]
+  ],
+  "bb.sport_ws.v1.common.PeriodScoreTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "MATCH",
+    1
+   ],
+   [
+    "MAP",
+    2
+   ]
+  ],
+  "bb.sport_ws.v1.common.PeriodScoreScoreTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "TOTAL",
+    1
+   ],
+   [
+    "KILLS",
+    2
+   ],
+   [
+    "WON_ROUNDS",
+    3
+   ],
+   [
+    "GOALS",
+    4
+   ],
+   [
+    "PART",
+    5
+   ]
+  ],
+  "bb.sport_ws.v1.common.ResponseStatuses": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "OK",
+    1
+   ],
+   [
+    "BAD_REQUEST",
+    2
+   ],
+   [
+    "FORBIDDEN",
+    3
+   ],
+   [
+    "NOT_FOUND",
+    4
+   ],
+   [
+    "SERVER_ERROR",
+    5
+   ],
+   [
+    "TOO_MANY_REQUESTS",
+    6
+   ]
+  ],
+  "bb.sport_ws.v1.common.TreeTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "LIVE",
+    1
+   ],
+   [
+    "PREMATCH",
+    2
+   ],
+   [
+    "TOP",
+    3
+   ],
+   [
+    "SUPER_TOP",
+    4
+   ]
+  ],
+  "bb.sport_ws.v1.common.NewsletterActions": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "CREATE",
+    1
+   ],
+   [
+    "UPDATE",
+    2
+   ],
+   [
+    "DELETE",
+    3
+   ],
+   [
+    "UPDATE_INFO",
+    4
+   ]
+  ],
+  "bb.sport_ws.v1.common.Languages": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "EN",
+    1
+   ],
+   [
+    "PT_BR",
+    2
+   ],
+   [
+    "ES",
+    3
+   ],
+   [
+    "ES_CL",
+    4
+   ],
+   [
+    "ES_PE",
+    5
+   ],
+   [
+    "ES_MX",
+    6
+   ],
+   [
+    "ES_AR",
+    7
+   ],
+   [
+    "RU",
+    8
+   ],
+   [
+    "KK",
+    9
+   ],
+   [
+    "KA",
+    10
+   ],
+   [
+    "UK",
+    11
+   ],
+   [
+    "AZ",
+    12
+   ],
+   [
+    "PT",
+    13
+   ],
+   [
+    "DE",
+    14
+   ],
+   [
+    "UZ",
+    15
+   ],
+   [
+    "DE_AT",
+    16
+   ],
+   [
+    "BE",
+    17
+   ]
+  ],
+  "bb.sport_ws.v1.common.TransformStatuses": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "READY",
+    1
+   ],
+   [
+    "NOT_READY",
+    2
+   ],
+   [
+    "DISABLED",
+    3
+   ]
+  ],
+  "bb.bets_history_ws.v1.common.ScoreTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "TOTAL",
+    1
+   ],
+   [
+    "DESTROYED_TOWERS",
+    2
+   ],
+   [
+    "DESTROYED_TURRETS",
+    3
+   ],
+   [
+    "GOLD",
+    4
+   ],
+   [
+    "KILLS",
+    5
+   ],
+   [
+    "WON_ROUNDS",
+    6
+   ],
+   [
+    "GOALS",
+    7
+   ],
+   [
+    "RED_CARDS",
+    8
+   ],
+   [
+    "YELLOW_CARDS",
+    9
+   ],
+   [
+    "CORNER_KICKS",
+    10
+   ],
+   [
+    "PART",
+    11
+   ],
+   [
+    "GAME",
+    12
+   ],
+   [
+    "SHOTS_ON_GOAL",
+    13
+   ]
+  ],
+  "bb.bets_history_ws.v1.common.PeriodScoreTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "MATCH",
+    1
+   ],
+   [
+    "MAP",
+    2
+   ]
+  ],
+  "bb.bets_history_ws.v1.common.PeriodScoreScoreTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "TOTAL",
+    1
+   ],
+   [
+    "KILLS",
+    2
+   ],
+   [
+    "WON_ROUNDS",
+    3
+   ],
+   [
+    "GOALS",
+    4
+   ]
+  ],
+  "bb.bets_history_ws.v1.common.BetStatusTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "NEW",
+    1
+   ],
+   [
+    "WIN",
+    2
+   ],
+   [
+    "LOSS",
+    3
+   ],
+   [
+    "CANCELED",
+    4
+   ],
+   [
+    "CASHOUT",
+    5
+   ]
+  ],
+  "bb.bets_history_ws.v1.common.BetTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "SINGLE",
+    1
+   ],
+   [
+    "SYSTEM",
+    2
+   ],
+   [
+    "EXPRESS",
+    3
+   ]
+  ],
+  "bb.bets_history_ws.v1.common.Providers": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "DIGITAIN",
+    1
+   ],
+   [
+    "ODDIN",
+    2
+   ],
+   [
+    "SPORTRADAR",
+    3
+   ],
+   [
+    "LSPORTS",
+    4
+   ]
+  ],
+  "bb.bets_history_ws.v1.common.BetStakeStatusTypes": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "NEW",
+    1
+   ],
+   [
+    "WIN",
+    2
+   ],
+   [
+    "LOSS",
+    3
+   ],
+   [
+    "OTHER",
+    4
+   ]
+  ],
+  "bb.sportradar_stream_events_ws.v1.common.PenaltyStatus": [
+   [
+    "UNKNOWN",
+    0
+   ],
+   [
+    "NOT_TAKEN",
+    1
+   ],
+   [
+    "MISSED",
+    2
+   ],
+   [
+    "SCORED",
+    3
+   ]
+  ],
+  "bb.sportradar_stream_events_ws.v1.common.MatchStatusType": [
+   [
+    "MATCH_STATUS_TYPE_UNSPECIFIED",
+    0
+   ],
+   [
+    "MATCH_STATUS_TYPE_NOT_STARTED",
+    1
+   ],
+   [
+    "MATCH_STATUS_TYPE_STARTED",
+    2
+   ],
+   [
+    "MATCH_STATUS_TYPE_1ST_HALF",
+    3
+   ],
+   [
+    "MATCH_STATUS_TYPE_2ND_HALF",
+    4
+   ],
+   [
+    "MATCH_STATUS_TYPE_OVERTIME",
+    5
+   ],
+   [
+    "MATCH_STATUS_TYPE_1ST_EXTRA",
+    6
+   ],
+   [
+    "MATCH_STATUS_TYPE_2ND_EXTRA",
+    7
+   ],
+   [
+    "MATCH_STATUS_TYPE_AWAITING_PENALTIES",
+    8
+   ],
+   [
+    "MATCH_STATUS_TYPE_PENALTIES",
+    9
+   ],
+   [
+    "MATCH_STATUS_TYPE_AWAITING_EXTRA_TIME",
+    10
+   ],
+   [
+    "MATCH_STATUS_TYPE_INTERRUPTED",
+    11
+   ],
+   [
+    "MATCH_STATUS_TYPE_ABANDONED",
+    12
+   ],
+   [
+    "MATCH_STATUS_TYPE_POSTPONED",
+    13
+   ],
+   [
+    "MATCH_STATUS_TYPE_START_DELAYED",
+    14
+   ],
+   [
+    "MATCH_STATUS_TYPE_CANCELLED",
+    15
+   ],
+   [
+    "MATCH_STATUS_TYPE_HALFTIME",
+    16
+   ],
+   [
+    "MATCH_STATUS_TYPE_EXTRA_TIME_HALFTIME",
+    17
+   ],
+   [
+    "MATCH_STATUS_TYPE_ENDED",
+    18
+   ],
+   [
+    "MATCH_STATUS_TYPE_AET",
+    19
+   ],
+   [
+    "MATCH_STATUS_TYPE_AP",
+    20
+   ]
+  ],
+  "bb.sportradar_stream_events_ws.v1.common.ResponseStatuses": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "OK",
+    1
+   ],
+   [
+    "BAD_REQUEST",
+    2
+   ],
+   [
+    "FORBIDDEN",
+    3
+   ],
+   [
+    "NOT_FOUND",
+    4
+   ],
+   [
+    "SERVER_ERROR",
+    5
+   ],
+   [
+    "TOO_MANY_REQUESTS",
+    6
+   ]
+  ],
+  "bb.sportradar_stream_events_ws.v1.common.UpdateAction": [
+   [
+    "UNSPECIFIED",
+    0
+   ],
+   [
+    "MODIFIED",
+    1
+   ],
+   [
+    "DELETED",
+    2
+   ]
+  ]
+ }
+}

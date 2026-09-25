@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+
+# generated protobuf classes: rebuilt from proto/ by grpc_tools.protoc
+tennis/ingest/betboom/generated/
+# captured data never goes in git
+data/
+*.jsonl
+*.parquet
+
+# virtualenvs: build output, never source. A Linux venv was committed once
+# by mistake (6,443 files, 30 MB) and is still in history; do not repeat it.
+.venv/
+venv/
+.env/
