@@ -35,11 +35,11 @@ BetBoom в объёме тысяч наблюдений.** Без этого к�
 
 | Параметр | Значение |
 |---|---|
-| `FEED_WS_URL_TEMPLATE` | `wss://{partner}-ws2.sporthub.bet:443/api/tree_ws/v1` |
+| `FEED_WS_URL_TEMPLATE` | `wss://{partner}-ws2.sporthub.bet:443/api/tree_ws/v1`; с 24.09 с `?uuid=…` виджета: без него фид отвечает 3003 (`a8d2f61`) |
 | `FEED_WS_PROTOCOL` | `protobuf` |
 | `MAX_MATCHES_SUBSCRIBE_FULL_ITEMS_LIMIT_PER_REQUEST` | **1** |
 | `MAX_MATCHES_SUBSCRIBE_ITEMS_LIMIT_PER_REQUEST` | 50 |
-| `APP_BUILD` | `8.45.1-5d29aa45` |
+| `APP_BUILD` | `8.45.1-5d29aa45`; 25.09 схема сверена с `8.45.2-f9e91ba9` — побайтно та же |
 
 HTTP-дублёра линии нет. Проверено прямо: при заблокированном сокете страница
 `betboom.ru/sport/live` отдаёт 200 и рендерит только навигацию — ни одного
@@ -499,6 +499,7 @@ python -m tennis.ingest.status data/raw
 # 1. схема из бандла (имя файла меняется при каждом деплое)
 #    взять vendor-core-*.js из
 #    https://sportbook.sporthub.bet/widgets/sportbook/v1/modern/
+#    (его имя — в widget.js там же, браузер не нужен)
 python tennis/ingest/betboom/extract_schema.py vendor-core-*.js \
     -o tennis/ingest/betboom/proto
 
@@ -518,6 +519,13 @@ python -m tennis.ingest.betboom.client --out data/raw --max-matches 8
 
 `APP_BUILD` в `runtime-env.js` стоит сверять перед каждым запуском: номера полей
 это контракт, и молчаливая перенумерация испортит запись, не подняв ошибки.
+Одной командой: `python -m tennis.ingest.betboom.check_build`. Скрипт скачивает
+`runtime-env.js`, `widget.js` и бандл, который тот называет, и сверяет две вещи:
+uuid сокета с `DEFAULT_URL` рекордера и схему с `proto/schema.json` поле за полем.
+Минифицированные имена он сначала переводит в имена типов, потому что они
+меняются с каждой сборкой, даже когда формат передачи тот же. Код выхода: 0 — всё
+то же, 1 — что-то сдвинулось (строки называют что), 2 — сверить не удалось.
+25.09 на сборке `8.45.2-f9e91ba9` ответ был 0.
 
 Разбор записанного лога, когда что-то пошло не так:
 

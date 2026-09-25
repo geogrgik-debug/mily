@@ -30,7 +30,8 @@ Usage:
 Finding the bundle (it is content-hashed, so the name changes on every
 deploy): load https://betboom.ru/sport/live in a browser, take the
 `vendor-core-*.js` request from
-https://sportbook.sporthub.bet/widgets/sportbook/v1/modern/.
+https://sportbook.sporthub.bet/widgets/sportbook/v1/modern/. Or no browser:
+widget.js in that directory names it, which is how check_build finds it.
 """
 
 from __future__ import annotations
@@ -127,6 +128,19 @@ def parse_bundle(src: str) -> tuple[dict[str, list[dict]], dict[str, str]]:
             continue
         messages[typename] = _parse_fields(arr)
     return messages, ident_to_type
+
+
+def schema_of(src: str) -> dict:
+    """The schema as schema.json keeps it: messages, the minified idents that
+    name message types, and each enum type's values. check_build compares a
+    live bundle by this same dict."""
+    messages, ident_to_type = parse_bundle(src)
+    enums = parse_enums(src)
+    enum_ident = {f["type_ref"]: f["enum_ident"]
+                  for fields in messages.values() for f in fields
+                  if f.get("kind") == "enum" and f.get("enum_ident")}
+    return {"messages": messages, "idents": ident_to_type,
+            "enums": {t: enums.get(i, []) for t, i in enum_ident.items()}}
 
 
 def _parse_fields(arr: str) -> list[dict]:
@@ -251,24 +265,20 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     src = args.bundle.read_text(encoding="utf-8", errors="replace")
-    messages, ident_to_type = parse_bundle(src)
-    enums = parse_enums(src)
-    enum_types: dict[str, str] = {}
-    enum_prefix: dict[str, str] = {}
-    for fields in messages.values():
-        for f in fields:
-            if f.get("kind") == "enum" and f.get("enum_ident"):
-                enum_types[f["type_ref"]] = f["enum_ident"]
-                enum_prefix[f["type_ref"]] = f.get("enum_prefix", "")
+    schema = schema_of(src)
+    messages, ident_to_type, enums = schema["messages"], schema["idents"], schema["enums"]
+    # schema_of already keys enum values by type name, so each type is its own key.
+    enum_types = {name: name for name in enums}
+    enum_prefix = {f["type_ref"]: f.get("enum_prefix", "")
+                   for fields in messages.values() for f in fields
+                   if f.get("kind") == "enum" and f.get("enum_ident")}
     if not messages:
         print("no protobuf message literals found — wrong bundle?", file=sys.stderr)
         return 2
 
     args.outdir.mkdir(parents=True, exist_ok=True)
     (args.outdir / "schema.json").write_text(
-        json.dumps({"messages": messages, "idents": ident_to_type,
-                    "enums": {k: enums.get(v, []) for k, v in enum_types.items()}},
-                   ensure_ascii=False, indent=1), encoding="utf-8")
+        json.dumps(schema, ensure_ascii=False, indent=1), encoding="utf-8")
 
     prefixes = sorted({".".join(n.split(".")[:3]) for n in messages}) \
         if args.packages == ["all"] else args.packages
