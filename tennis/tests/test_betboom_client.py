@@ -606,3 +606,12 @@ def test_a_refused_outcome_subscription_is_reported(tmp_path):
     rec, _, _ = run_session(tmp_path, [msg.SerializeToString()])
 
     assert any("stakes_subscribe.item code=404" in line for line in rec.bad_codes)
+
+
+def test_default_url_carries_the_widget_uuid():
+    """Without it the feed refuses every socket with 3003, from any address."""
+    from urllib.parse import parse_qs, urlsplit
+
+    from tennis.ingest.betboom.client import DEFAULT_URL
+
+    assert parse_qs(urlsplit(DEFAULT_URL).query).get("uuid")

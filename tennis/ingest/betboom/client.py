@@ -69,7 +69,13 @@ from tennis.ingest.clock import Clock, Instant
 from tennis.ingest.rawlog import RawLog
 from tennis.market.names import parse_market
 
-DEFAULT_URL = "wss://ru-ws2.sporthub.bet:443/api/tree_ws/v1"
+# The uuid is FEED_WS_URL_TEMPLATE's in the widget's runtime-env.js, since
+# APP_BUILD 8.45.2. From 24.09 15:28 MSK the feed closed every socket without it
+# at once, 3010 and from 17:03 3003 "Access rejected", from any address, and the
+# capture host recorded no price for 29 hours. If 3003 comes back, compare with
+# https://sportbook.sporthub.bet/widgets/sportbook/v1/modern/runtime-env.js
+DEFAULT_URL = ("wss://ru-ws2.sporthub.bet:443/api/tree_ws/v1"
+               "?uuid=01a0d23a-f305-719c-bb3d-11c5bed388f1")
 
 # A subscribed match that has priced nothing for this long gives its slot back.
 # A game lasts minutes and every score change re-sends the board, so twenty
