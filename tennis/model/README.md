@@ -53,6 +53,20 @@ The live function and the offline measurement go through the same `predict`.
   while the map they make is well pinned. If one comes out negative it is
   fixed at zero, as Kull et al. do. Isotonic, fitted on the same rows, scores
   the same on every level (the gains below), so the smooth map is kept.
+- One map serves all three levels. A map per level must beat it by 0.0001 of
+  held-out log loss, by 5-fold cross-validation by match inside the
+  calibration years. It won by 0.00006, and the test years show why that is
+  not enough (below). The rule's threshold was set on 2026-09-24, after the
+  test had been seen. `hold_v1.json` still carries a map per level, three
+  copies of one map, so the live code already looks the map up by level.
+- **Beyond the data the map does not extrapolate.** Its support is the
+  calibration years' q without the 0.1 % at each end: 0.472 to 0.951. Past
+  either edge the map's correction to the logit stays at its value at that
+  edge. The forecast still rises with q, but the map's slope there, fitted on
+  nothing, is dropped. At q = 0.3 the map alone would add 5.8 points, and held
+  it adds 1.4. At q = 0.2 it would add 8.4, and held it adds 1.1. Of the test
+  games, 343 of 218 848 (0.16 %) fall outside the support, and log loss does
+  not move in the fourth digit.
 
 The years, the data and how rows are built are in `tennis/eval/README.md`,
 section "Calibration". In short: everything fitted is from before 2017, and
@@ -100,10 +114,10 @@ calibrated forecast has (0, 1). The audit's bar is ECE < 0.02 and slope in
 | Slams, full model | **0.0090** [0.0047] | −0.108 (−0.163 – −0.055) | **1.043** (1.005–1.084) |
 | tour, live state | 0.0066 [0.0055] | +0.002 (−0.061 – +0.066) | 1.019 (0.970–1.072) |
 | tour, + residual | 0.0067 [0.0055] | +0.057 (−0.005 – +0.116) | 0.965 (0.918–1.013) |
-| tour, full model | **0.0097** [0.0055] | +0.111 (+0.051 – +0.168) | **0.948** (0.901–0.997) |
+| tour, full model | **0.0097** [0.0055] | +0.111 (+0.051 – +0.168) | **0.948** (0.900–0.997) |
 | Challenger, live state | 0.0092 [0.0043] | −0.161 (−0.199 – −0.118) | 1.146 (1.109–1.182) |
 | Challenger, + residual | 0.0065 [0.0041] | −0.065 (−0.100 – −0.026) | 1.065 (1.031–1.097) |
-| Challenger, full model | **0.0089** [0.0042] | −0.034 (−0.070 – +0.004) | **1.073** (1.039–1.105) |
+| Challenger, full model | **0.0089** [0.0042] | −0.034 (−0.069 – +0.004) | **1.073** (1.038–1.105) |
 | all, live state | 0.0058 [0.0026] | −0.121 (−0.151 – −0.092) | 1.085 (1.062–1.108) |
 | all, full model | **0.0039** [0.0027] | +0.006 (−0.021 – +0.033) | **1.009** (0.987–1.030) |
 
@@ -115,9 +129,22 @@ calibrated forecast has (0, 1). The audit's bar is ECE < 0.02 and slope in
 - **One calibration map serves three levels, and it trades them.** It helps
   the Slams (log loss +0.0004, ECE 0.0142 → 0.0090). It slightly hurts tour
   (−0.0002, ECE 0.0067 → 0.0097, intercept pushed to +0.11) and Challenger
-  (−0.0001). A map per level is the obvious next step. It must be chosen
-  inside the calibration years, by cross-validation, not by these test
-  numbers.
+  (−0.0001).
+- **A map per level does not do better.** Fitted on the same calibration years
+  and scored on the test:
+
+  | | one map | a map per level | gain of a map per level |
+  |---|---|---|---|
+  | Slams | ECE 0.0090, slope 1.043 | ECE 0.0058, slope 0.992 | +0.0003 (0.0001–0.0004) |
+  | tour | ECE 0.0097, slope 0.948 | ECE 0.0107, slope 0.903 | −0.0002 (−0.0003–−0.0001) |
+  | Challenger | ECE 0.0089, slope 1.073 | ECE 0.0095, slope **1.116** | −0.0001 (−0.0001–−0.0000) |
+  | all | ECE 0.0039, slope 1.009 | ECE 0.0043, slope 1.011 | +0.0000 (−0.0001–+0.0001) |
+
+  It helps the Slams and hurts tour and Challenger. On Challenger it takes the
+  slope outside the audit's bar. Tour and Challenger are calibrated on one
+  year, 2015, and tested on 2017, so a map of their own learns 2015. One map
+  stays; the owner chose it on 2026-09-24. A calibration fitted on recent
+  games, the live recordings once there are enough of them, is the real fix.
 - The ECE intervals come from resampling, which adds noise, so they sit above
   the point estimate. Read them against the floor, not against zero.
 
@@ -169,6 +196,8 @@ the full model, +0.0003 on Challenger, zero on tour.
   Nothing here is from 2025–2026, so drift since then is unmeasured.
 - Nothing here has met BetBoom's feed. The context comes from the feed's score
   in step 6, the replay.
-- Men only, and the three levels share one calibration map (see above).
+- Men only, and the three levels share one calibration map (see above). Its
+  calibration years are 2015–2016, ten to eleven years before the games it
+  will price.
 - Rows with the server's first service game are included. There the live
   state is still the prior.

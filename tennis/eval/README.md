@@ -136,6 +136,11 @@ whole matches:
 - log loss of the prior, the live state, plus the residual, and plus the
   calibration, with the gain of each step;
 - calibration alone on the live state;
+- one calibration map against a map per level. The parameters take one map
+  unless a map per level wins the calibration years' cross-validation by
+  `MIN_CAL_GAIN`, 0.0001;
+- the map held at the edges of its support against the map extrapolated,
+  and how many test games fall outside the support;
 - isotonic instead of beta;
 - the returner's serve added, measured apart and kept out of the parameters;
 - the residual refitted without each group of the context;

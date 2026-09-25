@@ -4,14 +4,16 @@ row, no test year in the fit, and the fits find what was planted."""
 import numpy as np
 import pytest
 
+import tennis.eval.calibrate as calibrate_mod
 from tennis.eval.calibrate import (
-    FEATURES, GROUPS, Rows, beta_apply, build_rows, calibration_stats, ece, equal_count_edges, evaluate,
-    fit_params, isotonic_apply, isotonic_fit, match_folds, role_of, set_numbers, to_plays,
+    FEATURES, GROUPS, Rows, beta_apply, build_rows, calibration_stats, choose_calibration,
+    choose_l2, ece, equal_count_edges, evaluate, fit_params, isotonic_apply, isotonic_fit,
+    match_folds, prefer_per_level, role_of, set_numbers, to_plays,
 )
-from tennis.eval.live_state import log_loss
-from tennis.eval.set_marks import compare, pbp_marks, slam_marks
 from tennis.eval.join import PricedMatch
+from tennis.eval.live_state import log_loss
 from tennis.eval.points import Game, MatchPoints, valid_game
+from tennis.eval.set_marks import compare, pbp_marks, slam_marks
 from tennis.features import GameContext, vector
 from tennis.model.hold import expit, logit, p_hold, predict, start_state
 from tennis.state import N0, MatchState
@@ -202,7 +204,30 @@ def test_the_fit_finds_a_planted_context_effect_and_leaves_calibration_alone():
     # the model is right, so the calibration map on top is close to the identity
     # (25 000 calibration rows: about 0.01 of noise at the thin ends)
     grid = np.linspace(0.55, 0.97, 50)
-    assert np.abs(beta_apply(grid, params.calibration) - grid).max() < 0.02
+    assert np.abs(beta_apply(grid, params.calibration["tour"]) - grid).max() < 0.02
+
+
+def test_a_level_the_residual_cannot_fix_gets_its_own_map():
+    # Challenger's truth is steeper than the residual can say (a slope, not a
+    # shift a level feature would absorb): the calibration years must pick a map
+    # per level, and that map, not the common one, must reach the parameters
+    rng = np.random.default_rng(12)
+    n = 200_000
+    Z = np.zeros((n, len(FEATURES)))
+    chall = rng.random(n) < 0.5
+    Z[chall, FEATURES.index("chall")] = 1.0
+    h = rng.uniform(0.55, 0.95, n)
+    y = (rng.random(n) < expit(np.where(chall, 1.4, 1.0) * logit(h))).astype(np.int64)
+    match = np.arange(n) // 10
+    rows = Rows(match=match, level=np.where(chall, "chall", "tour"),
+                role=np.array(["fit", "fit", "fit", "cal", "test", ""])[match % 6], hold=y,
+                prior=h, h=h, Z=Z, opp_dev=np.zeros(n))
+    params = fit_params(rows, l2_grid=(10.0,))
+    assert params.meta["calibration"]["per_level"]
+    assert params.calibration["chall"] != params.calibration["tour"]
+    q = np.array([0.6, 0.9])
+    steeper = beta_apply(q, params.calibration["chall"])
+    assert steeper[0] < q[0] - 0.02 and steeper[1] > q[1] + 0.01
 
 
 def test_poisoning_the_test_years_leaves_the_fit_unchanged():
@@ -261,6 +286,41 @@ def test_folds_never_split_a_match():
     assert set(fold) == set(range(5))
 
 
+def test_choose_l2_deals_its_folds_by_match(monkeypatch):
+    calls, real = [], calibrate_mod.match_folds
+
+    def spy(match, folds, seed=0):
+        calls.append((match.copy(), folds))
+        return real(match, folds, seed)
+
+    monkeypatch.setattr(calibrate_mod, "match_folds", spy)
+    rows = _synthetic_rows(n=3_000, seed=8)
+    choose_l2(rows.h, rows.Z, rows.hold, rows.match, grid=(0.0, 10.0), folds=5)
+    assert len(calls) == 1 and np.array_equal(calls[0][0], rows.match) and calls[0][1] == 5
+
+
+def _two_levels(shift, n=150_000, seed=0):
+    rng = np.random.default_rng(seed)
+    q = rng.uniform(0.55, 0.95, n)
+    lv = np.array(["tour", "chall"])[rng.integers(0, 2, n)]
+    y = (rng.random(n) < expit(logit(q) + np.where(lv == "chall", shift, 0.0))).astype(float)
+    return q, y, lv, np.arange(n) // 20
+
+
+def test_a_map_per_level_must_win_the_fourth_digit():
+    # the calibration years of 2026-09-24: per level ahead by 0.00006 -- not enough
+    assert not prefer_per_level({"one_map": 0.5216457, "per_level": 0.5215809})
+    assert prefer_per_level({"one_map": 0.5217, "per_level": 0.5215})
+    assert not prefer_per_level({"one_map": 0.5215, "per_level": 0.5217})
+
+
+def test_calibration_gets_a_map_per_level_only_when_the_levels_differ():
+    per_level, cv = choose_calibration(*_two_levels(0.3))
+    assert per_level and cv["per_level"] < cv["one_map"]
+    per_level, cv = choose_calibration(*_two_levels(0.0, seed=1))
+    assert not per_level and cv["one_map"] <= cv["per_level"]
+
+
 def test_isotonic_is_monotone_and_pools_violators():
     p = np.array([0.1, 0.2, 0.3, 0.4])
     y = np.array([0, 1, 0, 1])
@@ -285,6 +345,11 @@ def test_the_live_function_reproduces_the_evaluated_forecast():
         assert report["test"][lv]["games"] == int(i.sum())
         assert report["test"][lv]["logloss"]["final"] == pytest.approx(
             log_loss(final[i], rows.hold[i]).mean(), abs=1e-12)
+        # the full model is the variant the calibration years chose
+        chosen = "final_per_level" if params.meta["calibration"]["per_level"] else "final_one_map"
+        assert report["test"][lv]["logloss"]["final"] == pytest.approx(
+            report["test"][lv]["logloss"][chosen], abs=1e-12)
+        assert 0 <= report["test"][lv]["outside_support"] <= report["test"][lv]["games"]
     for pm in [pm for pm in priced if role_of(pm.match) == "test"][:2]:
         idx = np.flatnonzero(rows.match == priced.index(pm))
         plays = to_plays(pm.match)

@@ -38,7 +38,8 @@ from tennis.eval.points import MatchPoints
 from tennis.features.context import FEATURES, GameContext, matrix
 from tennis.model.game_rows import GamePlay, build_game_rows, prior_for_pair
 from tennis.model.hold import (
-    HoldParams, beta_apply, beta_fit, expit, fit_logit, logit, predict, residual,
+    IDENTITY, HoldParams, beta_apply, beta_fit, calibrate, expit, fit_calibration, fit_logit,
+    logit, predict, residual,
 )
 from tennis.state import N0, hold_prob
 
@@ -49,6 +50,11 @@ SPLITS = {
 L2_GRID = (0.0, 10.0, 100.0, 1000.0, 10000.0)
 ECE_BINS = 15
 OPP_SCALE = 10.0            # the returner's serve deviation, per 0.1 of serve probability
+# A map per level must beat one map by this much held-out log loss, the fourth
+# digit every gain here is read to. Set on 2026-09-24 after the test years had
+# been seen: the per-level maps won the calibration years by 0.00006 and did no
+# better on the test (tennis/model/README.md), so the owner chose one map.
+MIN_CAL_GAIN = 0.0001
 
 
 def role_of(m: MatchPoints) -> str:
@@ -169,21 +175,50 @@ def choose_l2(h, Z, y, match, grid=L2_GRID, folds: int = 5, seed: int = 0) -> Tu
     return curve[int(np.argmin([c[1] for c in curve]))][0], curve
 
 
+def prefer_per_level(cv: dict) -> bool:
+    """A map per level only if it beats one map by MIN_CAL_GAIN held out."""
+    return cv["one_map"] - cv["per_level"] >= MIN_CAL_GAIN
+
+
+def choose_calibration(q, y, levels, match, folds: int = 5, seed: int = 0) -> Tuple[bool, dict]:
+    """One beta map for all levels, or one per level (`prefer_per_level`), by
+    held-out log loss, folds by whole match, inside the rows given."""
+    fold = match_folds(match, folds, seed)
+    cv = {}
+    for per_level in (False, True):
+        ll = np.empty(len(y))
+        for f in range(folds):
+            out = fold == f
+            maps, support = fit_calibration(q[~out], y[~out], levels[~out], per_level)
+            ll[out] = log_loss(calibrate(q[out], levels[out], maps, support), y[out])
+        cv["per_level" if per_level else "one_map"] = float(ll.mean())
+    return prefer_per_level(cv), cv
+
+
 def fit_params(rows: Rows, l2_grid=L2_GRID, seed: int = 0) -> HoldParams:
-    """The residual on the fit rows, the beta calibration on the cal rows.
-    Rows of any other role are never read."""
+    """The residual on the fit rows; the beta calibration, one map or one per
+    level as cross-validation picks, on the cal rows. Rows of any other role
+    are never read."""
     f, c = rows.role == "fit", rows.role == "cal"
     l2, curve = choose_l2(rows.h[f], rows.Z[f], rows.hold[f], rows.match[f], l2_grid, seed=seed)
     theta = fit_logit(_design(rows.Z[f]), rows.hold[f], offset=logit(rows.h[f]), l2=l2)
-    raw = HoldParams(features=FEATURES, intercept=float(theta[0]),
-                     coef=tuple(float(x) for x in theta[1:]), calibration=(1.0, 1.0, 0.0),
-                     n0=dict(N0))
-    cal = beta_fit(residual(rows.h[c], rows.Z[c], raw), rows.hold[c])
+    raw = uncalibrated(float(theta[0]), tuple(float(x) for x in theta[1:]))
+    q = residual(rows.h[c], rows.Z[c], raw)
+    per_level, cv = choose_calibration(q, rows.hold[c], rows.level[c], rows.match[c], seed=seed)
+    maps, support = fit_calibration(q, rows.hold[c], rows.level[c], per_level)
     counts = {r: {lv: int(((rows.role == r) & (rows.level == lv)).sum()) for lv in N0}
               for r in ("fit", "cal")}
     meta = {"splits": SPLITS, "l2": l2, "l2_curve": curve, "rows": counts,
+            "calibration": {"per_level": per_level, "cv_logloss": cv},
             "command": "python -m tennis.eval calibrate"}
-    return HoldParams(raw.features, raw.intercept, raw.coef, cal, dict(N0), meta)
+    return HoldParams(raw.features, raw.intercept, raw.coef, maps, support, dict(N0), meta)
+
+
+def uncalibrated(intercept: float, coef: Tuple[float, ...]) -> HoldParams:
+    """The residual alone: identity maps, nothing held at an edge."""
+    return HoldParams(features=FEATURES, intercept=intercept, coef=coef,
+                      calibration={lv: IDENTITY for lv in N0},
+                      support={lv: (0.0, 1.0) for lv in N0}, n0=dict(N0))
 
 
 def boot_coef(rows: Rows, l2: float, n_boot: int = 200, seed: int = 0) -> np.ndarray:
@@ -274,12 +309,14 @@ GROUPS = {
                    "deciding_set"),
     "last_games": ("just_broke", "was_broken"),
 }
-MODELS = ("prior", "live", "live_cal", "resid", "final", "final_iso", "final_opp",
+MODELS = ("prior", "live", "live_cal", "resid", "final", "final_one_map", "final_per_level",
+          "final_unclamped", "final_iso", "final_opp",
           "resid_level_only") + tuple(f"resid_no_{g}" for g in GROUPS)
 GAINS = (("prior", "live"), ("live", "resid"), ("resid", "final"), ("live", "live_cal"),
-         ("live_cal", "final"), ("final", "final_opp"), ("final", "final_iso"),
+         ("live_cal", "final"), ("final_one_map", "final_per_level"), ("final_unclamped", "final"),
+         ("final", "final_opp"), ("final", "final_iso"),
          ("live", "resid_level_only")) + tuple((f"resid_no_{g}", "resid") for g in GROUPS)
-CALIBRATION_OF = ("prior", "live", "resid", "final")
+CALIBRATION_OF = ("prior", "live", "resid", "final_one_map", "final_per_level", "final")
 
 
 def _refit(rows: Rows, cols: Sequence[str], l2: float) -> np.ndarray:
@@ -296,16 +333,27 @@ def forecasts(rows: Rows, params: HoldParams, l2: float) -> Tuple[Dict[str, np.n
     and the residual refitted with the returner's serve, which is measured
     apart and kept out of the parameters."""
     f, c = rows.role == "fit", rows.role == "cal"
+    per_level = params.meta["calibration"]["per_level"]
     q = residual(rows.h, rows.Z, params)
     Zo = np.column_stack([rows.Z, rows.opp_dev])
     th = fit_logit(_design(Zo[f]), rows.hold[f], offset=logit(rows.h[f]), l2=l2)
     q_opp = expit(logit(rows.h) + _design(Zo) @ th)
+
+    def cal_on(x: np.ndarray, per: bool) -> np.ndarray:
+        return calibrate(x, rows.level, *fit_calibration(x[c], rows.hold[c], rows.level[c], per))
+
+    iso = np.empty(len(q))
+    for lv in (np.unique(rows.level) if per_level else [None]):
+        i = rows.level == lv if lv is not None else np.ones(len(q), bool)
+        iso[i] = isotonic_apply(q[i], isotonic_fit(q[i & c], rows.hold[i & c]))
     return {
         "prior": rows.prior, "live": rows.h,
         "live_cal": beta_apply(rows.h, beta_fit(rows.h[c], rows.hold[c])),
         "resid": q, "final": predict(rows.h, rows.Z, params),
-        "final_iso": isotonic_apply(q, isotonic_fit(q[c], rows.hold[c])),
-        "final_opp": beta_apply(q_opp, beta_fit(q_opp[c], rows.hold[c])),
+        "final_one_map": cal_on(q, False), "final_per_level": cal_on(q, True),
+        "final_unclamped": calibrate(q, rows.level, params.calibration),
+        "final_iso": iso,
+        "final_opp": cal_on(q_opp, per_level),
         "resid_level_only": _refit(rows, GROUPS["level_surface"], l2),
         **{f"resid_no_{g}": _refit(rows, [x for x in FEATURES if x not in cols], l2)
            for g, cols in GROUPS.items()},
@@ -327,7 +375,10 @@ def evaluate(rows: Rows, n_boot: int = 1000, n_boot_coef: int = 200, seed: int =
                              float(np.percentile(draws[:, i], 97.5))] if draws is not None else None)}
                  for i, (n, v) in enumerate(zip(names, theta))},
         "opp_coef": float(opp_theta[-1]),
-        "calibration": dict(zip(("a", "b", "d"), params.calibration)),
+        "calibration": {**params.meta["calibration"],
+                        "maps": {lv: dict(zip(("a", "b", "d"), m))
+                                 for lv, m in params.calibration.items()},
+                        "support": {lv: list(v) for lv, v in params.support.items()}},
         "test": {},
     }
     test = rows.role == "test"
@@ -339,6 +390,9 @@ def evaluate(rows: Rows, n_boot: int = 1000, n_boot_coef: int = 200, seed: int =
         ll = {k: log_loss(fc[k][i], y) for k in MODELS}
         report["test"][lv] = {
             "matches": int(len(np.unique(mt))), "games": int(i.sum()), "hold_rate": float(y.mean()),
+            "outside_support": int(sum(((fc["resid"][i] < params.support[x][0])
+                                        | (fc["resid"][i] > params.support[x][1]))[rows.level[i] == x].sum()
+                                       for x in N0)),
             "logloss": {k: float(v.mean()) for k, v in ll.items()},
             "gain": {f"{a}->{b}": boot_gain(ll[a], ll[b], mt, n_boot, seed) for a, b in GAINS},
             "calibration": {k: calibration_stats(fc[k][i], y, mt, n_boot, seed)
@@ -351,6 +405,9 @@ def evaluate(rows: Rows, n_boot: int = 1000, n_boot_coef: int = 200, seed: int =
 
 LABEL = {"prior": "prior alone", "live": "live state", "live_cal": "live + calibration",
          "resid": "live + residual", "final": "live + residual + calibration",
+         "final_one_map": "  same, one calibration map for all levels",
+         "final_per_level": "  same, a calibration map per level",
+         "final_unclamped": "  same, the map extrapolated past its support",
          "final_iso": "  same, isotonic instead of beta", "final_opp": "  same, + returner's serve",
          "resid_level_only": "live + residual on level and surface only",
          **{f"resid_no_{g}": f"live + residual without {g}" for g in GROUPS}}
@@ -370,9 +427,17 @@ def format_report(r: dict) -> str:
                                    else f"{c['value']:+.3f}"))
     out.append(f"  returner's serve, x0.1 (measured apart, not in the parameters): {r['opp_coef']:+.3f}")
     cal = r["calibration"]
-    out.append(f"beta calibration: a {cal['a']:.3f}, b {cal['b']:.3f}, d {cal['d']:+.3f}")
+    cv = cal["cv_logloss"]
+    out.append(f"calibration by 5-fold CV by match on the calibration years: one map "
+               f"{cv['one_map']:.5f}, a map per level {cv['per_level']:.5f} -> "
+               + ("a map per level" if cal["per_level"] else "one map"))
+    for lv, m in cal["maps"].items():
+        lo, hi = cal["support"][lv]
+        out.append(f"  {lv:5s} beta map a {m['a']:.3f}, b {m['b']:.3f}, d {m['d']:+.3f}; "
+                   f"support {lo:.3f} .. {hi:.3f}")
     for lv, t in r["test"].items():
-        out += ["", f"== test, {lv}: {t['matches']} matches, {t['games']} games, hold {t['hold_rate']:.3f}"]
+        out += ["", f"== test, {lv}: {t['matches']} matches, {t['games']} games, hold {t['hold_rate']:.3f}, "
+                    f"{t['outside_support']} outside the calibration's support"]
         out.append("  log loss: " + "  ".join(f"{k} {v:.4f}" for k, v in t["logloss"].items()))
         for k, g in t["gain"].items():
             a, b = k.split("->")
