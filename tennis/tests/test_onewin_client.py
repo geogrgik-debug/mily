@@ -508,7 +508,10 @@ def test_the_counters_sit_with_1win_and_are_not_taken_for_betboom_s(tmp_path):
         assert list(tmp_path.glob("_recorder*.json")) == []
         assert path not in find_logs(tmp_path)
 
-        st = capture_status(tmp_path)
+        # bytes_per_day=1: the verdict must not hang on the disk the test runs
+        # on. On the capture host tmp_path is a ~1 GB tmpfs, "1.1 days left"
+        # (START_HERE, the nine status tests of 22.09), and this failed there.
+        st = capture_status(tmp_path, bytes_per_day=1)
     assert st.ok, st.reason
     assert st.subscribed is None and st.stakes_seen is None
     assert st.other_providers["1win"]["files"] == 1
