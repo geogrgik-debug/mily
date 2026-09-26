@@ -1,7 +1,7 @@
 {
-  "age_s": 0.0,
+  "age_s": 0.2,
   "blind_s": 36.2,
-  "checked_at_s": 1790409001.4659646,
+  "checked_at_s": 1790409301.2911687,
   "disconnects": [
     {
       "at_s": 1790404099.0,
@@ -9,19 +9,19 @@
       "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- ConnectionResetError: [Errno 104] Connection reset by peer"
     }
   ],
-  "disk_free_bytes": 24287371264,
+  "disk_free_bytes": 24284790784,
   "disk_free_days": 27.0,
   "files": 9,
   "last_blind_s": 36.2,
   "last_disconnect": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- ConnectionResetError: [Errno 104] Connection reset by peer",
-  "last_stake_age_s": 24.4,
-  "newest_bytes": 42250675,
+  "last_stake_age_s": 27.4,
+  "newest_bytes": 44766113,
   "newest_file": "data/raw/provider=betboom/date=2026-09-26/run-1790403518-435829-57c899.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 651343 котировок",
+  "reason": "пишет, 10 подписок, 687176 котировок",
   "reconnects": 1,
-  "stakes_seen": 651343,
+  "stakes_seen": 687176,
   "subscribed": 10,
-  "total_bytes": 636611546
+  "total_bytes": 639126984
 }
