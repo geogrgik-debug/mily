@@ -1,7 +1,7 @@
 {
-  "age_s": 1.0,
-  "blind_s": 74.6,
-  "checked_at_s": 1790586901.3143392,
+  "age_s": 9.8,
+  "blind_s": 85.3,
+  "checked_at_s": 1790587201.3395,
   "disconnects": [
     {
       "at_s": 1790404099.0,
@@ -27,21 +27,41 @@
       "at_s": 1790524464.0,
       "lived_s": 5951.1,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1790587169.5,
+      "lived_s": 62705.0,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1790587176.8,
+      "lived_s": 6.9,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1790587181.0,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1790587185.3,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 23419584512,
+  "disk_free_bytes": 23417503744,
   "disk_free_days": 26.0,
   "files": 11,
   "last_blind_s": 1.0,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 15.2,
-  "newest_bytes": 157922227,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 28.6,
+  "newest_bytes": 159980601,
   "newest_file": "data/raw/provider=betboom/date=2026-09-28/run-1790403518-435829-57c899.jsonl.gz",
-  "ok": true,
+  "ok": false,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 13305650 котировок",
-  "reconnects": 5,
-  "stakes_seen": 13305650,
-  "subscribed": 10,
-  "total_bytes": 1484553543
+  "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
+  "reconnects": 9,
+  "stakes_seen": 13333859,
+  "subscribed": 0,
+  "total_bytes": 1486611917
 }
