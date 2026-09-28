@@ -1,7 +1,7 @@
 {
   "age_s": 0.4,
   "blind_s": 373.7,
-  "checked_at_s": 1790597701.750218,
+  "checked_at_s": 1790598001.073819,
   "disconnects": [
     {
       "at_s": 1790589877.9,
@@ -54,19 +54,19 @@
       "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
     }
   ],
-  "disk_free_bytes": 23349194752,
+  "disk_free_bytes": 23347359744,
   "disk_free_days": 25.9,
   "files": 11,
   "last_blind_s": 239.5,
   "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
-  "last_stake_age_s": 15.4,
-  "newest_bytes": 218411738,
+  "last_stake_age_s": 20.5,
+  "newest_bytes": 220204138,
   "newest_file": "data/raw/provider=betboom/date=2026-09-28/run-1790403518-435829-57c899.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 14092898 котировок",
+  "reason": "пишет, 10 подписок, 14116659 котировок",
   "reconnects": 25,
-  "stakes_seen": 14092898,
+  "stakes_seen": 14116659,
   "subscribed": 10,
-  "total_bytes": 1545043054
+  "total_bytes": 1546835454
 }
