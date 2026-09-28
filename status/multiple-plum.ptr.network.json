@@ -1,7 +1,7 @@
 {
-  "age_s": 4.6,
+  "age_s": 2.0,
   "blind_s": 74.6,
-  "checked_at_s": 1790559901.2368875,
+  "checked_at_s": 1790560201.0870054,
   "disconnects": [
     {
       "at_s": 1790404099.0,
@@ -29,19 +29,19 @@
       "why": "ConnectionClosedError: no close frame received or sent"
     }
   ],
-  "disk_free_bytes": 23583600640,
+  "disk_free_bytes": 23575117824,
   "disk_free_days": 26.2,
   "files": 11,
   "last_blind_s": 1.0,
   "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 1289.3,
-  "newest_bytes": 6105414,
+  "last_stake_age_s": 144.7,
+  "newest_bytes": 6136578,
   "newest_file": "data/raw/provider=betboom/date=2026-09-28/run-1790403518-435829-57c899.jsonl.gz",
-  "ok": false,
+  "ok": true,
   "other_providers": null,
-  "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
+  "reason": "пишет, 2 подписок, 11082699 котировок",
   "reconnects": 5,
-  "stakes_seen": 11082267,
-  "subscribed": 0,
-  "total_bytes": 1332736730
+  "stakes_seen": 11082699,
+  "subscribed": 2,
+  "total_bytes": 1332767894
 }
