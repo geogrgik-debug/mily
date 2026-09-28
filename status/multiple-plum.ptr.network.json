@@ -1,18 +1,8 @@
 {
-  "age_s": 0.5,
-  "blind_s": 134.2,
-  "checked_at_s": 1790595902.0318685,
+  "age_s": 4.3,
+  "blind_s": 190.8,
+  "checked_at_s": 1790596201.6509047,
   "disconnects": [
-    {
-      "at_s": 1790587181.0,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1790587185.3,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
     {
       "at_s": 1790587191.6,
       "lived_s": null,
@@ -52,21 +42,31 @@
       "at_s": 1790591185.6,
       "lived_s": 1307.4,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1790596176.3,
+      "lived_s": 4990.4,
+      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
+    },
+    {
+      "at_s": 1790596186.3,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
     }
   ],
-  "disk_free_bytes": 23359741952,
+  "disk_free_bytes": 23358369792,
   "disk_free_days": 26.0,
   "files": 11,
   "last_blind_s": 1.1,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 19.1,
-  "newest_bytes": 208125338,
+  "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
+  "last_stake_age_s": 71.7,
+  "newest_bytes": 209457529,
   "newest_file": "data/raw/provider=betboom/date=2026-09-28/run-1790403518-435829-57c899.jsonl.gz",
-  "ok": true,
+  "ok": false,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 13960249 котировок",
-  "reconnects": 17,
-  "stakes_seen": 13960249,
-  "subscribed": 10,
-  "total_bytes": 1534756654
+  "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
+  "reconnects": 19,
+  "stakes_seen": 13978465,
+  "subscribed": 0,
+  "total_bytes": 1536088845
 }
