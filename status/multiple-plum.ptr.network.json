@@ -1,33 +1,8 @@
 {
-  "age_s": 13.1,
-  "blind_s": 30202.4,
-  "checked_at_s": 1790808001.817795,
+  "age_s": 12.1,
+  "blind_s": 30502.5,
+  "checked_at_s": 1790808301.6463962,
   "disconnects": [
-    {
-      "at_s": 1790807387.0,
-      "lived_s": 0.1,
-      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790807447.1,
-      "lived_s": 0.1,
-      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790807507.3,
-      "lived_s": 0.1,
-      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790807567.5,
-      "lived_s": 0.1,
-      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790807627.7,
-      "lived_s": 0.1,
-      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
-    },
     {
       "at_s": 1790807687.9,
       "lived_s": 0.1,
@@ -52,21 +27,46 @@
       "at_s": 1790807928.6,
       "lived_s": 0.1,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1790807988.8,
+      "lived_s": 0.1,
+      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790808048.9,
+      "lived_s": 0.1,
+      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790808109.1,
+      "lived_s": 0.1,
+      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790808169.3,
+      "lived_s": 0.1,
+      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
+    },
+    {
+      "at_s": 1790808229.5,
+      "lived_s": 0.1,
+      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
     }
   ],
-  "disk_free_bytes": 22361341952,
+  "disk_free_bytes": 22361255936,
   "disk_free_days": 24.8,
   "files": 14,
   "last_blind_s": 60.2,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 73.2,
-  "newest_bytes": 126747462,
+  "last_disconnect": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected",
+  "last_stake_age_s": 72.2,
+  "newest_bytes": 126810118,
   "newest_file": "data/raw/provider=betboom/date=2026-09-30/run-1790749552-517950-21a5a8.jsonl.gz",
   "ok": false,
   "other_providers": null,
   "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
-  "reconnects": 515,
-  "stakes_seen": 1237672,
+  "reconnects": 520,
+  "stakes_seen": 1237890,
   "subscribed": 0,
-  "total_bytes": 2403168390
+  "total_bytes": 2403231046
 }
