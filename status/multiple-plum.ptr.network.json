@@ -1,72 +1,21 @@
 {
-  "age_s": 0.9,
-  "blind_s": 397.8,
-  "checked_at_s": 1790749501.9340255,
-  "disconnects": [
-    {
-      "at_s": 1790630429.0,
-      "lived_s": 30881.2,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1790676989.2,
-      "lived_s": 46560.0,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1790680899.3,
-      "lived_s": 3908.0,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1790680901.4,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1790680905.0,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1790687129.3,
-      "lived_s": 6220.5,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1790687154.0,
-      "lived_s": 24.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1790688595.6,
-      "lived_s": 1440.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1790692533.6,
-      "lived_s": 3937.2,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1790719568.0,
-      "lived_s": 27034.3,
-      "why": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout"
-    }
-  ],
-  "disk_free_bytes": 22550925312,
+  "age_s": 1.4,
+  "blind_s": 0.0,
+  "checked_at_s": 1790749801.060954,
+  "disconnects": [],
+  "disk_free_bytes": 22553296896,
   "disk_free_days": 25.1,
-  "files": 13,
-  "last_blind_s": 0.4,
-  "last_disconnect": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout",
-  "last_stake_age_s": 9.6,
-  "newest_bytes": 129390242,
-  "newest_file": "data/raw/provider=betboom/date=2026-09-30/run-1790403518-435829-57c899.jsonl.gz",
+  "files": 14,
+  "last_blind_s": null,
+  "last_disconnect": null,
+  "last_stake_age_s": 8.9,
+  "newest_bytes": 928876,
+  "newest_file": "data/raw/provider=betboom/date=2026-09-30/run-1790749552-517950-21a5a8.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 23764183 котировок",
-  "reconnects": 36,
-  "stakes_seen": 23764183,
+  "reason": "пишет, 10 подписок, 10648 котировок",
+  "reconnects": 0,
+  "stakes_seen": 10648,
   "subscribed": 10,
-  "total_bytes": 2276176240
+  "total_bytes": 2277349804
 }
