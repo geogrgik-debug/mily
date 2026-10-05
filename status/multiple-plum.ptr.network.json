@@ -1,38 +1,8 @@
 {
-  "age_s": 1.6,
-  "blind_s": 5375.2,
-  "checked_at_s": 1791210301.2605846,
+  "age_s": 0.0,
+  "blind_s": 5418.6,
+  "checked_at_s": 1791210601.0912488,
   "disconnects": [
-    {
-      "at_s": 1790927563.5,
-      "lived_s": 0.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1790927623.7,
-      "lived_s": 0.2,
-      "why": "ConnectionClosedError: received 3003 (registered) Access rejected; then sent 3003 (registered) Access rejected"
-    },
-    {
-      "at_s": 1790927685.8,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1790977387.0,
-      "lived_s": 49641.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791116823.5,
-      "lived_s": 139436.3,
-      "why": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout"
-    },
-    {
-      "at_s": 1791201057.7,
-      "lived_s": 84234.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
     {
       "at_s": 1791201066.8,
       "lived_s": 8.8,
@@ -52,21 +22,51 @@
       "at_s": 1791208552.3,
       "lived_s": 2956.7,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791210479.6,
+      "lived_s": 1926.0,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791210509.8,
+      "lived_s": 30.1,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791210513.1,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791210517.1,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791210530.3,
+      "lived_s": 7.3,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791210540.4,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 20629151744,
+  "disk_free_bytes": 20628176896,
   "disk_free_days": 22.9,
   "files": 20,
-  "last_blind_s": 2.4,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 33.0,
-  "newest_bytes": 294961259,
+  "last_blind_s": 29.0,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 31.4,
+  "newest_bytes": 295882222,
   "newest_file": "data/raw/provider=betboom/date=2026-10-05/run-1790922378-590868-da0534.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 21319917 котировок",
-  "reconnects": 101,
-  "stakes_seen": 21319917,
+  "reason": "пишет, 10 подписок, 21330146 котировок",
+  "reconnects": 107,
+  "stakes_seen": 21330146,
   "subscribed": 10,
-  "total_bytes": 3957195886
+  "total_bytes": 3958116849
 }
