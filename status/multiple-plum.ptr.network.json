@@ -1,7 +1,7 @@
 {
-  "age_s": 2.6,
+  "age_s": 0.9,
   "blind_s": 5467.7,
-  "checked_at_s": 1791234001.4385016,
+  "checked_at_s": 1791234301.487678,
   "disconnects": [
     {
       "at_s": 1791205522.0,
@@ -54,19 +54,19 @@
       "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
     }
   ],
-  "disk_free_bytes": 20504498176,
+  "disk_free_bytes": 20503457792,
   "disk_free_days": 22.8,
   "files": 20,
   "last_blind_s": 49.1,
   "last_disconnect": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection",
-  "last_stake_age_s": 26.5,
-  "newest_bytes": 396339195,
+  "last_stake_age_s": 33.6,
+  "newest_bytes": 397347590,
   "newest_file": "data/raw/provider=betboom/date=2026-10-05/run-1790922378-590868-da0534.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 22698783 котировок",
+  "reason": "пишет, 10 подписок, 22712730 котировок",
   "reconnects": 108,
-  "stakes_seen": 22698783,
+  "stakes_seen": 22712730,
   "subscribed": 10,
-  "total_bytes": 4058573822
+  "total_bytes": 4059582217
 }
