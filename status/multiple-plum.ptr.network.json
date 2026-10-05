@@ -1,7 +1,7 @@
 {
-  "age_s": 9.0,
+  "age_s": 4.9,
   "blind_s": 5368.9,
-  "checked_at_s": 1791164701.2417498,
+  "checked_at_s": 1791165001.2837775,
   "disconnects": [
     {
       "at_s": 1790927262.5,
@@ -54,19 +54,19 @@
       "why": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout"
     }
   ],
-  "disk_free_bytes": 20939952128,
+  "disk_free_bytes": 20939886592,
   "disk_free_days": 23.3,
   "files": 20,
   "last_blind_s": 4.2,
   "last_disconnect": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout",
-  "last_stake_age_s": 11857.1,
-  "newest_bytes": 127327,
+  "last_stake_age_s": 206.4,
+  "newest_bytes": 160948,
   "newest_file": "data/raw/provider=betboom/date=2026-10-05/run-1790922378-590868-da0534.jsonl.gz",
-  "ok": false,
+  "ok": true,
   "other_providers": null,
-  "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
+  "reason": "пишет, 3 подписок, 17371339 котировок",
   "reconnects": 96,
-  "stakes_seen": 17370845,
-  "subscribed": 0,
-  "total_bytes": 3662361954
+  "stakes_seen": 17371339,
+  "subscribed": 3,
+  "total_bytes": 3662395575
 }
