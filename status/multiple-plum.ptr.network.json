@@ -1,28 +1,8 @@
 {
-  "age_s": 0.7,
-  "blind_s": 5697.2,
-  "checked_at_s": 1791288901.762793,
+  "age_s": 0.1,
+  "blind_s": 5711.9,
+  "checked_at_s": 1791289201.4587343,
   "disconnects": [
-    {
-      "at_s": 1791279192.4,
-      "lived_s": 30.6,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791279195.8,
-      "lived_s": 0.9,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791279238.2,
-      "lived_s": 39.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791279244.5,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
     {
       "at_s": 1791279254.5,
       "lived_s": null,
@@ -52,21 +32,41 @@
       "at_s": 1791285941.5,
       "lived_s": 450.0,
       "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
+    },
+    {
+      "at_s": 1791289100.8,
+      "lived_s": 3159.3,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791289148.1,
+      "lived_s": 47.2,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791289151.3,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791289155.3,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 20246568960,
+  "disk_free_bytes": 20251213824,
   "disk_free_days": 22.5,
   "files": 21,
-  "last_blind_s": 35.4,
-  "last_disconnect": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection",
-  "last_stake_age_s": 27.1,
-  "newest_bytes": 138879109,
+  "last_blind_s": 14.3,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 27.0,
+  "newest_bytes": 139453167,
   "newest_file": "data/raw/provider=betboom/date=2026-10-06/run-1790922378-590868-da0534.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 24761634 котировок",
-  "reconnects": 126,
-  "stakes_seen": 24761634,
+  "reason": "пишет, 10 подписок, 24765862 котировок",
+  "reconnects": 130,
+  "stakes_seen": 24765862,
   "subscribed": 10,
-  "total_bytes": 4221851821
+  "total_bytes": 4222425879
 }
