@@ -1,13 +1,8 @@
 {
-  "age_s": 1.0,
-  "blind_s": 5526.3,
-  "checked_at_s": 1791283201.7357697,
+  "age_s": 0.7,
+  "blind_s": 5562.6,
+  "checked_at_s": 1791283501.653288,
   "disconnects": [
-    {
-      "at_s": 1791277207.1,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
     {
       "at_s": 1791277231.1,
       "lived_s": 22.2,
@@ -52,21 +47,26 @@
       "at_s": 1791279254.5,
       "lived_s": null,
       "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791283260.9,
+      "lived_s": 3990.3,
+      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
     }
   ],
-  "disk_free_bytes": 20288569344,
+  "disk_free_bytes": 20287782912,
   "disk_free_days": 22.5,
   "files": 21,
-  "last_blind_s": 32.8,
-  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
-  "last_stake_age_s": 26.0,
-  "newest_bytes": 119920032,
+  "last_blind_s": 36.3,
+  "last_disconnect": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection",
+  "last_stake_age_s": 27.4,
+  "newest_bytes": 120429868,
   "newest_file": "data/raw/provider=betboom/date=2026-10-06/run-1790922378-590868-da0534.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 24575706 котировок",
-  "reconnects": 121,
-  "stakes_seen": 24575706,
+  "reason": "пишет, 10 подписок, 24579036 котировок",
+  "reconnects": 122,
+  "stakes_seen": 24579036,
   "subscribed": 10,
-  "total_bytes": 4202892744
+  "total_bytes": 4203402580
 }
