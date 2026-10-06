@@ -1,13 +1,8 @@
 {
-  "age_s": 0.5,
-  "blind_s": 5485.4,
-  "checked_at_s": 1791277801.5361605,
+  "age_s": 0.3,
+  "blind_s": 5486.2,
+  "checked_at_s": 1791278101.2205706,
   "disconnects": [
-    {
-      "at_s": 1791210517.1,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
     {
       "at_s": 1791210530.3,
       "lived_s": 7.3,
@@ -52,21 +47,26 @@
       "at_s": 1791277235.2,
       "lived_s": null,
       "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791277797.3,
+      "lived_s": 556.8,
+      "why": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout"
     }
   ],
-  "disk_free_bytes": 20314779648,
+  "disk_free_bytes": 20313968640,
   "disk_free_days": 22.6,
   "files": 21,
-  "last_blind_s": 9.9,
-  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
-  "last_stake_age_s": 25.1,
-  "newest_bytes": 106138903,
+  "last_blind_s": 0.8,
+  "last_disconnect": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout",
+  "last_stake_age_s": 25.4,
+  "newest_bytes": 106741830,
   "newest_file": "data/raw/provider=betboom/date=2026-10-06/run-1790922378-590868-da0534.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 24460836 котировок",
-  "reconnects": 114,
-  "stakes_seen": 24460836,
+  "reason": "пишет, 10 подписок, 24465256 котировок",
+  "reconnects": 115,
+  "stakes_seen": 24465256,
   "subscribed": 10,
-  "total_bytes": 4189111615
+  "total_bytes": 4189714542
 }
