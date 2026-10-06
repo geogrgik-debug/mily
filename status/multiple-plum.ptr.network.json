@@ -1,72 +1,21 @@
 {
-  "age_s": 1.3,
-  "blind_s": 5779.5,
-  "checked_at_s": 1791315301.5703423,
-  "disconnects": [
-    {
-      "at_s": 1791285941.5,
-      "lived_s": 450.0,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
-    {
-      "at_s": 1791289100.8,
-      "lived_s": 3159.3,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791289148.1,
-      "lived_s": 47.2,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791289151.3,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1791289155.3,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1791292881.6,
-      "lived_s": 3720.3,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received"
-    },
-    {
-      "at_s": 1791293262.6,
-      "lived_s": 381.0,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received"
-    },
-    {
-      "at_s": 1791296492.6,
-      "lived_s": 3229.8,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791296494.7,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1791309883.9,
-      "lived_s": 13388.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    }
-  ],
-  "disk_free_bytes": 20136988672,
+  "age_s": 2.3,
+  "blind_s": null,
+  "checked_at_s": 1791325801.2403069,
+  "disconnects": null,
+  "disk_free_bytes": 20169506816,
   "disk_free_days": 22.4,
-  "files": 21,
-  "last_blind_s": 2.0,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 23.8,
-  "newest_bytes": 193811401,
-  "newest_file": "data/raw/provider=betboom/date=2026-10-06/run-1790922378-590868-da0534.jsonl.gz",
+  "files": 22,
+  "last_blind_s": null,
+  "last_disconnect": null,
+  "last_stake_age_s": null,
+  "newest_bytes": 143899,
+  "newest_file": "data/raw/provider=betboom/date=2026-10-06/run-1791325746-833-5dd387.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 25362798 котировок",
-  "reconnects": 135,
-  "stakes_seen": 25362798,
-  "subscribed": 10,
-  "total_bytes": 4276784113
+  "reason": "пишет, последний кадр 2 с назад (счётчиков рекордера нет — только по файлу)",
+  "reconnects": null,
+  "stakes_seen": null,
+  "subscribed": null,
+  "total_bytes": 4277209819
 }
