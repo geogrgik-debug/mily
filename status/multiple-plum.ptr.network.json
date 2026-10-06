@@ -1,18 +1,8 @@
 {
-  "age_s": 2.5,
-  "blind_s": 5773.8,
-  "checked_at_s": 1791296401.330166,
+  "age_s": 1.7,
+  "blind_s": 5777.5,
+  "checked_at_s": 1791296701.2154212,
   "disconnects": [
-    {
-      "at_s": 1791283851.0,
-      "lived_s": 590.1,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
-    {
-      "at_s": 1791284261.2,
-      "lived_s": 410.0,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
     {
       "at_s": 1791285491.3,
       "lived_s": 1230.1,
@@ -52,21 +42,31 @@
       "at_s": 1791293262.6,
       "lived_s": 381.0,
       "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received"
+    },
+    {
+      "at_s": 1791296492.6,
+      "lived_s": 3229.8,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791296494.7,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 20216176640,
+  "disk_free_bytes": 20215480320,
   "disk_free_days": 22.5,
   "files": 21,
-  "last_blind_s": 24.6,
-  "last_disconnect": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received",
+  "last_blind_s": 3.7,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
   "last_stake_age_s": 23.9,
-  "newest_bytes": 149853783,
+  "newest_bytes": 150211643,
   "newest_file": "data/raw/provider=betboom/date=2026-10-06/run-1790922378-590868-da0534.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 24843528 котировок",
-  "reconnects": 132,
-  "stakes_seen": 24843528,
+  "reason": "пишет, 10 подписок, 24845954 котировок",
+  "reconnects": 134,
+  "stakes_seen": 24845954,
   "subscribed": 10,
-  "total_bytes": 4232826495
+  "total_bytes": 4233184355
 }
