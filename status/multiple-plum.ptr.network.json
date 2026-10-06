@@ -1,28 +1,8 @@
 {
-  "age_s": 0.3,
-  "blind_s": 5470.7,
-  "checked_at_s": 1791277201.7631316,
+  "age_s": 0.5,
+  "blind_s": 5485.4,
+  "checked_at_s": 1791277501.8437402,
   "disconnects": [
-    {
-      "at_s": 1791208552.3,
-      "lived_s": 2956.7,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791210479.6,
-      "lived_s": 1926.0,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791210509.8,
-      "lived_s": 30.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791210513.1,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
     {
       "at_s": 1791210517.1,
       "lived_s": null,
@@ -52,21 +32,41 @@
       "at_s": 1791273378.0,
       "lived_s": 719.2,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791277205.0,
+      "lived_s": 3827.0,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791277207.1,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791277231.1,
+      "lived_s": 22.2,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791277235.2,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 20325916672,
+  "disk_free_bytes": 20316209152,
   "disk_free_days": 22.6,
   "files": 21,
-  "last_blind_s": 0.4,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 29.5,
-  "newest_bytes": 103818995,
+  "last_blind_s": 9.9,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 25.9,
+  "newest_bytes": 104921823,
   "newest_file": "data/raw/provider=betboom/date=2026-10-06/run-1790922378-590868-da0534.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 24432802 котировок",
-  "reconnects": 110,
-  "stakes_seen": 24432802,
+  "reason": "пишет, 10 подписок, 24446874 котировок",
+  "reconnects": 114,
+  "stakes_seen": 24446874,
   "subscribed": 10,
-  "total_bytes": 4186791707
+  "total_bytes": 4187894535
 }
