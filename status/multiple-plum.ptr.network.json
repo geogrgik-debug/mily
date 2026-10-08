@@ -1,33 +1,8 @@
 {
-  "age_s": 35.4,
-  "blind_s": 808.7,
-  "checked_at_s": 1791463501.7328007,
+  "age_s": 55.1,
+  "blind_s": 1108.8,
+  "checked_at_s": 1791463801.5759244,
   "disconnects": [
-    {
-      "at_s": 1791462838.0,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
-    {
-      "at_s": 1791462864.0,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
-    {
-      "at_s": 1791462906.0,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
-    {
-      "at_s": 1791462976.1,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
-    {
-      "at_s": 1791463046.1,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
     {
       "at_s": 1791463116.1,
       "lived_s": null,
@@ -52,21 +27,46 @@
       "at_s": 1791463396.3,
       "lived_s": null,
       "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791463466.3,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791463536.3,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791463606.4,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791463676.4,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791463746.5,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
     }
   ],
-  "disk_free_bytes": 19484168192,
+  "disk_free_bytes": 19484069888,
   "disk_free_days": 21.6,
   "files": 24,
   "last_blind_s": 35.3,
   "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
-  "last_stake_age_s": 794.8,
-  "newest_bytes": 197788826,
+  "last_stake_age_s": 1094.7,
+  "newest_bytes": 197789053,
   "newest_file": "data/raw/provider=betboom/date=2026-10-08/run-1791325746-833-5dd387.jsonl.gz",
   "ok": false,
   "other_providers": null,
   "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
-  "reconnects": 21,
+  "reconnects": 26,
   "stakes_seen": 6590823,
   "subscribed": 0,
-  "total_bytes": 4806079442
+  "total_bytes": 4806079669
 }
