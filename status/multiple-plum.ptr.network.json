@@ -1,28 +1,8 @@
 {
-  "age_s": 24.5,
-  "blind_s": 1709.1,
-  "checked_at_s": 1791464401.2560575,
+  "age_s": 2.0,
+  "blind_s": 2004.7,
+  "checked_at_s": 1791464701.1005154,
   "disconnects": [
-    {
-      "at_s": 1791463676.4,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
-    {
-      "at_s": 1791463746.5,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
-    {
-      "at_s": 1791463816.5,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
-    {
-      "at_s": 1791463886.5,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
     {
       "at_s": 1791463956.5,
       "lived_s": null,
@@ -52,21 +32,41 @@
       "at_s": 1791464306.7,
       "lived_s": null,
       "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791464376.8,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791464446.8,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791464516.8,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791464586.9,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
     }
   ],
-  "disk_free_bytes": 19483897856,
+  "disk_free_bytes": 19483672576,
   "disk_free_days": 21.6,
   "files": 24,
-  "last_blind_s": 35.3,
+  "last_blind_s": 1920.6,
   "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
-  "last_stake_age_s": 1694.3,
-  "newest_bytes": 197789571,
+  "last_stake_age_s": 50.5,
+  "newest_bytes": 197935476,
   "newest_file": "data/raw/provider=betboom/date=2026-10-08/run-1791325746-833-5dd387.jsonl.gz",
-  "ok": false,
+  "ok": true,
   "other_providers": null,
-  "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
-  "reconnects": 34,
-  "stakes_seen": 6590823,
-  "subscribed": 0,
-  "total_bytes": 4806080187
+  "reason": "пишет, 10 подписок, 6591582 котировок",
+  "reconnects": 38,
+  "stakes_seen": 6591582,
+  "subscribed": 10,
+  "total_bytes": 4806226092
 }
