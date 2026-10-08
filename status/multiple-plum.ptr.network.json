@@ -1,33 +1,8 @@
 {
-  "age_s": 37.9,
-  "blind_s": 208.5,
-  "checked_at_s": 1791462901.9064133,
+  "age_s": 15.7,
+  "blind_s": 508.6,
+  "checked_at_s": 1791463201.856034,
   "disconnects": [
-    {
-      "at_s": 1791366546.8,
-      "lived_s": 5785.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791452015.0,
-      "lived_s": 85468.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791452049.3,
-      "lived_s": 34.2,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791462702.8,
-      "lived_s": 10650.6,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
-    {
-      "at_s": 1791462772.9,
-      "lived_s": 70.0,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
     {
       "at_s": 1791462782.9,
       "lived_s": null,
@@ -52,21 +27,46 @@
       "at_s": 1791462838.0,
       "lived_s": null,
       "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791462864.0,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791462906.0,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791462976.1,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791463046.1,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1791463116.1,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
     }
   ],
-  "disk_free_bytes": 19484377088,
+  "disk_free_bytes": 19484270592,
   "disk_free_days": 21.6,
   "files": 24,
   "last_blind_s": 35.3,
   "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
-  "last_stake_age_s": 195.0,
-  "newest_bytes": 197788304,
+  "last_stake_age_s": 494.9,
+  "newest_bytes": 197788596,
   "newest_file": "data/raw/provider=betboom/date=2026-10-08/run-1791325746-833-5dd387.jsonl.gz",
   "ok": false,
   "other_providers": null,
   "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
-  "reconnects": 12,
+  "reconnects": 17,
   "stakes_seen": 6590823,
   "subscribed": 0,
-  "total_bytes": 4806078920
+  "total_bytes": 4806079212
 }
