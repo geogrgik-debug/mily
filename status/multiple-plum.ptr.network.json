@@ -1,23 +1,8 @@
 {
   "age_s": 0.1,
-  "blind_s": 2098.2,
-  "checked_at_s": 1791722401.8299577,
+  "blind_s": 2107.5,
+  "checked_at_s": 1791722701.534736,
   "disconnects": [
-    {
-      "at_s": 1791636250.7,
-      "lived_s": 55629.5,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791637162.1,
-      "lived_s": 910.3,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791638455.7,
-      "lived_s": 1293.5,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
     {
       "at_s": 1791638459.0,
       "lived_s": 3.2,
@@ -52,21 +37,36 @@
       "at_s": 1791657751.8,
       "lived_s": 3558.7,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791722581.5,
+      "lived_s": 64829.6,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791722583.6,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791722605.8,
+      "lived_s": 21.0,
+      "why": "ConnectionClosedError: no close frame received or sent"
     }
   ],
-  "disk_free_bytes": 18483060736,
+  "disk_free_bytes": 18480205824,
   "disk_free_days": 20.5,
   "files": 27,
-  "last_blind_s": 0.1,
+  "last_blind_s": 4.1,
   "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 36.9,
-  "newest_bytes": 165845655,
+  "last_stake_age_s": 36.7,
+  "newest_bytes": 168661415,
   "newest_file": "data/raw/provider=betboom/date=2026-10-11/run-1791325746-833-5dd387.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 19644421 котировок",
-  "reconnects": 61,
-  "stakes_seen": 19644421,
+  "reason": "пишет, 10 подписок, 19684461 котировок",
+  "reconnects": 64,
+  "stakes_seen": 19684461,
   "subscribed": 10,
-  "total_bytes": 5706875438
+  "total_bytes": 5709691198
 }
