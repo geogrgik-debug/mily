@@ -8,10 +8,10 @@ Example manifest (player IDs must be verified against the rating snapshot)::
     python -m tennis.replay.betboom CAPTURE.jsonl.gz \
         --snapshot ratings.json.gz --manifest matches.json --out replay.jsonl
 
-Only full two-sided snapshots are quoted in v1. This prevents mixing separate
-per-outcome pushes into a synthetic book. In-game 0-0 of the preceding game is
-required for an early projection; the project has not calibrated a later
-conditional hold used to weight that game. All skipped rows carry a reason.
+Full two-sided snapshots and pairs of per-outcome pushes within 250 ms are
+quoted. A single push is never combined with an old opposite outcome. In-game
+0-0 of the preceding game is required for an early projection; the project has
+not calibrated a later conditional hold used to weight that game.
 """
 from __future__ import annotations
 
@@ -27,6 +27,41 @@ from tennis.market.overround import normalize_proportional, shin
 from tennis.model.hold import HoldParams
 from tennis.ratings.snapshot import RatingsSnapshot
 from tennis.replay.core import MatchReplay, Score
+
+PUSH_PAIR_NS = 250_000_000
+
+
+class PushPairs:
+    """Assemble only two fresh outcome updates from the same score state."""
+
+    def __init__(self, window_ns: int = PUSH_PAIR_NS):
+        self.window_ns = window_ns
+        self.pending: dict[tuple[int, int, int], dict[str, tuple[int, float, object]]] = {}
+
+    def reset_match(self, mid: int) -> None:
+        for key in list(self.pending):
+            if key[0] == mid:
+                del self.pending[key]
+
+    def update(self, key: tuple[int, int, int], name: str, t: int,
+               odd: float, active: bool, score_identity: object
+               ) -> tuple[tuple[float, float], float] | None:
+        if name not in ('П1', 'П2'):
+            return None
+        if not active or not math.isfinite(odd) or odd <= 1:
+            self.pending.pop(key, None)
+            return None
+        pair = self.pending.setdefault(key, {})
+        pair[name] = (t, odd, score_identity)
+        if any(t - item[0] > self.window_ns or item[2] != score_identity
+               for item in pair.values()):
+            pair = self.pending[key] = {name: (t, odd, score_identity)}
+        if set(pair) != {'П1', 'П2'}:
+            return None
+        age_s = (t - min(item[0] for item in pair.values())) / 1e9
+        odds = pair['П1'][1], pair['П2'][1]
+        del self.pending[key]
+        return odds, age_s
 
 
 def _board(info) -> Score | None:
@@ -81,6 +116,9 @@ def replay(path: str | Path, snapshot: RatingsSnapshot, manifest: dict,
     matches: dict[int, MatchReplay] = {}
     quotes: dict[tuple[int, int, int], dict] = {}
     first_skip: dict[tuple[int, int, int], str] = {}
+    stake_ids: dict[tuple[int, str], tuple[int, int, str]] = {}
+    push_pairs = PushPairs()
+    bet_stop: dict[int, bool] = {}
     observed = Counter()
     last_ns = None
     for row in read_raw(path):
@@ -92,12 +130,54 @@ def replay(path: str | Path, snapshot: RatingsSnapshot, manifest: dict,
             # unknowable. A new file/run is replayed separately.
             for m in matches.values():
                 m._invalidate('capture_clock_or_connection_gap')
+            push_pairs.pending.clear()
         last_ns = t
         msg = pb.MainResponse()
         try:
             msg.ParseFromString(row['payload'])
         except Exception:
             observed['protobuf_parse_error'] += 1
+            continue
+        if msg.WhichOneof('type') == 'newsletters_stake':
+            body = msg.newsletters_stake
+            s = body.stake
+            mid = s.match_id
+            m = matches.get(mid)
+            if m is None or m.invalid_reason or m.score is None or bet_stop.get(mid):
+                continue
+            ref = parse_market(s.market_name) if s.market_name else None
+            if ref is not None and ref.scope == 'game' and ref.kind == GAME_WINNER:
+                address = (ref.set_no, ref.game_no, s.name)
+            else:
+                address = stake_ids.get((mid, s.stake_id))
+            if address is None:
+                continue
+            set_no, game_no, name = address
+            key = mid, set_no, game_no
+            score = m.score
+            if key in quotes or (set_no, game_no) != (score.set_no, score.game_no + 1):
+                continue
+            pair = push_pairs.update(
+                key, name, t, s.factor,
+                body.action != pb.NEWSLETTER_ACTIONS_DELETE and s.is_active and s.is_live,
+                (score.sets, score.points))
+            if pair is not None:
+                odds, age_s = pair
+                p, reason = m.project_next(t)
+                if p is None:
+                    first_skip.setdefault(key, reason)
+                else:
+                    fair = shin(odds)[0] if method == 'shin' else normalize_proportional(odds)
+                    quotes[key] = {
+                        'quote_ts_received_ns': t, 'odds_home': odds[0],
+                        'odds_away': odds[1], 'model_p_home_at_quote': p,
+                        'market_p_home': fair[0],
+                        'overround': sum(1 / x for x in odds) - 1,
+                        'quote_age_s': age_s,
+                        'quote_age_reason': 'older_of_two_fresh_outcome_pushes',
+                        'quote_source': 'stake_pair', 'method': method,
+                        'previous_game_points_at_quote': score.points,
+                    }
             continue
         for obj, has_board in _objects(msg):
             mid = obj.info.id
@@ -117,9 +197,21 @@ def replay(path: str | Path, snapshot: RatingsSnapshot, manifest: dict,
                     surface=spec['surface'], best_of=int(spec['best_of']),
                     params=params)
             m = matches[mid]
+            if m.score is not None and (m.score.sets, m.score.points) != (
+                    score.sets, score.points):
+                push_pairs.reset_match(mid)
+            bet_stop[mid] = obj.info.is_bet_stop
+            if bet_stop[mid]:
+                push_pairs.reset_match(mid)
             m.observe(score, t)
             if not has_board or m.invalid_reason:
                 continue
+            for stake in obj.stakes:
+                ref = parse_market(stake.market_name)
+                if (ref.scope == 'game' and ref.kind == GAME_WINNER
+                        and stake.stake_id):
+                    stake_ids[(mid, stake.stake_id)] = (ref.set_no, ref.game_no,
+                                                        stake.name)
             key = mid, score.set_no, score.game_no + 1
             if key in quotes:
                 continue
@@ -138,6 +230,7 @@ def replay(path: str | Path, snapshot: RatingsSnapshot, manifest: dict,
                 'overround': sum(1 / x for x in odds) - 1,
                 'quote_age_s': None,
                 'quote_age_reason': 'first_active_full_snapshot_does_not_date_price_change',
+                'quote_source': 'full_snapshot',
                 'method': method,
                 'previous_game_points_at_quote': score.points,
             }
