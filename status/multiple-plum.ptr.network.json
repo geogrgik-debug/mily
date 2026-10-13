@@ -1,33 +1,8 @@
 {
-  "age_s": 0.8,
-  "blind_s": 2118.5,
-  "checked_at_s": 1791883202.0371706,
+  "age_s": 0.7,
+  "blind_s": 2143.0,
+  "checked_at_s": 1791883501.2044272,
   "disconnects": [
-    {
-      "at_s": 1791645831.2,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1791654193.1,
-      "lived_s": 8360.7,
-      "why": "ConnectionClosedError: no close frame received or sent <- ConnectionResetError: [Errno 104] Connection reset by peer"
-    },
-    {
-      "at_s": 1791657751.8,
-      "lived_s": 3558.7,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791722581.5,
-      "lived_s": 64829.6,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791722583.6,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
     {
       "at_s": 1791722605.8,
       "lived_s": 21.0,
@@ -52,21 +27,46 @@
       "at_s": 1791861775.1,
       "lived_s": 113539.5,
       "why": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout"
+    },
+    {
+      "at_s": 1791883316.0,
+      "lived_s": 21540.7,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791883317.4,
+      "lived_s": 1.0,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1791883320.5,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791883324.5,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1791883330.6,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 17834790912,
+  "disk_free_bytes": 17832792064,
   "disk_free_days": 19.8,
   "files": 29,
-  "last_blind_s": 1.3,
-  "last_disconnect": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout",
-  "last_stake_age_s": 29.8,
-  "newest_bytes": 108915491,
+  "last_blind_s": 23.7,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 29.4,
+  "newest_bytes": 110870215,
   "newest_file": "data/raw/provider=betboom/date=2026-10-13/run-1791325746-833-5dd387.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 28315373 котировок",
-  "reconnects": 68,
-  "stakes_seen": 28315373,
+  "reason": "пишет, 10 подписок, 28339383 котировок",
+  "reconnects": 73,
+  "stakes_seen": 28339383,
   "subscribed": 10,
-  "total_bytes": 6272839768
+  "total_bytes": 6274794492
 }
