@@ -1,0 +1,37 @@
+# tennis/
+
+The build. `research/` stays the laboratory journal; nothing here imports it.
+Code in this package must be importable with no side effects, must keep I/O out
+of the probability core, and must be covered by tests.
+
+Two tracks run in parallel, because they block on different things.
+
+**Track A, the collector**, has one governing rule: live data cannot be
+re-fetched. A game market exists for about a minute and is archived by nobody.
+So raw bytes land on disk before anything tries to parse them, and nothing is
+ever rewritten — corrections are appended.
+
+**Track B, the engine**, is buildable today from data we already understand, and
+starts at the probability core.
+
+| Module | What | Status |
+|---|---|---|
+| `markov/` | Point → game → tiebreak → set → match, the in-game hold probability, the eight-outcome game market, and the Klaassen–Magnus inversion. See its README. | done, 299 tests |
+| `ingest/clock.py` | Paired wall/monotonic readings. The project's decisive number is a latency, so the clock is handled deliberately. | done |
+| `ingest/ids.py` | ULIDs (time-sortable event ids) and payload fingerprints. | done |
+| `ingest/names.py` | Cross-provider match identity: `initial.surname` normalisation and match keys. | done |
+| `ingest/rawlog.py` | Append-only, crash-safe raw frame log. Gzipped by default -- 4.8x measured on live capture -- with the per-line crash guarantee preserved through a Z_SYNC_FLUSH before every fsync. | done |
+| `ingest/betboom/` | The BetBoom line recorder. See its README. | done |
+| `ingest/onewin/` | The 1win recorder: finds live tennis singles over the REST gateway, subscribes to 1win's socket.io push server, writes every frame before reading it, and reconnects with the BetBoom recorder's backoff; config with no baked-in host, the partner id kept out of the log. See its README. | done |
+| `ratings/` | Elo and as-of serve priors (Elo inversion blended with Barnett–Clarke), configured from the B1c sweep, with a snapshot the live process loads in 0.12 s instead of replaying 270k matches. Elo bit-identical to `research/elo_prior.py`; B1 numbers reproduced to four decimals. See its README. | done |
+| `market/` | Market-name parsing, overround, Shin, and the single-p fit behind a game book. Measured: the bookmaker prices the *next* game 74% of the time. `lead_lag.py`: which of two books moves a price first, by how much, and whether it is always the same one -- from logs of one machine only. `streams.py` decodes both BetBoom and 1win; `join.py` pairs the two books' matches by the players' names and re-keys 1win onto BetBoom. First two-book reading, 15 minutes on the laptop: BetBoom first in 82% of paired moves, 1win behind by a median of 2.1 s. `p_gap.py`: how far the two books disagree on p, game by game -- the first look, 13 games, is too small for a number. See its README. | done |
+| `model/` | Track B step 3: one row per service game from only what was known before it (`game_rows.py`). Leak safety is by construction -- a game enters the accumulators only after its own row is out -- and a test poisons the future to guard it. The serve features shrink with the live state's n0. Track B step 5: `hold.py`, the calibrated P(server holds the next game) -- the live state, plus a residual on the game's context, plus a beta calibration; `p_hold` for the live process, its parameters in `hold_v1.json`, tested equal to the offline measurement. See its README. | steps 3 and 5 done |
+| `state/` | Track B step 4, v1: for each player a Beta on the chance of winning a point on his own serve, centred on the prior with n0 phantom points fitted on history (Slams 140, tour 100, Challenger 90); `p_hold_next` and `p_hold_now` through `markov`. See its README. | v1 done |
+| `eval/` | The history measurement: Grand Slam point by point and `tennis_pointbypoint`, priced with `RatingsSnapshot.prior`; n0 fitted on training years, the gain over the prior measured on later ones (+0.0036 Slams, +0.0043 tour, +0.0068 Challenger). `python -m tennis.eval download` then `live-state`. `calibrate` fits and scores step 5: the residual adds +0.0013 log loss over the live state on the test years, calibration slope 1.009, ECE 0.0039. See its README. | done |
+| `features/` | The game's context for the residual: the score in the set and the match, level, surface, who broke last. | done |
+| `replay/` | Replay backtest over the recorded capture, by `ts_received`. | not started |
+
+```bash
+pip install pytest numpy
+python -m pytest tennis/ -q
+```
