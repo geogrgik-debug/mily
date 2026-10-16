@@ -1,48 +1,8 @@
 {
-  "age_s": 0.1,
-  "blind_s": 2148.8,
-  "checked_at_s": 1792162801.6787553,
+  "age_s": 23.7,
+  "blind_s": 2235.0,
+  "checked_at_s": 1792163101.4989173,
   "disconnects": [
-    {
-      "at_s": 1791883316.0,
-      "lived_s": 21540.7,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791883317.4,
-      "lived_s": 1.0,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791883320.5,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1791883324.5,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1791883330.6,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1791887130.0,
-      "lived_s": 3789.3,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791890956.4,
-      "lived_s": 3826.4,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1791926798.2,
-      "lived_s": 35841.7,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
     {
       "at_s": 1792143626.4,
       "lived_s": 216828.1,
@@ -52,21 +12,61 @@
       "at_s": 1792144873.8,
       "lived_s": 1247.2,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792162998.5,
+      "lived_s": 18124.0,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792163000.6,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792163003.7,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792163007.7,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792163013.8,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792163024.0,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792163043.6,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792163077.8,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 16561242112,
+  "disk_free_bytes": 16560189440,
   "disk_free_days": 18.4,
   "files": 32,
   "last_blind_s": 1.2,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 19.4,
-  "newest_bytes": 178900463,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 103.8,
+  "newest_bytes": 179902556,
   "newest_file": "data/raw/provider=betboom/date=2026-10-16/run-1791325746-833-5dd387.jsonl.gz",
-  "ok": true,
+  "ok": false,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 42853510 котировок",
-  "reconnects": 78,
-  "stakes_seen": 42853510,
-  "subscribed": 10,
-  "total_bytes": 7296854959
+  "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
+  "reconnects": 86,
+  "stakes_seen": 42870776,
+  "subscribed": 0,
+  "total_bytes": 7297857052
 }
