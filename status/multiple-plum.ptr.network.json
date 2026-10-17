@@ -1,7 +1,7 @@
 {
-  "age_s": 2.1,
+  "age_s": 2.5,
   "blind_s": 2411.0,
-  "checked_at_s": 1792279501.8866866,
+  "checked_at_s": 1792279801.6431751,
   "disconnects": [
     {
       "at_s": 1792174976.2,
@@ -54,19 +54,19 @@
       "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 16107700224,
+  "disk_free_bytes": 16106745856,
   "disk_free_days": 17.9,
   "files": 33,
   "last_blind_s": 6.1,
   "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
-  "last_stake_age_s": 13.6,
-  "newest_bytes": 289190276,
+  "last_stake_age_s": 13.4,
+  "newest_bytes": 290105854,
   "newest_file": "data/raw/provider=betboom/date=2026-10-17/run-1791325746-833-5dd387.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 6 подписок, 48489050 котировок",
+  "reason": "пишет, 6 подписок, 48504235 котировок",
   "reconnects": 98,
-  "stakes_seen": 48489050,
+  "stakes_seen": 48504235,
   "subscribed": 6,
-  "total_bytes": 7660321628
+  "total_bytes": 7661237206
 }
