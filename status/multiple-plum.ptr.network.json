@@ -1,7 +1,7 @@
 {
-  "age_s": 2.6,
+  "age_s": 0.1,
   "blind_s": 2431.9,
-  "checked_at_s": 1792324501.7979362,
+  "checked_at_s": 1792324802.0136929,
   "disconnects": [
     {
       "at_s": 1792174978.3,
@@ -54,19 +54,19 @@
       "why": "ConnectionClosedError: no close frame received or sent <- ConnectionResetError: [Errno 104] Connection reset by peer"
     }
   ],
-  "disk_free_bytes": 16001433600,
+  "disk_free_bytes": 15999959040,
   "disk_free_days": 17.8,
   "files": 34,
   "last_blind_s": 20.8,
   "last_disconnect": "ConnectionClosedError: no close frame received or sent <- ConnectionResetError: [Errno 104] Connection reset by peer",
-  "last_stake_age_s": 12.2,
-  "newest_bytes": 172342837,
+  "last_stake_age_s": 14.1,
+  "newest_bytes": 173760703,
   "newest_file": "data/raw/provider=betboom/date=2026-10-18/run-1791325746-833-5dd387.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 9 подписок, 51244844 котировок",
+  "reason": "пишет, 10 подписок, 51267982 котировок",
   "reconnects": 99,
-  "stakes_seen": 51244844,
-  "subscribed": 9,
-  "total_bytes": 7836966535
+  "stakes_seen": 51267982,
+  "subscribed": 10,
+  "total_bytes": 7838384401
 }
