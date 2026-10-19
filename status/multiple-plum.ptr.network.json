@@ -1,23 +1,8 @@
 {
-  "age_s": 0.7,
-  "blind_s": 2447.5,
-  "checked_at_s": 1792416301.5270467,
+  "age_s": 0.0,
+  "blind_s": 2457.1,
+  "checked_at_s": 1792416601.5931902,
   "disconnects": [
-    {
-      "at_s": 1792269943.8,
-      "lived_s": 36110.9,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792269945.9,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792281962.6,
-      "lived_s": 12015.5,
-      "why": "ConnectionClosedError: no close frame received or sent <- ConnectionResetError: [Errno 104] Connection reset by peer"
-    },
     {
       "at_s": 1792333220.5,
       "lived_s": 51256.3,
@@ -52,21 +37,36 @@
       "at_s": 1792415330.8,
       "lived_s": 20.9,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792416473.3,
+      "lived_s": 1139.0,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792416475.4,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792416478.6,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 15685754880,
+  "disk_free_bytes": 15684956160,
   "disk_free_days": 17.4,
   "files": 35,
-  "last_blind_s": 4.0,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 7.3,
-  "newest_bytes": 103061207,
+  "last_blind_s": 9.6,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 8.7,
+  "newest_bytes": 103823571,
   "newest_file": "data/raw/provider=betboom/date=2026-10-19/run-1791325746-833-5dd387.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 55498444 котировок",
-  "reconnects": 106,
-  "stakes_seen": 55498444,
+  "reason": "пишет, 10 подписок, 55507693 котировок",
+  "reconnects": 109,
+  "stakes_seen": 55507693,
   "subscribed": 10,
-  "total_bytes": 8111559230
+  "total_bytes": 8112321594
 }
