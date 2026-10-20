@@ -1,23 +1,8 @@
 {
-  "age_s": 1.6,
-  "blind_s": 2468.4,
-  "checked_at_s": 1792500301.193389,
+  "age_s": 1.1,
+  "blind_s": 2477.9,
+  "checked_at_s": 1792500601.5599086,
   "disconnects": [
-    {
-      "at_s": 1792415330.8,
-      "lived_s": 20.9,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792416473.3,
-      "lived_s": 1139.0,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792416475.4,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
     {
       "at_s": 1792416478.6,
       "lived_s": null,
@@ -52,21 +37,36 @@
       "at_s": 1792485550.1,
       "lived_s": 63.8,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792500446.0,
+      "lived_s": 14894.4,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792500448.0,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792500451.2,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 15329882112,
+  "disk_free_bytes": 15328735232,
   "disk_free_days": 17.0,
   "files": 36,
-  "last_blind_s": 2.0,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 7.2,
-  "newest_bytes": 171783593,
+  "last_blind_s": 9.5,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 5.0,
+  "newest_bytes": 172855425,
   "newest_file": "data/raw/provider=betboom/date=2026-10-20/run-1791325746-833-5dd387.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 59950483 котировок",
-  "reconnects": 115,
-  "stakes_seen": 59950483,
+  "reason": "пишет, 10 подписок, 59963444 котировок",
+  "reconnects": 118,
+  "stakes_seen": 59963444,
   "subscribed": 10,
-  "total_bytes": 8419269973
+  "total_bytes": 8420341805
 }
