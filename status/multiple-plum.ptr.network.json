@@ -1,7 +1,7 @@
 {
-  "age_s": 4.5,
+  "age_s": 0.3,
   "blind_s": 82.1,
-  "checked_at_s": 1792608001.9050565,
+  "checked_at_s": 1792608301.7214146,
   "disconnects": [
     {
       "at_s": 1792582601.6,
@@ -54,19 +54,19 @@
       "why": "ConnectionClosedError: no close frame received or sent"
     }
   ],
-  "disk_free_bytes": 14908973056,
+  "disk_free_bytes": 14907645952,
   "disk_free_days": 16.6,
   "files": 38,
   "last_blind_s": 0.3,
   "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 50.1,
-  "newest_bytes": 125680467,
+  "last_stake_age_s": 49.5,
+  "newest_bytes": 126893392,
   "newest_file": "data/raw/provider=betboom/date=2026-10-21/run-1792563251-356960-b0168f.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 1430140 котировок",
+  "reason": "пишет, 10 подписок, 1446820 котировок",
   "reconnects": 14,
-  "stakes_seen": 1430140,
+  "stakes_seen": 1446820,
   "subscribed": 10,
-  "total_bytes": 8745827237
+  "total_bytes": 8747040162
 }
