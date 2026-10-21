@@ -1,72 +1,21 @@
 {
-  "age_s": 1.0,
-  "blind_s": 2482.8,
-  "checked_at_s": 1792563301.9923668,
-  "disconnects": [
-    {
-      "at_s": 1792418335.1,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792422347.0,
-      "lived_s": 4008.2,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792485486.3,
-      "lived_s": 63139.2,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792485550.1,
-      "lived_s": 63.8,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792500446.0,
-      "lived_s": 14894.4,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792500448.0,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792500451.2,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792503295.5,
-      "lived_s": 2840.5,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792503362.6,
-      "lived_s": 67.0,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792521151.7,
-      "lived_s": 17787.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    }
-  ],
-  "disk_free_bytes": 15083257856,
+  "age_s": 0.2,
+  "blind_s": 0.0,
+  "checked_at_s": 1792563601.8703613,
+  "disconnects": [],
+  "disk_free_bytes": 15082885120,
   "disk_free_days": 16.8,
   "files": 38,
-  "last_blind_s": 0.8,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 63.0,
-  "newest_bytes": 105361,
+  "last_blind_s": null,
+  "last_disconnect": null,
+  "last_stake_age_s": 57.1,
+  "newest_bytes": 441708,
   "newest_file": "data/raw/provider=betboom/date=2026-10-21/run-1792563251-356960-b0168f.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 62715046 котировок",
-  "reconnects": 121,
-  "stakes_seen": 62715046,
+  "reason": "пишет, 10 подписок, 3690 котировок",
+  "reconnects": 0,
+  "stakes_seen": 3690,
   "subscribed": 10,
-  "total_bytes": 8620252131
+  "total_bytes": 8620588478
 }
