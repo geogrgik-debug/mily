@@ -1,23 +1,8 @@
 {
-  "age_s": 0.3,
-  "blind_s": 71.9,
-  "checked_at_s": 1792599302.0053303,
+  "age_s": 0.1,
+  "blind_s": 81.8,
+  "checked_at_s": 1792599601.2006254,
   "disconnects": [
-    {
-      "at_s": 1792578122.5,
-      "lived_s": 14871.0,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
-    {
-      "at_s": 1792582580.2,
-      "lived_s": 4457.3,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792582587.4,
-      "lived_s": 7.1,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
     {
       "at_s": 1792582597.5,
       "lived_s": 9.0,
@@ -52,21 +37,36 @@
       "at_s": 1792594645.4,
       "lived_s": 5.2,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792599439.7,
+      "lived_s": 4790.8,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792599441.8,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1792599445.0,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 14946983936,
+  "disk_free_bytes": 14946131968,
   "disk_free_days": 16.6,
   "files": 38,
-  "last_blind_s": 4.3,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 49.6,
-  "newest_bytes": 98106118,
+  "last_blind_s": 9.9,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 50.3,
+  "newest_bytes": 98904065,
   "newest_file": "data/raw/provider=betboom/date=2026-10-21/run-1792563251-356960-b0168f.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 1082595 котировок",
-  "reconnects": 10,
-  "stakes_seen": 1082595,
+  "reason": "пишет, 10 подписок, 1093268 котировок",
+  "reconnects": 13,
+  "stakes_seen": 1093268,
   "subscribed": 10,
-  "total_bytes": 8718252888
+  "total_bytes": 8719050835
 }
