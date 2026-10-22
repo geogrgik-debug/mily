@@ -1,13 +1,8 @@
 {
-  "age_s": 1.1,
-  "blind_s": 82.1,
-  "checked_at_s": 1792665601.0691025,
+  "age_s": 0.5,
+  "blind_s": 83.8,
+  "checked_at_s": 1792665901.913298,
   "disconnects": [
-    {
-      "at_s": 1792582601.6,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
     {
       "at_s": 1792582982.2,
       "lived_s": 375.3,
@@ -52,21 +47,26 @@
       "at_s": 1792600053.8,
       "lived_s": 605.8,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792665743.1,
+      "lived_s": 65689.2,
+      "why": "ConnectionClosedError: no close frame received or sent"
     }
   ],
-  "disk_free_bytes": 14709334016,
+  "disk_free_bytes": 14708322304,
   "disk_free_days": 16.3,
   "files": 39,
-  "last_blind_s": 0.3,
+  "last_blind_s": 1.7,
   "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 48.4,
-  "newest_bytes": 86307255,
+  "last_stake_age_s": 47.2,
+  "newest_bytes": 87226507,
   "newest_file": "data/raw/provider=betboom/date=2026-10-22/run-1792563251-356960-b0168f.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 3476604 котировок",
-  "reconnects": 14,
-  "stakes_seen": 3476604,
+  "reason": "пишет, 10 подписок, 3487990 котировок",
+  "reconnects": 15,
+  "stakes_seen": 3487990,
   "subscribed": 10,
-  "total_bytes": 8894406318
+  "total_bytes": 8895325570
 }
