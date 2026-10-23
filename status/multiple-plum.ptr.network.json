@@ -1,48 +1,8 @@
 {
-  "age_s": 1.1,
-  "blind_s": 182.4,
-  "checked_at_s": 1792769401.584699,
+  "age_s": 3.5,
+  "blind_s": 334.9,
+  "checked_at_s": 1792769701.226335,
   "disconnects": [
-    {
-      "at_s": 1792749306.6,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792749310.7,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792749316.7,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792751331.9,
-      "lived_s": 2005.2,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792751382.0,
-      "lived_s": 50.0,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
-    {
-      "at_s": 1792762245.1,
-      "lived_s": 10861.8,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792762267.9,
-      "lived_s": 22.7,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1792762289.7,
-      "lived_s": 20.8,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
     {
       "at_s": 1792762931.5,
       "lived_s": 639.6,
@@ -52,21 +12,61 @@
       "at_s": 1792763391.2,
       "lived_s": 459.6,
       "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1792769541.7,
+      "lived_s": 6150.5,
+      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
+    },
+    {
+      "at_s": 1792769543.0,
+      "lived_s": null,
+      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
+    },
+    {
+      "at_s": 1792769548.4,
+      "lived_s": null,
+      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
+    },
+    {
+      "at_s": 1792769550.7,
+      "lived_s": null,
+      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
+    },
+    {
+      "at_s": 1792769555.0,
+      "lived_s": null,
+      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
+    },
+    {
+      "at_s": 1792769563.2,
+      "lived_s": null,
+      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
+    },
+    {
+      "at_s": 1792769579.5,
+      "lived_s": null,
+      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
+    },
+    {
+      "at_s": 1792769611.7,
+      "lived_s": null,
+      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
     }
   ],
-  "disk_free_bytes": 14318063616,
+  "disk_free_bytes": 14317580288,
   "disk_free_days": 15.9,
   "files": 40,
   "last_blind_s": 2.0,
-  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
-  "last_stake_age_s": 42.7,
-  "newest_bytes": 155288824,
+  "last_disconnect": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)",
+  "last_stake_age_s": 194.0,
+  "newest_bytes": 155679870,
   "newest_file": "data/raw/provider=betboom/date=2026-10-23/run-1792563251-356960-b0168f.jsonl.gz",
-  "ok": true,
+  "ok": false,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 7786145 котировок",
-  "reconnects": 32,
-  "stakes_seen": 7786145,
-  "subscribed": 10,
-  "total_bytes": 9197296996
+  "reason": "подключён, но НЕ ПОДПИСАН ни на один матч — пишет только счёт, котировок нет",
+  "reconnects": 40,
+  "stakes_seen": 7794207,
+  "subscribed": 0,
+  "total_bytes": 9197688042
 }
