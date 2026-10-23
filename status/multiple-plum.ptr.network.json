@@ -1,23 +1,8 @@
 {
   "age_s": 0.9,
-  "blind_s": 174.3,
-  "checked_at_s": 1792762201.3801553,
+  "blind_s": 179.3,
+  "checked_at_s": 1792762501.3726919,
   "disconnects": [
-    {
-      "at_s": 1792675025.4,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792675029.5,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1792675326.3,
-      "lived_s": 290.7,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
     {
       "at_s": 1792749301.3,
       "lived_s": 73974.9,
@@ -52,21 +37,36 @@
       "at_s": 1792751382.0,
       "lived_s": 50.0,
       "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
+    },
+    {
+      "at_s": 1792762245.1,
+      "lived_s": 10861.8,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792762267.9,
+      "lived_s": 22.7,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1792762289.7,
+      "lived_s": 20.8,
+      "why": "ConnectionClosedError: no close frame received or sent"
     }
   ],
-  "disk_free_bytes": 14337720320,
+  "disk_free_bytes": 14336761856,
   "disk_free_days": 15.9,
   "files": 40,
-  "last_blind_s": 48.4,
-  "last_disconnect": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection",
-  "last_stake_age_s": 44.0,
-  "newest_bytes": 137211152,
+  "last_blind_s": 2.7,
+  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
+  "last_stake_age_s": 45.9,
+  "newest_bytes": 138087257,
   "newest_file": "data/raw/provider=betboom/date=2026-10-23/run-1792563251-356960-b0168f.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 7542065 котировок",
-  "reconnects": 27,
-  "stakes_seen": 7542065,
+  "reason": "пишет, 10 подписок, 7554404 котировок",
+  "reconnects": 30,
+  "stakes_seen": 7554404,
   "subscribed": 10,
-  "total_bytes": 9179219324
+  "total_bytes": 9180095429
 }
