@@ -1,7 +1,7 @@
 {
-  "age_s": 3.0,
+  "age_s": 3.7,
   "blind_s": 117.3,
-  "checked_at_s": 1792870801.2480764,
+  "checked_at_s": 1792871101.976052,
   "disconnects": [
     {
       "at_s": 1792870503.0,
@@ -39,19 +39,19 @@
       "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
     }
   ],
-  "disk_free_bytes": 13889441792,
+  "disk_free_bytes": 13888675840,
   "disk_free_days": 15.4,
   "files": 42,
   "last_blind_s": 117.3,
   "last_disconnect": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)",
-  "last_stake_age_s": 52.8,
-  "newest_bytes": 191350106,
+  "last_stake_age_s": 53.9,
+  "newest_bytes": 192048393,
   "newest_file": "data/raw/provider=betboom/date=2026-10-24/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 7 подписок, 2849160 котировок",
+  "reason": "пишет, 7 подписок, 2859041 котировок",
   "reconnects": 7,
-  "stakes_seen": 2849160,
+  "stakes_seen": 2859041,
   "subscribed": 7,
-  "total_bytes": 9547278332
+  "total_bytes": 9547976619
 }
