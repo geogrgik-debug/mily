@@ -1,21 +1,21 @@
 {
-  "age_s": 1.6,
+  "age_s": 2.2,
   "blind_s": 0.0,
-  "checked_at_s": 1792824301.4576771,
+  "checked_at_s": 1792824601.130601,
   "disconnects": [],
-  "disk_free_bytes": 14109777920,
+  "disk_free_bytes": 14108835840,
   "disk_free_days": 15.7,
   "files": 42,
   "last_blind_s": null,
   "last_disconnect": null,
   "last_stake_age_s": 53.7,
-  "newest_bytes": 7887636,
+  "newest_bytes": 8772178,
   "newest_file": "data/raw/provider=betboom/date=2026-10-24/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 9 подписок, 109006 котировок",
+  "reason": "пишет, 9 подписок, 123710 котировок",
   "reconnects": 0,
-  "stakes_seen": 109006,
+  "stakes_seen": 123710,
   "subscribed": 9,
-  "total_bytes": 9363815862
+  "total_bytes": 9364700404
 }
