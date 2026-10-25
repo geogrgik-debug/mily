@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package bb.market_betstats_ws.v1;
+
+import "google/protobuf/any.proto";
+
+// Recovered from the shipped BetBoom/sporthub JS bundle by
+// tennis/ingest/betboom/extract_schema.py. Not an official schema:
+// field numbers are read off the client and must be re-checked
+// whenever the widget's APP_BUILD changes.
+
+message common_Error {
+  string message = 1;
+  .google.protobuf.Any details = 2;
+}
+
+message models_OutcomeStat {
+  int64 outcome_id = 1;
+  int32 percentage = 2;
+}
+
+message rpc_MainRequest {
+  oneof type {
+    rpc_MainRequest_SubscribeRequest subscribe_match_market = 1;
+    rpc_MainRequest_UnsubscribeRequest unsubscribe_match_market = 2;
+    rpc_MainRequest_PingRequest ping = 3;
+  }
+}
+
+message rpc_MainRequest_PingRequest {
+  string uuid = 1;
+}
+
+message rpc_MainRequest_SubscribeRequest {
+  int64 match_id = 1;
+  string uid = 2;
+}
+
+message rpc_MainRequest_UnsubscribeRequest {
+  int64 match_id = 1;
+}
+
+message rpc_MainResponse {
+  oneof type {
+    rpc_MainResponse_DefaultResponse error = 1;
+    rpc_MainResponse_SubscribeResponse subscribe_match_market = 2;
+    rpc_MainResponse_UnsubscribeResponse unsubscribe_match_market = 3;
+    rpc_MainResponse_PingResponse ping = 5;
+    rpc_MainResponse_BetstatsOutcomeChangedResponse betstats_outcome_changed = 6;
+  }
+}
+
+message rpc_MainResponse_BetstatsOutcomeChangedResponse {
+  int32 code = 1;
+  string status = 2;
+  common_Error error = 3;
+  uint64 match_id = 4;
+  uint64 market_id = 5;
+  repeated models_OutcomeStat outcome_stats = 6;
+  optional string period_id = 7;
+}
+
+message rpc_MainResponse_DefaultResponse {
+  int32 code = 1;
+  string status = 2;
+  common_Error error = 3;
+}
+
+message rpc_MainResponse_PingResponse {
+  int32 code = 1;
+  string status = 2;
+  common_Error error = 3;
+  string uuid = 4;
+}
+
+message rpc_MainResponse_SubscribeResponse {
+  int32 code = 1;
+  string status = 2;
+  common_Error error = 3;
+  string uid = 5;
+  repeated rpc_MainResponse_SubscribeResponse_MatchMarketOutcomeStat outcome_stats = 6;
+}
+
+message rpc_MainResponse_SubscribeResponse_MatchMarketOutcomeStat {
+  uint64 match_id = 1;
+  uint64 market_id = 2;
+  repeated models_OutcomeStat outcome_stats = 3;
+  optional string period_id = 4;
+}
+
+message rpc_MainResponse_UnsubscribeResponse {
+  int32 code = 1;
+  string status = 2;
+  common_Error error = 3;
+}
