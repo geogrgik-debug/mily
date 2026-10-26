@@ -1,38 +1,8 @@
 {
-  "age_s": 5.8,
-  "blind_s": 202.0,
-  "checked_at_s": 1793004901.1913536,
+  "age_s": 2.7,
+  "blind_s": 244.3,
+  "checked_at_s": 1793005201.9992433,
   "disconnects": [
-    {
-      "at_s": 1792870503.3,
-      "lived_s": null,
-      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
-    },
-    {
-      "at_s": 1792870504.5,
-      "lived_s": null,
-      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
-    },
-    {
-      "at_s": 1792870506.7,
-      "lived_s": null,
-      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
-    },
-    {
-      "at_s": 1792870511.0,
-      "lived_s": null,
-      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
-    },
-    {
-      "at_s": 1792870529.0,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
-    {
-      "at_s": 1792870545.3,
-      "lived_s": null,
-      "why": "OSError: [Errno 113] Connect call failed ('178.248.236.46', 443)"
-    },
     {
       "at_s": 1792871508.3,
       "lived_s": 930.1,
@@ -52,21 +22,51 @@
       "at_s": 1793004244.1,
       "lived_s": 358.0,
       "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793004874.2,
+      "lived_s": 630.0,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793004888.2,
+      "lived_s": 13.7,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793004891.4,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1793004895.4,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1793004901.5,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1793004911.6,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 13341298688,
+  "disk_free_bytes": 13331451904,
   "disk_free_days": 14.8,
   "files": 44,
-  "last_blind_s": 0.6,
-  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
-  "last_stake_age_s": 44.2,
-  "newest_bytes": 112760220,
+  "last_blind_s": 40.6,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 45.0,
+  "newest_bytes": 114145202,
   "newest_file": "data/raw/provider=betboom/date=2026-10-26/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 10114899 котировок",
-  "reconnects": 11,
-  "stakes_seen": 10114899,
+  "reason": "пишет, 10 подписок, 10133182 котировок",
+  "reconnects": 17,
+  "stakes_seen": 10133182,
   "subscribed": 10,
-  "total_bytes": 10003782099
+  "total_bytes": 10005167081
 }
