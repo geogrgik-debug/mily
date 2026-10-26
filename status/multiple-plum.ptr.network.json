@@ -1,23 +1,8 @@
 {
-  "age_s": 1.4,
-  "blind_s": 244.7,
-  "checked_at_s": 1793005501.7179594,
+  "age_s": 1.1,
+  "blind_s": 254.0,
+  "checked_at_s": 1793005801.5190666,
   "disconnects": [
-    {
-      "at_s": 1792876398.8,
-      "lived_s": 4890.5,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
-    {
-      "at_s": 1793003885.8,
-      "lived_s": 127486.9,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1793004244.1,
-      "lived_s": 358.0,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
     {
       "at_s": 1793004874.2,
       "lived_s": 630.0,
@@ -52,21 +37,36 @@
       "at_s": 1793005263.4,
       "lived_s": 335.7,
       "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793005511.3,
+      "lived_s": 247.8,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793005523.6,
+      "lived_s": 12.0,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793005526.7,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 13330407424,
+  "disk_free_bytes": 13329272832,
   "disk_free_days": 14.8,
   "files": 44,
-  "last_blind_s": 0.5,
-  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
-  "last_stake_age_s": 44.6,
-  "newest_bytes": 115107027,
+  "last_blind_s": 8.5,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 44.4,
+  "newest_bytes": 116157746,
   "newest_file": "data/raw/provider=betboom/date=2026-10-26/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 10145141 котировок",
-  "reconnects": 18,
-  "stakes_seen": 10145141,
+  "reason": "пишет, 10 подписок, 10157282 котировок",
+  "reconnects": 21,
+  "stakes_seen": 10157282,
   "subscribed": 10,
-  "total_bytes": 10006128906
+  "total_bytes": 10007179625
 }
