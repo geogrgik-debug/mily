@@ -1,18 +1,8 @@
 {
-  "age_s": 1.8,
-  "blind_s": 264.6,
-  "checked_at_s": 1793091002.014986,
+  "age_s": 0.3,
+  "blind_s": 265.6,
+  "checked_at_s": 1793091301.857503,
   "disconnects": [
-    {
-      "at_s": 1793005511.3,
-      "lived_s": 247.8,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1793005523.6,
-      "lived_s": 12.0,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
     {
       "at_s": 1793005526.7,
       "lived_s": null,
@@ -52,21 +42,31 @@
       "at_s": 1793087907.8,
       "lived_s": 1243.4,
       "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793091066.8,
+      "lived_s": 3159.0,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793091131.0,
+      "lived_s": 64.1,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
     }
   ],
-  "disk_free_bytes": 12929228800,
+  "disk_free_bytes": 12928516096,
   "disk_free_days": 14.4,
   "files": 45,
-  "last_blind_s": 0.9,
+  "last_blind_s": 0.8,
   "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
-  "last_stake_age_s": 49.2,
-  "newest_bytes": 114063542,
+  "last_stake_age_s": 54.4,
+  "newest_bytes": 114726338,
   "newest_file": "data/raw/provider=betboom/date=2026-10-27/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 15126060 котировок",
-  "reconnects": 28,
-  "stakes_seen": 15126060,
+  "reason": "пишет, 10 подписок, 15134198 котировок",
+  "reconnects": 30,
+  "stakes_seen": 15134198,
   "subscribed": 10,
-  "total_bytes": 10339070203
+  "total_bytes": 10339732999
 }
