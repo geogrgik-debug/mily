@@ -1,13 +1,8 @@
 {
-  "age_s": 0.3,
-  "blind_s": 338.8,
-  "checked_at_s": 1793396101.537587,
+  "age_s": 0.2,
+  "blind_s": 340.2,
+  "checked_at_s": 1793396401.3657773,
   "disconnects": [
-    {
-      "at_s": 1793139418.2,
-      "lived_s": 19414.9,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
     {
       "at_s": 1793139681.4,
       "lived_s": 263.2,
@@ -52,21 +47,26 @@
       "at_s": 1793357489.5,
       "lived_s": 890.1,
       "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
+    },
+    {
+      "at_s": 1793396367.0,
+      "lived_s": 38877.4,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
     }
   ],
-  "disk_free_bytes": 11651076096,
+  "disk_free_bytes": 11649380352,
   "disk_free_days": 12.9,
   "files": 48,
-  "last_blind_s": 40.5,
-  "last_disconnect": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection",
-  "last_stake_age_s": 31.5,
-  "newest_bytes": 252507744,
+  "last_blind_s": 1.4,
+  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
+  "last_stake_age_s": 29.9,
+  "newest_bytes": 254126991,
   "newest_file": "data/raw/provider=betboom/date=2026-10-30/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 29121176 котировок",
-  "reconnects": 42,
-  "stakes_seen": 29121176,
+  "reason": "пишет, 10 подписок, 29147613 котировок",
+  "reconnects": 43,
+  "stakes_seen": 29147613,
   "subscribed": 10,
-  "total_bytes": 11337316218
+  "total_bytes": 11338935465
 }
