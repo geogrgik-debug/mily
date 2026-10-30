@@ -1,18 +1,8 @@
 {
   "age_s": 0.1,
-  "blind_s": 271.0,
-  "checked_at_s": 1793356501.105165,
+  "blind_s": 298.3,
+  "checked_at_s": 1793356801.8835247,
   "disconnects": [
-    {
-      "at_s": 1793091131.0,
-      "lived_s": 64.1,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1793119009.8,
-      "lived_s": 27878.6,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
     {
       "at_s": 1793120003.1,
       "lived_s": 993.2,
@@ -52,21 +42,31 @@
       "at_s": 1793230177.2,
       "lived_s": 10031.1,
       "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793356587.9,
+      "lived_s": 126410.6,
+      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- ConnectionResetError: [Errno 104] Connection reset by peer"
+    },
+    {
+      "at_s": 1793356597.9,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
     }
   ],
-  "disk_free_bytes": 11832705024,
+  "disk_free_bytes": 11831558144,
   "disk_free_days": 13.1,
   "files": 48,
-  "last_blind_s": 1.1,
-  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
-  "last_stake_age_s": 33.9,
-  "newest_bytes": 105940248,
+  "last_blind_s": 27.3,
+  "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
+  "last_stake_age_s": 31.1,
+  "newest_bytes": 107009746,
   "newest_file": "data/raw/provider=betboom/date=2026-10-30/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 26948553 котировок",
-  "reconnects": 39,
-  "stakes_seen": 26948553,
+  "reason": "пишет, 10 подписок, 26961759 котировок",
+  "reconnects": 41,
+  "stakes_seen": 26961759,
   "subscribed": 10,
-  "total_bytes": 11190748722
+  "total_bytes": 11191818220
 }
