@@ -1,13 +1,8 @@
 {
-  "age_s": 0.5,
-  "blind_s": 298.3,
-  "checked_at_s": 1793357401.4822226,
+  "age_s": 0.3,
+  "blind_s": 338.8,
+  "checked_at_s": 1793357701.2670708,
   "disconnects": [
-    {
-      "at_s": 1793120003.1,
-      "lived_s": 993.2,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
     {
       "at_s": 1793139418.2,
       "lived_s": 19414.9,
@@ -52,21 +47,26 @@
       "at_s": 1793356597.9,
       "lived_s": null,
       "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1793357489.5,
+      "lived_s": 890.1,
+      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
     }
   ],
-  "disk_free_bytes": 11829227520,
+  "disk_free_bytes": 11828731904,
   "disk_free_days": 13.1,
   "files": 48,
-  "last_blind_s": 27.3,
-  "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
-  "last_stake_age_s": 32.0,
-  "newest_bytes": 109212217,
+  "last_blind_s": 40.5,
+  "last_disconnect": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection",
+  "last_stake_age_s": 33.7,
+  "newest_bytes": 109633588,
   "newest_file": "data/raw/provider=betboom/date=2026-10-30/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 26990778 котировок",
-  "reconnects": 41,
-  "stakes_seen": 26990778,
+  "reason": "пишет, 10 подписок, 26995927 котировок",
+  "reconnects": 42,
+  "stakes_seen": 26995927,
   "subscribed": 10,
-  "total_bytes": 11194020691
+  "total_bytes": 11194442062
 }
