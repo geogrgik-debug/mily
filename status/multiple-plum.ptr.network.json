@@ -1,13 +1,8 @@
 {
-  "age_s": 0.3,
-  "blind_s": 351.4,
-  "checked_at_s": 1793822101.252929,
+  "age_s": 1.1,
+  "blind_s": 351.9,
+  "checked_at_s": 1793822401.126522,
   "disconnects": [
-    {
-      "at_s": 1793356597.9,
-      "lived_s": null,
-      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
-    },
     {
       "at_s": 1793357489.5,
       "lived_s": 890.1,
@@ -52,21 +47,26 @@
       "at_s": 1793821827.5,
       "lived_s": null,
       "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
+    },
+    {
+      "at_s": 1793822161.4,
+      "lived_s": 332.8,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
     }
   ],
-  "disk_free_bytes": 9906573312,
+  "disk_free_bytes": 9905926144,
   "disk_free_days": 11.0,
   "files": 53,
-  "last_blind_s": 3.2,
-  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
-  "last_stake_age_s": 11.7,
-  "newest_bytes": 229891703,
+  "last_blind_s": 0.6,
+  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
+  "last_stake_age_s": 12.6,
+  "newest_bytes": 230492129,
   "newest_file": "data/raw/provider=betboom/date=2026-11-04/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 51239607 котировок",
-  "reconnects": 50,
-  "stakes_seen": 51239607,
+  "reason": "пишет, 10 подписок, 51243448 котировок",
+  "reconnects": 51,
+  "stakes_seen": 51243448,
   "subscribed": 10,
-  "total_bytes": 12837036137
+  "total_bytes": 12837636563
 }
