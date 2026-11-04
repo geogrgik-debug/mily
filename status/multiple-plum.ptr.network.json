@@ -1,18 +1,8 @@
 {
-  "age_s": 0.1,
-  "blind_s": 348.1,
-  "checked_at_s": 1793821801.1855154,
+  "age_s": 0.3,
+  "blind_s": 351.4,
+  "checked_at_s": 1793822101.252929,
   "disconnects": [
-    {
-      "at_s": 1793230177.2,
-      "lived_s": 10031.1,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1793356587.9,
-      "lived_s": 126410.6,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- ConnectionResetError: [Errno 104] Connection reset by peer"
-    },
     {
       "at_s": 1793356597.9,
       "lived_s": null,
@@ -52,21 +42,31 @@
       "at_s": 1793744624.1,
       "lived_s": 40496.0,
       "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
+    },
+    {
+      "at_s": 1793821825.4,
+      "lived_s": 77201.2,
+      "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1793821827.5,
+      "lived_s": null,
+      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
     }
   ],
-  "disk_free_bytes": 9907322880,
+  "disk_free_bytes": 9906573312,
   "disk_free_days": 11.0,
   "files": 53,
-  "last_blind_s": 0.8,
-  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
-  "last_stake_age_s": 17.7,
-  "newest_bytes": 229191580,
+  "last_blind_s": 3.2,
+  "last_disconnect": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line",
+  "last_stake_age_s": 11.7,
+  "newest_bytes": 229891703,
   "newest_file": "data/raw/provider=betboom/date=2026-11-04/run-1792821908-446859-b3f689.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 51233890 котировок",
-  "reconnects": 48,
-  "stakes_seen": 51233890,
+  "reason": "пишет, 10 подписок, 51239607 котировок",
+  "reconnects": 50,
+  "stakes_seen": 51239607,
   "subscribed": 10,
-  "total_bytes": 12836336014
+  "total_bytes": 12837036137
 }
