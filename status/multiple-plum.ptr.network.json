@@ -1,72 +1,21 @@
 {
-  "age_s": 1.9,
-  "blind_s": 368.1,
-  "checked_at_s": 1794550201.98847,
-  "disconnects": [
-    {
-      "at_s": 1793892525.5,
-      "lived_s": 5653.2,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1793913217.3,
-      "lived_s": 20691.7,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1793948679.6,
-      "lived_s": 35462.2,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1794005759.4,
-      "lived_s": 57079.6,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1794234496.9,
-      "lived_s": 228737.5,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1794260781.2,
-      "lived_s": 26284.0,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1794299859.6,
-      "lived_s": 39078.4,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1794485666.8,
-      "lived_s": 185807.0,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1794504528.7,
-      "lived_s": 18861.7,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    },
-    {
-      "at_s": 1794521765.3,
-      "lived_s": 17236.5,
-      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
-    }
-  ],
-  "disk_free_bytes": 8255049728,
+  "age_s": 0.1,
+  "blind_s": 0.0,
+  "checked_at_s": 1794550501.190681,
+  "disconnects": [],
+  "disk_free_bytes": 8253538304,
   "disk_free_days": 9.2,
-  "files": 62,
-  "last_blind_s": 1.0,
-  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
-  "last_stake_age_s": 58.0,
-  "newest_bytes": 32946065,
-  "newest_file": "data/raw/provider=betboom/date=2026-11-13/run-1792821908-446859-b3f689.jsonl.gz",
+  "files": 63,
+  "last_blind_s": null,
+  "last_disconnect": null,
+  "last_stake_age_s": 48.1,
+  "newest_bytes": 114508,
+  "newest_file": "data/raw/provider=betboom/date=2026-11-13/run-1794550276-1066479-b99ebc.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 3 подписок, 65656534 котировок",
-  "reconnects": 64,
-  "stakes_seen": 65656534,
-  "subscribed": 3,
-  "total_bytes": 14081897629
+  "reason": "пишет, 6 подписок, 650 котировок",
+  "reconnects": 0,
+  "stakes_seen": 650,
+  "subscribed": 6,
+  "total_bytes": 14082078899
 }
