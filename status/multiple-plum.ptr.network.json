@@ -1,7 +1,7 @@
 {
-  "age_s": 0.1,
+  "age_s": 2.7,
   "blind_s": 2.4,
-  "checked_at_s": 1794908701.8686101,
+  "checked_at_s": 1794909001.7980175,
   "disconnects": [
     {
       "at_s": 1794833833.9,
@@ -14,19 +14,19 @@
       "why": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout"
     }
   ],
-  "disk_free_bytes": 7583858688,
+  "disk_free_bytes": 7583571968,
   "disk_free_days": 8.4,
   "files": 67,
   "last_blind_s": 0.1,
   "last_disconnect": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout",
-  "last_stake_age_s": 37.2,
-  "newest_bytes": 55823766,
+  "last_stake_age_s": 30.2,
+  "newest_bytes": 56006197,
   "newest_file": "data/raw/provider=betboom/date=2026-11-17/run-1794550276-1066479-b99ebc.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 9 подписок, 6330104 котировок",
+  "reason": "пишет, 10 подписок, 6331460 котировок",
   "reconnects": 2,
-  "stakes_seen": 6330104,
-  "subscribed": 9,
-  "total_bytes": 14614836316
+  "stakes_seen": 6331460,
+  "subscribed": 10,
+  "total_bytes": 14615018747
 }
