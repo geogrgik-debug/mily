@@ -1,13 +1,8 @@
 {
-  "age_s": 0.5,
-  "blind_s": 374.7,
-  "checked_at_s": 1795211101.3780148,
+  "age_s": 1.1,
+  "blind_s": 375.7,
+  "checked_at_s": 1795211401.2868648,
   "disconnects": [
-    {
-      "at_s": 1795083381.0,
-      "lived_s": 3879.0,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
     {
       "at_s": 1795173650.9,
       "lived_s": 90269.8,
@@ -52,21 +47,26 @@
       "at_s": 1795192995.6,
       "lived_s": null,
       "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1795211158.6,
+      "lived_s": 18102.9,
+      "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
     }
   ],
-  "disk_free_bytes": 7087628288,
+  "disk_free_bytes": 7087177728,
   "disk_free_days": 7.9,
   "files": 70,
-  "last_blind_s": 241.7,
-  "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
-  "last_stake_age_s": 17.6,
-  "newest_bytes": 117333994,
+  "last_blind_s": 1.0,
+  "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
+  "last_stake_age_s": 23.0,
+  "newest_bytes": 117715415,
   "newest_file": "data/raw/provider=betboom/date=2026-11-20/run-1794550276-1066479-b99ebc.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 9 подписок, 10942058 котировок",
-  "reconnects": 17,
-  "stakes_seen": 10942058,
-  "subscribed": 9,
-  "total_bytes": 15072385053
+  "reason": "пишет, 10 подписок, 10946455 котировок",
+  "reconnects": 18,
+  "stakes_seen": 10946455,
+  "subscribed": 10,
+  "total_bytes": 15072766474
 }
