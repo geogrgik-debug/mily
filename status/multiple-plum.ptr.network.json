@@ -1,43 +1,8 @@
 {
-  "age_s": 0.0,
-  "blind_s": 133.0,
-  "checked_at_s": 1795192802.040612,
+  "age_s": 0.2,
+  "blind_s": 374.7,
+  "checked_at_s": 1795193101.0746195,
   "disconnects": [
-    {
-      "at_s": 1794833833.9,
-      "lived_s": 283556.6,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1794844049.5,
-      "lived_s": 10215.3,
-      "why": "ConnectionClosedError: received 3008 (registered) Ping timeout; then sent 3008 (registered) Ping timeout"
-    },
-    {
-      "at_s": 1794919285.6,
-      "lived_s": 75236.0,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
-    {
-      "at_s": 1794921956.0,
-      "lived_s": 2670.2,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
-    },
-    {
-      "at_s": 1794921958.0,
-      "lived_s": null,
-      "why": "InvalidMessage: did not receive a valid HTTP response <- EOFError: connection closed while reading HTTP status line"
-    },
-    {
-      "at_s": 1795035417.9,
-      "lived_s": 113458.7,
-      "why": "ConnectionClosedError: no close frame received or sent"
-    },
-    {
-      "at_s": 1795079501.9,
-      "lived_s": 44083.7,
-      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received"
-    },
     {
       "at_s": 1795083381.0,
       "lived_s": 3879.0,
@@ -47,21 +12,61 @@
       "at_s": 1795173650.9,
       "lived_s": 90269.8,
       "why": "ConnectionClosedError: no close frame received or sent"
+    },
+    {
+      "at_s": 1795192862.5,
+      "lived_s": 19211.4,
+      "why": "ConnectionClosedError: sent 1011 (internal error) keepalive ping timeout; no close frame received <- TimeoutError: timed out while closing connection"
+    },
+    {
+      "at_s": 1795192872.5,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1795192883.5,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1795192895.5,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1795192909.6,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1795192927.6,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1795192953.6,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
+    },
+    {
+      "at_s": 1795192995.6,
+      "lived_s": null,
+      "why": "TimeoutError: timed out during opening handshake <- TimeoutError"
     }
   ],
-  "disk_free_bytes": 7135485952,
+  "disk_free_bytes": 7135301632,
   "disk_free_days": 7.9,
   "files": 70,
-  "last_blind_s": 1.3,
-  "last_disconnect": "ConnectionClosedError: no close frame received or sent",
-  "last_stake_age_s": 20.2,
-  "newest_bytes": 81350517,
+  "last_blind_s": 241.7,
+  "last_disconnect": "TimeoutError: timed out during opening handshake <- TimeoutError",
+  "last_stake_age_s": 19.0,
+  "newest_bytes": 81485333,
   "newest_file": "data/raw/provider=betboom/date=2026-11-20/run-1794550276-1066479-b99ebc.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 10 подписок, 10589275 котировок",
-  "reconnects": 9,
-  "stakes_seen": 10589275,
+  "reason": "пишет, 10 подписок, 10590787 котировок",
+  "reconnects": 17,
+  "stakes_seen": 10590787,
   "subscribed": 10,
-  "total_bytes": 15036401576
+  "total_bytes": 15036536392
 }
