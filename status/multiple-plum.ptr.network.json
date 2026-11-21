@@ -1,7 +1,7 @@
 {
-  "age_s": 0.8,
+  "age_s": 0.5,
   "blind_s": 375.7,
-  "checked_at_s": 1795236301.9485323,
+  "checked_at_s": 1795236601.9135141,
   "disconnects": [
     {
       "at_s": 1795173650.9,
@@ -54,19 +54,19 @@
       "why": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown"
     }
   ],
-  "disk_free_bytes": 7030022144,
+  "disk_free_bytes": 7029669888,
   "disk_free_days": 7.8,
   "files": 71,
   "last_blind_s": 1.0,
   "last_disconnect": "ConnectionClosedError: received 1012 (service restart) Server shutdown; then sent 1012 (service restart) Server shutdown",
-  "last_stake_age_s": 17.8,
-  "newest_bytes": 20669343,
+  "last_stake_age_s": 16.9,
+  "newest_bytes": 20974658,
   "newest_file": "data/raw/provider=betboom/date=2026-11-21/run-1794550276-1066479-b99ebc.jsonl.gz",
   "ok": true,
   "other_providers": null,
-  "reason": "пишет, 4 подписок, 11422398 котировок",
+  "reason": "пишет, 5 подписок, 11426006 котировок",
   "reconnects": 18,
-  "stakes_seen": 11422398,
-  "subscribed": 4,
-  "total_bytes": 15108254197
+  "stakes_seen": 11426006,
+  "subscribed": 5,
+  "total_bytes": 15108559512
 }
